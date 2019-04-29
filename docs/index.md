@@ -25,8 +25,7 @@ The APIs are organized as follows:
                 <a title="Pentaho JavaScript Data API" 
                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.data'}}">Data</a>
             </dt>
-            <dd>Abstractions for data exchange among components, applications and data sources.
-            </dd>
+            <dd>Abstractions for data exchange among components, applications and data sources.</dd>
         </dl>
     </li>
     <li class="api-box">
@@ -35,8 +34,9 @@ The APIs are organized as follows:
                 <a title="Pentaho JavaScript Type API" 
                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}">Type</a>
             </dt>
-            <dd><em>Types</em> offer out-of-the-box features such as class inheritance, metadata support, 
-                configuration, validation and serialization.
+            <dd>
+                <em>Types</em> offer out-of-the-box features such as class inheritance, metadata support, 
+                validation and serialization.
             </dd>
         </dl>
     </li>
@@ -50,42 +50,6 @@ The APIs are organized as follows:
                     <li>
                         <dl>
                             <dt>
-                                <a title="Pentaho JavaScript Configuration API" 
-                                href="platform/configuration">Configuration</a>
-                            </dt>
-                            <dd>Allows <em>modules</em> to be configured by third-parties.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Modules API" 
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.module'}}">Modules</a>
-                            </dt>
-                            <dd>Provides information about existing modules.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Localization API"
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}">Localization</a>
-                            </dt>
-                            <dd>Resource bundle loader AMD/RequireJS plugin.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
-                                <a title="Pentaho JavaScript Language Support API"
-                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.lang'}}">Language Support</a>
-                            </dt>
-                            <dd>API building blocks for JavaScript.</dd>
-                        </dl>
-                    </li>
-                    <li>
-                        <dl>
-                            <dt>
                                 <a title="Pentaho JavaScript Environment API" 
                                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.environment'}}">Environment</a>
                             </dt>
@@ -95,10 +59,46 @@ The APIs are organized as follows:
                     <li>
                         <dl>
                             <dt>
+                                <a title="Pentaho JavaScript Modules API" 
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.module'}}">Modules</a>
+                            </dt>
+                            <dd>Provides metadata about JavaScript <em>modules</em>.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Configuration API" 
+                                href="platform/configuration">Configuration</a>
+                            </dt>
+                            <dd>Allows JavaScript <em>modules</em> to be configured by third-parties.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
                                 <a title="Pentaho JavaScript Debugging Control API"
                                    href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.debug'}}">Debugging</a>
                             </dt>
-                            <dd>Controls the debugging level of components.</dd>
+                            <dd>Controls the debugging level of JavaScript <em>modules</em>.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Localization API"
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}">Localization</a>
+                            </dt>
+                            <dd>Enables loading of i18n resource bundles.</dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a title="Pentaho JavaScript Language Support API"
+                                   href="{{site.refDocsUrlPattern | replace: '$', 'pentaho.lang'}}">Language Support</a>
+                            </dt>
+                            <dd>API building blocks for JavaScript.</dd>
                         </dl>
                     </li>
                 </ul>

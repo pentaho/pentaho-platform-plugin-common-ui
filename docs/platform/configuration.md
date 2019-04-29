@@ -1,12 +1,12 @@
 ---
 title: Configuration API
-description: The Configuration API provides a means for modules to be configured by third-parties.
+description: The Configuration API provides a means for JavaScript modules to be configured by third-parties.
 layout: default
 ---
 
 The 
 [Configuration API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config'}}) 
-provides a means for _modules_ to be configured by third-parties.
+provides a means for JavaScript _modules_ to be configured by third-parties.
 
 **Configurations** are JavaScript objects that conform to the 
 [`pentaho.config.spec.IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}) interface
@@ -14,7 +14,7 @@ provides a means for _modules_ to be configured by third-parties.
 [`pentaho.config.spec.IRule`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule'}}).
 Typically, 
 configurations are provided as the value returned by an AMD/RequireJS module.
-This module needs to be advertised to the configuration system by registering it with `pentaho/modules`,
+The configuration module needs to be registered with `pentaho/modules`,
 as an instance of type 
 [`pentaho/config/spec/IRuleSet`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSet'}}).
 
@@ -24,13 +24,13 @@ as an instance of type
    specifies the targeted _module_, and the values of any 
    [Pentaho environment variables]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment'}})
    to which it applies. Alternative values for a variable can be specified using a JavaScript array. 
-   The most useful environment variable is 
+   The most useful environment variable is arguably
    [application]({{site.refDocsUrlPattern | replace: '$', 'pentaho.environment.IEnvironment#application'}}),
    as it allows creating rules that are only applied when a _module_ is being used by 
    a certain _application_, like, for example, 
    [CDF](https://community.hitachivantara.com/docs/DOC-1009859-cdf-dashboard-framework) or 
    [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html).
-   See also [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-platform-environment-variables).
+   See, below, [Known Values of Pentaho Environment Variables](#known-values-of-pentaho-platform-environment-variables).
    
 2. The [**apply**]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#apply'}}) object
    specifies the actual configuration properties and their values.
@@ -63,19 +63,24 @@ for more information on the the order by which configuration rules having the sa
 
 ## Example Configuration Module
 
-The following is an AMD/RequireJS configuration module that contains two configuration rules:
+The following is an AMD/RequireJS configuration module that contains four configuration rules:
 
-1. The first rule targets the _type_ module `my/ICar`,
-when used by the `my-vehicle-editor` _application_,
+1. The first rule targets the _type_ module `my/Car`,
+when used by the `my/vehicleEditor` _application_,
 and specifies the value of its `tireSize` and `exteriorColor` properties.
 
-2. The second rule, has a higher-than-default _priority_, targets the _type_ module `my/ICandy`,
+2. The second rule, has a higher-than-default _priority_, targets the _type_ module `my/Candy`,
 whatever the _application_ using it,
 and specifies the value of its `cocoaPercentage` and `fillingFlavour` properties.
 
-3. The third rule targets the _instance_ module `my/friend/john1`,
+3. The third rule targets the _instance_ modules `my/friends/john1` and `my/friends/marie`,
 whatever the _application_ using it,
-and specifies the value of its `empathyFactor` property.
+and specifies the value of their `empathyLevel` property.
+
+4. The fourth rule targets the _instance_ module `my/houses/main`,
+whatever the _application_ using it,
+and configures it; 
+the configuration is based on a configuration obtained as a dependency from the sibling module `baseHouseSchematics`.
 
 ```js
 define(function() {
@@ -88,7 +93,7 @@ define(function() {
       // IRule 1
       {
         select: {
-          module: "my/ICar",
+          module: "my/Car",
           application: "my/vehicleEditor"
         },
         apply: {
@@ -101,7 +106,7 @@ define(function() {
       {
         priority: 1,
         select: {
-          module: "my/ICandy"
+          module: "my/Candy"
         },
         apply: {
           cocoaPercentage: 0.9,
@@ -113,19 +118,19 @@ define(function() {
       {
         select: {
           module: [
-            "my/friend/john", 
-            "my/friend/marie"
+            "my/friends/john", 
+            "my/friends/marie"
           ]
         },
         apply: {
-          empathyFactor: 0.6
+          empathyLevel: 0.6
         }
       },
       
       // IRule 4
       {
         select: {
-          module: "my/house/main"
+          module: "my/houses/main"
         },
         deps: [
           "lodash", 
@@ -144,9 +149,9 @@ define(function() {
 
 ## Global Configuration File
 
-_Ad hoc_ configuration rules can be added to the system, by system administrators, 
+_Ad hoc_ configuration rules can be added to the system, by systems integrators or system administrators, 
 by placing these in the **global configuration file** — 
-a configuration file conveniently registered for you.
+a conveniently pre-registered configuration file.
 
 The file is located within the Apache Karaf folder at: `config/web-client/config.js`.
 Depending on the product, the Karaf folder is located at: 
@@ -170,14 +175,15 @@ included and registered in the same [Pentaho Web Package](web-package).
 
 
 ## Known Values of Pentaho Platform Environment Variables
+
 ### `application`
 
-| Description             | Value                |
-|-------------------------|----------------------|
-| CDF                     | `pentaho/cdf`        |
-| Analyzer                | `pentaho/analyzer`   |
-| Analyzer in Dashboards  | `pentaho/dashboardDesigner` |
-| PDI                     | `pentaho/det`        |
+| Description                     | Value                       |
+|---------------------------------|-----------------------------|
+| CDF                             | `pentaho/cdf`               |
+| Analyzer                        | `pentaho/analyzer`          |
+| Analyzer in Dashboard Designer  | `pentaho/dashboardDesigner` |
+| PDI                             | `pentaho/det`               |
 
 ### `theme`
 

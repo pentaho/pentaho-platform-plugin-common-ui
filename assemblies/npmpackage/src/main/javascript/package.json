@@ -1,0 +1,22 @@
+{
+  "name": "@${js-package-scope}/${js-package-name}",
+  "version": "${js-package-version}",
+  "description": "Pentaho JavaScript APIs development package",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pentaho/pentaho-platform-plugin-common-ui.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "@pentaho/millenniumfalcon"
+  },
+  "bin": {
+    "init-sandbox": "./bin/init-sandbox.js"
+  },
+  "publishConfig": {
+    "registry": "http://nexus.pentaho.org/repository/public-npm-release/"
+  },
+  "dependencies": {
+    "fs-extra": "^7.0.1"
+  }
+}

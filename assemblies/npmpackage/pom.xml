@@ -11,8 +11,8 @@
 
   <properties>
     <js-package-scope>pentaho</js-package-scope>
-    <js-package-name>viz-api</js-package-name>
-    <js-package-version>3.0.0</js-package-version>
+    <js-package-name>visual-sandbox</js-package-name>
+    <js-package-version>3.0.0-beta.4.2</js-package-version>
   </properties>
 
   <artifactId>common-ui-npmpackage</artifactId>

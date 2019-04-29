@@ -1,6 +1,6 @@
 ---
 title: Configuring a Visualization
-description: Shows how to use the Configuration API to configure a visualization.
+description: Shows how to use the Modules API to configure a visualization.
 parent-title: Visualization API
 layout: default
 ---
@@ -8,17 +8,16 @@ layout: default
 This article shows you how to create a configuration for a [Visualization API](.) visualization.
 
 It is assumed that you have some basic knowledge on how to configure JavaScript 
-_types_ and _instances_ on the Pentaho platform
-and on what constitutes a visualization.
+_modules_ on the Pentaho platform and on what constitutes a visualization.
 If not, you should first read [Configuration API](../configuration) and 
 [Creating a visualization](./#creating-a-visualization).
 
-Visualizations are constituted by one 
+Visualizations are constituted by a 
 [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}) 
-type and (at least) one 
+type and a
 [`IView`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.IView'}})
 type,
-any of which can be seamlessly configured.
+and any of these can be configured.
 
 Section [Identifiers of Stock Visualizations](#identifiers-of-stock-visualizations) contains the list
 of identifiers of stock model and view types.
@@ -26,10 +25,10 @@ Additionally,
 section [Identifiers of Stock Color Palettes](#identifiers-of-stock-color-palettes) contains the list
 of identifiers of stock color palettes.
 
-The following sections show examples of typical model and view configurations.
+The following sections show examples of typical model and view type configurations.
 A single [IRule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule'}}) object 
 is provided in each example, 
-but it should be interpreted as being part of the following generic configuration module:
+but it should be interpreted as being part of a generic configuration ruleset module, like the following:
 
 ```js
 define(function() {
@@ -50,7 +49,7 @@ The following rule configures the
 [isBrowsable]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#isBrowsable'}}) 
 type attribute to hide the stock _Pie_ visualization (and any visualizations that derive from it) 
 from the [Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) application's
-visualizations menu, effectively preventing the user from creating new visualizations of this type:
+visualizations menu, effectively preventing the user from creating _new_ visualizations of this type:
 
 ```js
 var ruleSpec = {
@@ -122,17 +121,12 @@ var ruleSpec = {
 The following rule changes the 
 [label]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#label'}})
 type attribute of the _Bar_ stock visualization, 
-affecting how it is displayed in the visualizations menu of the Analyzer and 
-[PDI](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-data-integration.html) applications:
+affecting how it is displayed in the visualizations menu of applications:
 
 ```js
 var ruleSpec = {
   select: {
-    module: "pentaho/visual/models/Bar",
-    application: [
-      "pentaho/analyzer",
-      "pentaho/det"
-    ]
+    module: "pentaho/visual/models/Bar"
   },
   apply: {
     label: "Vertical Bars"
@@ -141,12 +135,12 @@ var ruleSpec = {
 ```
 
 Note that it is a best practice to load localizable text from a resource bundle. 
-See [pentaho/i18n]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}).
+You can use the [Localization]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}) API to that end.
 
 ## Examples of typical view configurations
 
 Note that view configuration is typically tied to the technology with which views are built.
-You should consult the view documentation to find out about which extension properties it supports.
+You should consult the view documentation to find out about which configuration properties it supports.
 
 The views of stock visualizations are implemented using the 
 [CCC](https://community.hitachivantara.com/docs/DOC-1009860) charting library,
@@ -211,15 +205,15 @@ var ruleSpec = {
 ### Change the colors of the default discrete color palette
 
 The following rule changes the 
-[Palette#colors]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.Palette' | append: '#colors'}})
-property of default nominal color palette,
+[colors]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.Palette' | append: '#colors'}})
+of the default nominal color palette,
 [pentaho.visual.color.palettes.nominalPrimary]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.palettes' | append: '#.nominalPrimary'}}),
 in any application:
 
 ```js
 var ruleSpec = {
   select: {
-    module: "pentaho.visual.color.palettes.nominalPrimary"
+    module: "pentaho/visual/color/palettes/nominalPrimary"
   },
   apply: {
     colors: [
@@ -231,8 +225,8 @@ var ruleSpec = {
 
 ### Change the colors used by a certain visualization
 
-The following rule changes the default value of the "palette" property
-of the bar chart visualization, in any application, 
+The following rule changes the default value of the `palette` property
+of the stock bar chart visualization, in any application, 
 so that a specific _ad hoc_ palette is used:
 
 ```js
@@ -277,10 +271,10 @@ var ruleSpec = {
 
 ## Identifiers of Stock Visualizations
 
-The models of stock visualizations are all sub-modules of the `pentaho/visual/models` module. 
+The _models_ of stock visualizations are all sub-modules of the `pentaho/visual/models` module. 
 For example, `pentaho/visual/models/Line`, is the identifier of the stock Line visualization model.
 
-The corresponding CCC-based view of a stock visualization is a sub-module of the `pentaho/ccc/visual` module. 
+The corresponding CCC-based _view_ of a stock visualization is a sub-module of the `pentaho/ccc/visual` module. 
 For example, `pentaho/ccc/visual/Line`, is the identifier of the CCC view corresponding to 
 the stock Line visualization model.
 

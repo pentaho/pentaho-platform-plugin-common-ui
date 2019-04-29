@@ -12,8 +12,8 @@ layout: default
 
 Visualizations can be much more fun and useful if the user is able to interact with them.
 The Visualization API defines two standard types of actions: 
-[execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Execute'}}) and
-[select]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select'}}).
+[Execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Execute'}}) and
+[Select]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select'}}).
 Most container applications handle these in some useful way.
 
 ## On data actions and filters...
@@ -41,22 +41,26 @@ in this case, the bars.
 ### Declare the dependency on the `Execute` action
 
 The `Execute` action type module needs to be loaded with the view module.
-Modify the AMD module declaration of the `ViewD3.js` file to the following:
+Modify the AMD/RequireJS module declaration of the `View.js` file to the following:
 
 ```js
 define([
   "pentaho/module!_",
   "pentaho/visual/impl/View",
-  "./Model",
-  "pentaho/visual/action/Execute",
   "d3",
-  "./clickD3",
   "pentaho/visual/scene/Base",
-  "css!./css/viewD3"
-], function(module, BaseView, BarModel, ExecuteAction, d3, d3ClickController, Scene) {
+  "./clickD3"
+], function(module, BaseView, d3, Scene, d3ClickController) {
   // ...
 });
 ```
+
+The `clickD3.js` file can be obtained from
+[pentaho/pentaho-engineering-samples]({{site.platformSamplesBaseUrl | append: "javascript-apis/platform/visual-samples-bar-d3/clickD3.js"}}).
+Place it besides the `View.js` file.
+
+This file provides a _click controller_ for D3,
+which handles the correct distinction between click and double-click events.
 
 ### Handle the `dblclick` event
 
@@ -64,55 +68,35 @@ Now, you'll handle the `dblclick` event of the SVG rect elements — the bars.
 Add the following code to the `_updateAll` method:
 
 ```js
-// ViewD3.js
+// View.js
 // _updateAll:
 function() {
   // Part 1 & 2
   // ...
   
   // Part 3
-  var view = this;
-  
-  bar.on("dblclick", function(scene) {
-    // A filter that would select the data that the bar visually represents
+  var cc = d3ClickController();
+  bar.call(cc);
+    
+  cc.on("dblclick", function(event, scene) {
+    // A filter that selects the data that the bar visually represents
     var filter = scene.createFilter();
-
-    // Create the action.
-    var action = new ExecuteAction({dataFilter: filter});
-
-    // Dispatch the action through the view.
-    view.act(action);
+    
+    // Dispatch an "Execute" action through the model
+    model.execute({dataFilter: filter});
   });
 }
 ```
 
 Remarks:
-  - The scene object knows how to create a filter for the data it represents
-    (see [createFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base' | append: '#createFilter'}})). 
-  - The action is being dispatched through the view, where action listeners can handle it. 
-
-### Handling of the `Execute` action event
-
-The `Execute` action event is already being handled on the sandbox side, 
-helping you to easily check that the action is being dispatched.
-
-In the `sandbox.html` file you can find the following statements:
-
-```js
-view.on("pentaho/visual/action/Execute", {
-  "do": function(action) {
-    alert("Executed " + action.dataFilter.$contentKey);
-  }
-});
-```
-
-Remarks:
-  - Actions emit events whose _type_ is the id of the action's type.
-  - Actions emit _structured_ events, composed of multiple phases; you're handling its `do` phase.
-  - Action listener functions receive the action as argument.
-  - The filter's 
-    [$contentKey]({{site.refDocsUrlPattern | replace: '$', 'pentaho.data.filter.Abstract' | append: '#$contentKey'}})
-    property provides an easy way to get a human-readable description of a filter.
+  - The `scene` object knows how to create a filter for the data it represents
+    (see 
+    [createFilter]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.scene.Base' | append: '#createFilter'}}),
+    for more information). 
+  - The 
+    [execute]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#execute'}})
+    method creates and dispatches an execute action through the model, 
+    where action listeners can handle it. 
 
 What are you waiting for? 
 Refresh the `sandbox.html` page in the browser, and double-click a bar!
@@ -136,52 +120,28 @@ to be performed on the currently selected subset of data.
 
 You'll let the user _select_ bars by clicking on them.
 
-### Declare the dependency on the `Select` action
-
-The `Select` action type module needs to be loaded with the view module.
-Modify the type factory declaration of the `ViewD3.js` file to the following:
-
-```js
-define([
-  "pentaho/module!_",
-  "pentaho/visual/impl/View",
-  "./Model",
-  "pentaho/visual/action/Execute",
-  "pentaho/visual/action/Select",
-  "d3",
-  "./clickD3",
-  "pentaho/visual/scene/Base",
-  "css!./css/viewD3"
-], function(module, BaseView, BarModel, ExecuteAction, SelectAction, d3, d3ClickController, Scene) {
-  // ...
-});
-```
-
 ### Handle the `click` event
 
 Now, you'll handle the `click` event of the SVG rect elements, the bars.
 Add the following code to the `_updateAll` method:
 
 ```js
-// ViewD3.js
+// View.js
 // _updateAll:
 function() {
   // Part 1 & 2 & 3
   // ...
   
   // Part 4
-  bar.on("click", function(d) {
-    // A filter that would select the data that the bar visually represents
+  cc.on("click", function(event, scene) {
+    // A filter that selects the data that the bar visually represents
     var filter = scene.createFilter();
-
-    // Create the action.
-    var action = new SelectAction({
-      dataFilter: filter, 
+    
+    // Dispatch a "Select" action through the model
+    model.select({
+      dataFilter: filter,
       selectionMode: event.ctrlKey || event.metaKey ? "toggle" : "replace"
     });
-
-    // Dispatch the action through the view.
-    view.act(action);
   });
 }
 ```
@@ -193,46 +153,25 @@ Remarks:
     [toggled]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action' | append: '#.SelectionModes'}})
     if the ctrl/cmd key is pressed.
 
-### Handling of the `Select` action event
-
-The `Select` action event is also being handled on the sandbox side.
-
-In `sandbox.html` you can analyze this block of code:
-
-```js
-view.on("pentaho/visual/action/Select", {
-  "finally": function(action) {
-    document.getElementById("messages_div").innerText =
-      "Selected: " + view.model.selectionFilter.$contentKey;
-  }
-});
-```
-
-Remarks:
-  - You're handling the `finally` phase of the `Select` action, the last phase, that is called whatever happens.
-  - The `Select` action's 
-    [default action]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action.Select' | append: '#_doDefault'}})
-    automatically processes the action's `dataFilter` and `selectionMode` and applies it to the model's
-    `selectionFilter`. We are using the content's of the model's `selectionFilter` property for displaying the final result.
-
 Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see a text under the visualization showing the selected data's filter.
 
 ### Render selected bars differently
 
-It would be much nicer if bars where highlighted with a different color when selected. Let's do that.
+It would be much nicer if bars where highlighted with a different color when selected.
+Let's do that.
 
 #### Edit the CSS file
 
-Edit the `viewD3.css` file. Append the following rules to it:
+Edit the `View.css` file. Append the following rules to it:
 
 ```css
-.pentaho-visual-samples-bar-d3 .bar.selected {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .bar.selected {
   stroke-opacity: 0.4;
   fill-opacity: 0.6;
 }
 
-.pentaho-visual-samples-bar-d3 .bar.selected:hover {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .bar.selected:hover {
   stroke-opacity: 0.8;
 }
 ```
@@ -242,7 +181,7 @@ Edit the `viewD3.css` file. Append the following rules to it:
 Finally, add the following code to the `_updateAll` method:
 
 ```js
-// ViewD3.js
+// View.js
 // _updateAll:
 function() {
   // Part 1 & 2 & 3 & 4
@@ -258,14 +197,5 @@ function() {
 
 Refresh the `sandbox.html` page in the browser, and click a bar!
 You should see the selected bar exhibiting different colors.
-
-{% include callout.html content='
-<h2 id="conflicting-click-and-double-click-events">Conflicting Click and Double-click events</h2>
-<p>You might have noticed that when double-clicking, apart from the <code class="highlighter-rouge">dblclick</code> event, 
-two other <code class="highlighter-rouge">click</code> events are being triggered. 
-This is a known issue of DOM events and there are multiple workarounds.</p>
-<p>Check the code at the sample repository for a possible solution, based on
-<a href="http://bl.ocks.org/ropeladder/83915942ac42f17c087a82001418f2ee" target="_black">Distinguishing click and double-click in D3</a>.</p>
-' type="warning" %}
 
 **Continue** to [Adding a default configuration](step7-default-configuration).
