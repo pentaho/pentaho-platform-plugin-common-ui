@@ -18,7 +18,7 @@ The complete code of this sample is available at
 
 - Basic JavaScript knowledge
 - Basic D3 knowledge
-- An npm registry compatible package manager like [npm](https://www.npmjs.com) or [yarn](https://yarnpkg.com).
+- Have the [npm](https://www.npmjs.com) package manager installed.
 
 ## Steps
 

@@ -2,7 +2,7 @@
 title: What's new and changed in the Visualization API beta 4
 description: Describes the new and changed features in the beta 4 of the Visualization API.
 parent-title: Visualization API
-layout: default
+layout: 8.2_default
 ---
 
 You might want to take a look at 

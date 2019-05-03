@@ -10,33 +10,34 @@ grand-grand-parent-path: ../..
 layout: default
 ---
 
-Noticed that before you added CSS classes to some of the SVG elements? 
+Have you noticed that, before, CSS classes were added to some of the SVG elements? 
 Let's then give some love to the Bar chart by styling these elements with CSS.
 
 ## Creating the CSS file
 
-Create a folder named `css` and, in it, create a file named `ViewD3.css`. Add the following content to it:
+Create a folder named `css` and, in it, create a file named `View.css`.
+Add the following content to it:
 
 ```css
-.pentaho-visual-samples-bar-d3 .bar {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .bar {
   stroke-width: 2px;
 }
 
-.pentaho-visual-samples-bar-d3 .bar:hover {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .bar:hover {
   fill-opacity: 0.8;
 }
 
-.pentaho-visual-samples-bar-d3 .axis path,
-.pentaho-visual-samples-bar-d3 .tick line {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .axis path,
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .tick line {
   stroke: #cbdde8;
 }
 
-.pentaho-visual-samples-bar-d3 .tick text {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .tick text {
   font-family: OpenSansLight, Helvetica, Arial, Sans serif;
   fill: #26363d;
 }
 
-.pentaho-visual-samples-bar-d3 .title {
+._pentaho-visual-samples-bar-d3-pentaho-visual-samples-bar-D3-View .title {
   font-family: OpenSansLight, Helvetica, Arial, Sans serif;
   font-size: 18px;
   font-style: normal;
@@ -45,28 +46,83 @@ Create a folder named `css` and, in it, create a file named `ViewD3.css`. Add th
 ```
 
 Remarks:
-  - The CSS rules are scoped with the visualization model's
-    CSS [style class]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}), 
-    previously specified when defining the model.
+  - The CSS rules are scoped with the visualization model's automatically generated CSS class.
+    Essentially, the CSS class is composed by the hyphenated package name and AMD module identifier of the model type.
+    See 
+    [pentaho.visual.util.getCssClasses]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.util' | append: '#.getCssClasses'}}), 
+    for more information on the structure of the CSS class names.
 
-## Loading the CSS file with the view
+## Register the CSS file as a theme of the View
 
-To load the view's CSS file dynamically, whenever the view module is loaded, use the `css` AMD/RequireJS plugin.
-Modify the AMD module declaration of the `ViewD3.js` file to the following:
+In the `package.json` file, 
+declare the `pentaho/visual/samples/barD3/View` module. Its base class is not relevant.
+Then, add the  
+[ThemeAnnotation]({{site.refDocsUrlPattern | replace: '$', 'pentaho.theme.ThemeAnnotation'}})
+annotation, referencing the just created `View.css` file:
 
-```js
-define([
-  "pentaho/module!_",
-  "pentaho/visual/impl/View",
-  "./Model",
-  "d3",
-  "pentaho/visual/scene/Base",
-  "css!./css/ViewD3"
-], function(module, BaseView, BarModel, d3, Scene) {
-  // ...
-});
+```json
+{
+  "name": "@pentaho/visual-samples-bar-d3",
+  
+  "...": "...",
+  
+  "config": {
+    "pentaho/modules": {
+    
+      "...": "...",
+      
+      "pentaho/visual/samples/barD3/View": {
+        "base": null,
+        "annotations": {
+          "pentaho/theme/Theme": {
+            "main": "css!./css/View"
+          }
+        }
+      }
+    }
+  },
+  
+  "...": "..."
+}
 ```
 
-Now, refresh the `sandbox.html` page in the browser, and you should see a better styled title and hover effects on the bars!
+## Automatically loading the theme of the view
+
+When a view supports CSS theming, it is its responsibility to 
+automatically load any registered themes whenever the view module is loaded.
+
+In the `package.json` file, simply add the 
+[LoadThemeAnnotation]({{site.refDocsUrlPattern | replace: '$', 'pentaho.theme.LoadThemeAnnotation'}})
+annotation to the view module:
+
+```json
+{
+  "name": "@pentaho/visual-samples-bar-d3",
+  
+  "...": "...",
+  
+  "config": {
+    "pentaho/modules": {
+    
+      "...": "...",
+      
+      "pentaho/visual/samples/barD3/View": {
+        "base": null,
+        "annotations": {
+          
+          "...": "...",
+          
+          "pentaho/theme/LoadTheme": {}
+        }
+      }
+    }
+  },
+  
+  "...": "..."
+}
+```
+
+Now, refresh the `sandbox.html` page in the browser, and you should see a better styled title and 
+hover effects on the bars!
 
 **Continue** to [Model styling for applications](step5-model-styling).

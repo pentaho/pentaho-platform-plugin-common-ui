@@ -126,6 +126,9 @@ define([
      * Classes are added to the DOM element so that any themes
      * associated with either the model or the view classes are applied to it.
      *
+     * For both the model and the view,
+     * the class names are applied by calling {@link pentaho.theme.IService#classifyDomAsModule}.
+     *
      * @param {HTMLElement} domElement - The DOM element.
      * @param {?string} [vizTypeId] - The identifier of the visualization type.
      * @param {?string} [viewTypeId] - The identifier of the view type.
@@ -144,11 +147,18 @@ define([
     },
 
     /**
+     * Gets the CSS class names that should be added to a DOM element so
+     * that any themes associated with either the model or the view classes are applied to it.
+     *
+     * For both the model and the view,
+     * the class names are obtained by calling {@link pentaho.theme.IService#getModuleCssClasses}.
      *
      * @param {?string} [vizTypeId] - The identifier of the visualization type.
      * @param {?string} [viewTypeId] - The identifier of the view type.
      *
-     * @return {string} The Css Classes
+     * @return {string} The CSS class names string.
+     *
+     * @see pentaho.theme.IService#getModuleCssClasses
      */
     getCssClasses: function(vizTypeId, viewTypeId) {
       var cssClasses = [];

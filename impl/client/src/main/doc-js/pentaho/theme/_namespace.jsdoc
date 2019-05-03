@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,42 @@
  */
 
 /**
- * The `theme` namespace contains types that help with theming of components.
+ * The `theme` namespace contains types and utilities that constitute the Theming API.
+ *
+ * The _Theming API_ coordinates the interaction between applications, visualizations and
+ * systems integrators on the definition and application of CSS styles for the DOM elements these provide.
+ *
+ * #### Content Creators
+ *
+ * When an application displays a menu entry representing a visualization,
+ * it owns the corresponding DOM elements, and defines and documents
+ * what elements and styles may be configured by other parties.
+ * Likewise, when a view renders a visualization, it owns the DOM elements it creates, and defines and documents
+ * what elements and styles can be configured by other parties.
+ * In this description, the application and the view are content creators.
+ * The elements and styles that can be configured constitute the themeable content.
+ *
+ * Generally, it is the content creator which is responsible for loading any registered themes
+ * for their themeable content.
+ * This can be done by using the [LoadThemeAnnotation]{@link pentaho.theme.LoadThemeAnnotation} module annotation
+ * or by directly calling the theming service's
+ * [loadModuleThemeAsync]{@link pentaho.theme.IService#loadModuleThemeAsync}
+ * method.
+ *
+ * #### Theme Providers
+ *
+ * A theme provides arbitrary styles for the elements of the themeable content.
+ * Whoever provides a theme does so by providing, for example, CSS files and images, i.e. theme resources.
+ * The power of themes is realized if theme providers can be different from content creators.
+ *
+ * The [ThemeAnnotation]{@link pentaho.theme.ThemeAnnotation} module annotation
+ * allows a theme provider to associate theme resources with a themeable module.
+ *
+ * #### Theme Service
+ *
+ * The theme service exposes the Theming API's core functionality.
+ * The theme service is defined by the interface {@link pentaho.theme.IService}.
+ * A singleton instance which exposes this interface is the module {@link pentaho.theme.service}.
  *
  * @name pentaho.theme
  * @namespace

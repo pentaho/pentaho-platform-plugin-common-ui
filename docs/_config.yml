@@ -2,7 +2,7 @@ title: Pentaho Platform JavaScript APIs
 description: > # this means to ignore newlines in this property's value
   JavaScript component development for the Pentaho platform.
 
-titleHtml: Pentaho Platform JavaScript APIs <sup><em>beta</em></sup>
+titleHtml: Pentaho Platform JavaScript APIs
 
 theme: jekyll-theme-cayman
 
@@ -29,7 +29,9 @@ safe: true
 # * TypeDef:   {{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#.IContainer'}}
 # * Class:     {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}
 # * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
-refDocsUrlPattern: https://help.pentaho.com/Documentation/8.2/Developer_Center/JavaScript_API/platform/$
+#refDocsUrlPattern: /jsdoc/$.html
+refDocsUrlPattern: https://help.pentaho.com/Documentation/8.3/Developer_Center/JavaScript_API/platform/$
+refDocsUrlPattern82: https://help.pentaho.com/Documentation/8.2/Developer_Center/JavaScript_API/platform/$
 refDocsUrlPattern81: https://help.pentaho.com/Documentation/8.1/Developer_Center/JavaScript_API/platform/$
 refDocsUrlPattern8: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$
 refDocsUrlPattern7: https://help.pentaho.com/Documentation/7.1/0R0/070/javascript-apis/platform/$
@@ -37,7 +39,8 @@ refDocsUrlPattern7: https://help.pentaho.com/Documentation/7.1/0R0/070/javascrip
 starNew: '<sup>&thinsp;⭐</sup>'
 
 # Base URL for Platform samples:
-platformSamplesBaseUrl: https://github.com/pentaho/pentaho-engineering-samples/tree/8.2/Samples_for_Extending_Pentaho/
+platformSamplesBaseUrl: https://github.com/pentaho/pentaho-engineering-samples/tree/8.3/Samples_for_Extending_Pentaho/
+platformSamplesBaseUrl82: https://github.com/pentaho/pentaho-engineering-samples/tree/8.2/Samples_for_Extending_Pentaho/
 platformSamplesBaseUrl81: https://github.com/pentaho/pentaho-engineering-samples/tree/8.1/Samples_for_Extending_Pentaho/
 platformSamplesBaseUrl8: https://github.com/pentaho/pentaho-engineering-samples/tree/8.0/Samples_for_Extending_Pentaho/
 platformSamplesBaseUrl7: https://github.com/pentaho/pentaho-engineering-samples/tree/7.1/Samples_for_Extending_Pentaho/
