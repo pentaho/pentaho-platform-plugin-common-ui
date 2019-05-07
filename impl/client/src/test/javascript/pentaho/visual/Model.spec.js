@@ -451,6 +451,30 @@ define([
         expect(model.update).toHaveBeenCalled();
       });
 
+      it("should not call #update when #isAutoUpdate is `true` and the properties change has no changes", function() {
+
+        var model = createValidCleanModel(true);
+
+        spyOn(model, "update").and.returnValue(Promise.resolve());
+
+        var initSpy = jasmine.createSpy().and.callFake(function() {
+          // Set to default value again.
+          this.width = null;
+        });
+
+        model.on("change", {
+          init: initSpy
+        });
+
+        model.width = 200;
+
+        expect(initSpy).toHaveBeenCalled();
+        expect(model.update).not.toHaveBeenCalled();
+
+        expect(model.isDirty).toBe(false);
+        expect(model.isDirtyNew).toBe(false);
+      });
+
       // Coverage.
       // TODO: should test that logger.debug is called.
       it("should log the rejected case of an auto-update", function() {

@@ -302,10 +302,10 @@ define([
     _onChangeFinally: function(transaction) {
 
       if(transaction.isDone) {
-        if(this.isAutoUpdate) {
+        if(this.isAutoUpdate && transaction.action.hasChanges) {
           this._onAutoUpdate();
         } else {
-          // Capture change.
+          // Capture change / update version number.
           /* eslint-disable-next-line no-unused-expressions */
           this.isDirtyNew;
         }
@@ -743,6 +743,8 @@ define([
    *
    * A full changeset combined with any other changeset remains a full changeset.
    *
+   * If the composed changeset would not have changes, `null` is returned.
+   *
    * @param {?pentaho.type.action.ComplexChangeset|pentaho.visual.action.FullChangeset} changeset1 - The first
    * changeset.
    * @param {?pentaho.type.action.ComplexChangeset|pentaho.visual.action.FullChangeset} changeset2 - The second
@@ -751,6 +753,8 @@ define([
    * @return {?pentaho.type.action.ComplexChangeset|pentaho.visual.action.FullChangeset} The combined changeset.
    */
   function __combineChangesets(changeset1, changeset2) {
+    var result;
+
     if(changeset1 != null && changeset2 != null) {
       if(changeset1 === __fullChangeset) {
         return __fullChangeset;
@@ -760,9 +764,11 @@ define([
         return __fullChangeset;
       }
 
-      return changeset1.compose(changeset2);
+      result = changeset1.compose(changeset2);
+    } else {
+      result = changeset1 || changeset2;
     }
 
-    return changeset1 || changeset2;
+    return result != null && result.hasChanges ? result : null;
   }
 });
