@@ -251,7 +251,9 @@ define([
 
       var targetVersion = changeset.targetVersion;
       if(targetVersion < this.targetVersion) {
-        throw error.argInvalid("changeset.targetVersion", "Cannot compose with a changeset which has a previous target version.");
+        throw error.argInvalid(
+          "changeset.targetVersion",
+          "Cannot compose with a changeset which has a previous target version.");
       }
 
       var transaction =  changeset.transaction;
