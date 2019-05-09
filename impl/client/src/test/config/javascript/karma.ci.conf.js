@@ -25,7 +25,7 @@ module.exports = function(config) {
     preprocessors: {
       // Include only the common-ui's Pentaho source code.
       // All "bundled" external libs should be excluded.
-      "${build.outputDirectory}/web/(pentaho|angular-directives|cache|dataapi|dojo/pentaho)/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/(pentaho|cache|dataapi|dojo/pentaho)/**/*.js": ["coverage"],
       "${build.outputDirectory}/web/(plugin-handler|prompting|repo|vizapi)/**/*.js": ["coverage"],
       "${build.outputDirectory}/web/angular-translate/properties-parser.js": ["coverage"],
       "${build.outputDirectory}/web/util/*.js": ["coverage"]
