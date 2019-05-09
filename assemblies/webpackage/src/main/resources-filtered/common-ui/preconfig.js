@@ -167,9 +167,7 @@ if(!useDebug) {
     "common-ui/properties-parser",
     "common-ui/angular-translate",
     "common-ui/angular-translate-loader-partial",
-    "common-ui/angular-translate-loader-static",
-    "common-ui/angular-ui-bootstrap",
-    "common-ui/angular-directives"
+    "common-ui/angular-translate-loader-static"
   ].forEach(function(mid) {
     var versionMid = getVersionedModuleId(mid);
     var path = requirePaths[versionMid];

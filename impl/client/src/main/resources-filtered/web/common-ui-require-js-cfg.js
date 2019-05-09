@@ -285,12 +285,6 @@
   requirePaths["common-ui/angular-translate-loader-static"] = basePath +
       "/angular-translate/angular-translate-loader-static-files";
   requireShim["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
-
-  requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
-  requireShim["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
-
-  requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
-  requireShim["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
   // endregion
 
   // region Type API and Visualization Models Packages and Themes
