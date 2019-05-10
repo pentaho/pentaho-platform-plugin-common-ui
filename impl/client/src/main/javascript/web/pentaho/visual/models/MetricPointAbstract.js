@@ -71,7 +71,6 @@ define([
           // Modal visual role
           name: "color", // VISUAL_ROLE
           base: "pentaho/visual/role/Property",
-          isVisualKey: false,
           modes: [
             {dataType: "number"},
             {dataType: "list"} // Catch-all.

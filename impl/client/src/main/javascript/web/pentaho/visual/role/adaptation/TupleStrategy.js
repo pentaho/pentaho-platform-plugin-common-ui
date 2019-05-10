@@ -76,6 +76,10 @@ define([
       }
 
       var value = dataUtil.getCellValue(values[level]);
+      if(value === undefined) {
+        return -1;
+      }
+
       var key = keyFuns[level](value);
 
       var child = children[key];
@@ -197,10 +201,31 @@ define([
 
       inputValues = __trimRightUndefined(inputValues);
 
-      return this._getDataRowCells(
+      var outputCells = this._getDataRowCells(
         this.__getIndex().getIndexOf(inputValues, this.__keyFuns),
         this.outputFieldIndexes,
         inputValues.length);
+
+      if(outputCells === null && this.__isWildcardValues(inputValues)) {
+        // Left-aligned index lookup resulted in no results.
+        // Try to match individual inputValues to input cells.
+        // Return missing inputValues as missing.
+        var any = false;
+        outputCells = this.inputFieldIndexes.map(function(fieldIndex, index) {
+          var outputCell = this.__findFirstCell(inputValues[index], fieldIndex);
+          if(!any && outputCell !== undefined) {
+            any = true;
+          }
+
+          return outputCell;
+        }, this);
+
+        if(!any) {
+          outputCells = null;
+        }
+      }
+
+      return outputCells;
     },
 
     /** @inheritDoc */
@@ -208,10 +233,55 @@ define([
 
       outputValues = __trimRightUndefined(outputValues);
 
-      return this._getDataRowCells(
+      var inputCells = this._getDataRowCells(
         this.__getIndex().getIndexOf(outputValues, this.__keyFuns),
         this.inputFieldIndexes,
         outputValues.length);
+
+      if(inputCells === null && this.__isWildcardValues(outputValues)) {
+        // Left-aligned index lookup resulted in no results.
+        // Try to match individual outputValues to input cells.
+        // Return missing outputValues as missing.
+        var any = false;
+        inputCells = this.inputFieldIndexes.map(function(fieldIndex, index) {
+          var inputCell = this.__findFirstCell(outputValues[index], fieldIndex);
+          if(!any && inputCell !== undefined) {
+            any = true;
+          }
+
+          return inputCell;
+        }, this);
+
+        if(!any) {
+          inputCells = null;
+        }
+      }
+
+      return inputCells;
+    },
+
+    /**
+     * Gets a value that indicates if the given values array is a wildcard (contains any undefined values).
+     *
+     * @param {Array.<*|pentaho.data.ICell>} values - The values or cells.
+     * @return {boolean} `true`, if it is a wildcard array; `false`, otherwise.
+     * @private
+     */
+    __isWildcardValues: function(values) {
+
+      var L = values.length;
+      if(L !== this.inputFieldIndexes.length) {
+        return true;
+      }
+
+      // NOTE: Cannot use Array#some, or missing indexes are not checked...
+      while(L--) {
+        if(dataUtil.getCellValue(values[L]) === undefined) {
+          return true;
+        }
+      }
+
+      return false;
     },
 
     /**
@@ -244,6 +314,34 @@ define([
       while(++rowIndex < rowCount) {
         index.add(dataTable, rowIndex, inputFieldIndexes, keyFuns);
       }
+    },
+
+    /**
+     * Gets the first data cell which matches a given value, for a given field.
+     *
+     * @param {*|pentaho.data.ICell} valueEx - The value or cell.
+     * @param {number} fieldIndex - The index of the field.
+     *
+     * @return {pentaho.data.ICell|undefined} The first data cell, if one is found; `undefined`, otherwise.
+     *
+     * @private
+     */
+    __findFirstCell: function(valueEx, fieldIndex) {
+
+      var value = dataUtil.getCellValue(valueEx);
+      if(value !== undefined) {
+        var dataTable = this.data;
+        var rowCount = dataTable.getNumberOfRows();
+        var rowIndex = -1;
+        while(++rowIndex < rowCount) {
+          var fieldValue = dataTable.getValue(rowIndex, fieldIndex);
+          if(fieldValue === value) {
+            return dataTable.getCell(rowIndex, fieldIndex);
+          }
+        }
+      }
+
+      // return undefined;
     },
 
     $type: /** @lends pentaho.visual.role.adaptation.TupleStrategyType# */{

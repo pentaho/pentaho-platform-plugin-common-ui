@@ -97,7 +97,10 @@ define([
             : cccScene.data();
 
         cccRoles = cccRoles.filter(function(cccRole) {
-          return cccRole.isMeasureEffective && cccRole.isBoundDimensionName(cccGroup, dimName);
+          // NOTE: `dimName` is assumed to belong to the measure axis, so,
+          // it doesn't really matter if it's really seen as a measure or not for CCC.
+          // CCC's isMeasureEffective is mixed with using a discrete or continuous scale.
+          return !cccRole.isMeasureEffective || cccRole.isBoundDimensionName(cccGroup, dimName);
         });
 
         if(cccRoles.length === 0) {

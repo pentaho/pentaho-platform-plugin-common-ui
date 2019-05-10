@@ -260,12 +260,22 @@ define([
         ]);
       });
 
-      it("should return cell corresponding to given existing value (with undefined positions)", function() {
+      it("should return cell corresponding to given existing value (with undefined right positions)", function() {
 
         var outputCells = strategy.map(["A", undefined]);
 
         expect(outputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return cell corresponding to given existing value (with undefined left positions)", function() {
+
+        var outputCells = strategy.map([undefined, "PT"]);
+
+        expect(outputCells).toEqual([
+          undefined,
+          jasmine.objectContaining({value: "PT", formatted: "Portugal"})
         ]);
       });
 
@@ -368,11 +378,21 @@ define([
         ]);
       });
 
-      it("should return two cells corresponding to given existing values (with undefined position)", function() {
+      it("should return two cells corresponding to given existing values (with undefined right position)", function() {
         var inputCells = strategy.invert(["A", undefined]);
 
         expect(inputCells).toEqual([
           jasmine.objectContaining({value: "A", formatted: "AA1"})
+        ]);
+      });
+
+      it("should return two cells corresponding to given existing values (with undefined left position)", function() {
+
+        var inputCells = strategy.invert([undefined, "PT"]);
+
+        expect(inputCells).toEqual([
+          undefined,
+          jasmine.objectContaining({value: "PT", formatted: "Portugal"})
         ]);
       });
     });
