@@ -17,7 +17,7 @@
 /**
  * The `config` namespace contains the configuration types of the core layer of the **Pentaho JavaScript APIs**.
  *
- * @name pentaho._core.module
+ * @name pentaho._core.config
  * @namespace
  */
 

@@ -79,7 +79,7 @@ exports.defineTags = function ( dictionary ) {
   }
 
   /**
-   * Change an existing tag definition, to change the behaviour its default behaviour.
+   * Change an existing tag definition, to change its default behaviour.
    *
    * @param {string}  name    - Tag name.
    * @param {object}  options - Tag options.

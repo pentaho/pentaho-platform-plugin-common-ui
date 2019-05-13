@@ -15,7 +15,7 @@
  */
 
 /**
- * @name pentaho.action
+ * @name pentaho.type.action
  * @namespace
  *
  * @description The `action` namespace contains classes related with the management of internal value changes.
