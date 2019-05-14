@@ -42,13 +42,14 @@ define([
      * @extends pentaho.type.Complex
      * @abstract
      *
-     * @amd *   pentaho/visual/role/adaptation/Strategy
+     * @amd pentaho/visual/role/adaptation/Strategy
      *
      * @classDesc The `Strategy` class describes a strategy for mapping the data mapped to a visual role
      * from the external data space to the internal data space, and back.
      *
      * @description Creates a visual role adaptation strategy instance.
      * @constructor
+     *
      * @param {pentaho.visual.role.adaptation.spec.IStrategy} instSpec - An adaptation strategy specification.
      */
     constructor: function(instSpec) {
