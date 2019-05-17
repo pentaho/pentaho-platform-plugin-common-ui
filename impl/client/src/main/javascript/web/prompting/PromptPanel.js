@@ -1380,7 +1380,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         if(this.onAfterRender) {
           this.onAfterRender();
         }
-      } else if(this.diff && (this.diff.toAdd.parameters || this.diff.toChangeData.parameters || this.diff.toRemove.parameters || this.isForceRefresh)) { // Perform update when there are differences
+      } else if(this.diff) {
         this.update(this.diff);
 
         var layout = this.dashboard.getComponentByName("prompt" + this.guid);
