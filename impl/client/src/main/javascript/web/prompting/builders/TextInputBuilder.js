@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,16 @@
  * @class
  * @extends FormattedParameterWidgetBuilderBase
  */
-define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
-  function (Util, DojoNumber, TextInputComponent, FormattedParameterWidgetBuilderBase, $) {
+define(['cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
+  function (TextInputComponent, FormattedParameterWidgetBuilderBase, $) {
+    /**
+     * Check if value is a valid number.
+     * @param value
+     * @returns {boolean}
+     */
+    function isValidValue(value){
+      return value != null && ( typeof value === "string" ? (value!=="") : (!isNaN(value) && Math.abs(value) !== Infinity ));
+    }
 
     return FormattedParameterWidgetBuilderBase.extend({
       /**
@@ -64,59 +72,52 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
        * @returns {TextInputComponent} The TextInputComponent built
        */
       build: function (args) {
-        function parseNumber(val){
-          try{
-            return DojoNumber.parse(val, { locale : Util.normalizeDojoLocale(SESSION_LOCALE) });
-          } catch(e) {
-            return DojoNumber.parse(val, { locale : "en" });
-          }
-        }
-        function formatNumber(val){
-          try{
-            return DojoNumber.format(val, { locale : Util.normalizeDojoLocale(SESSION_LOCALE) });
-          } catch(e) {
-            return DojoNumber.format(val, { locale : "en" });
-          }
-        }
         var widget = this.base(args);
         var name = widget.name + "-input";
         $.extend(widget, {
           name: name,
           type: 'TextInputComponent',
-          preChange: function(){
-            var val = $("#"+this.name).attr('value');
-            this.dashboard.setParameter(this.parameter, parseNumber(val));
-          },
-          postExecution: function(){
-            this.base();
-
-            var initialValue;
-            $.each(this.param.values, function(i, v) {
-              if (v.selected) {
-                initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.value)) : v.value;
-
-                try {
-                  if (isNaN(v.value) || Math.abs(v.value) == Infinity) {
-                    var valueParsed = null;
-                  } else {
-                    if (Util.isNumberType(v.type)) {
-                      valueParsed = formatNumber(v.value);
-                    } else {
-                      valueParsed = v.value;
-                    }
-                  }
-                } catch (e) {
-                  valueParsed = v.value;
-                }
-
-                if (valueParsed != null) {
-                  initialValue = v.label = v.value = valueParsed;
-                }
+          /**
+           * Convert from the transport format value to the UI value
+           * @param {*} transportValue Serialized value according to the transport format.
+           * @returns {string} Value that appears on the UI.
+           * @protected
+           */
+          _formatValue: function(transportValue) {
+            var uiValue;
+            // Apply mask, if there is a formatter.
+            if (this.formatter) {
+              var value = this.transportFormatter.parse(transportValue);
+              uiValue = this.formatter.format(value);
+              // If value is already formatted, a NaN is thrown.
+              if (!uiValue) {
+                uiValue = transportValue;
               }
-            }.bind(this));
-
-            $("#"+this.name).attr('value', initialValue);
-          }
+            } else {
+              uiValue = transportValue;
+            }
+            return uiValue;
+          },
+          /**
+           * Convert from the UI value to the transport format value
+           * @param {string} uiValue Value that appears on the UI.
+           * @returns {*} Serialized value according to the transport format.
+           * @protected
+           */
+          _parseValue: function(uiValue) {
+            var transportValue;
+            if (this.formatter) {
+              var value = this.formatter.parse(uiValue);
+              if (isValidValue(value)) {
+                transportValue = this.transportFormatter.format(value);
+              } else {
+                transportValue = uiValue;
+              }
+            } else {
+              transportValue = uiValue;
+            }
+            return transportValue;
+          },
         });
         return new TextInputComponent(widget);
       }
