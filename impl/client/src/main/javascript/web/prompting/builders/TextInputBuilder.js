@@ -93,6 +93,8 @@ define(['cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderB
               if (!uiValue) {
                 uiValue = transportValue;
               }
+            } else {
+              uiValue = transportValue;
             }
             return uiValue;
           },
@@ -111,6 +113,8 @@ define(['cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderB
               } else {
                 transportValue = uiValue;
               }
+            } else {
+              transportValue = uiValue;
             }
             return transportValue;
           },
