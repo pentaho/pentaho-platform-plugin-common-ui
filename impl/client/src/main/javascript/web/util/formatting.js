@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -197,7 +197,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
 
           // for every other mode (fixed timezone modes), translate the time into the specified timezone
           if ((parameter.timezoneHint != undefined && $.trim(parameter.timezoneHint).length != 0)
-           && value.match(parameter.timezoneHint + '$'))
+           && value.match(parameter.timezoneHint.startsWith("+") ? "\\" + parameter.timezoneHint  + '$' : parameter.timezoneHint  + '$'))
           {
             return value;
           }
