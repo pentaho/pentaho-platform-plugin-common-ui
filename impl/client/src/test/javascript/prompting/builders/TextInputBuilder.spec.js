@@ -56,6 +56,7 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       expect(component.type).toBe('TextInputComponent');
     });
 
+    /**
     it("should set parameter on prechange", function() {
       var parameterValue = 'test';
       component.dashboard = {
@@ -153,7 +154,7 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       expect($.fn.attr).toHaveBeenCalled();
       expect($('input', ph).attr('value')).toBe(parameterLabel);
     });
-
+    */
   });
 
 });
