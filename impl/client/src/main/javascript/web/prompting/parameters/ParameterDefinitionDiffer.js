@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,6 +152,11 @@ define([], function() {
         // Force change on null value params back to originally selected value
         for (var i in nullValueParams) {
           var nullValueParam = nullValueParams[i];
+          // if the parameter is on the old definition, we ignore it as is the same
+          var oldParam = oldParamDefn.getParameter(nullValueParam.name);
+          if (oldParam && (!this._isBehavioralAttrsChanged(oldParam, nullValueParams[i]))){
+            continue;
+          }
           newParamDefn.mapParameters(function(param, group) {
             if (nullValueParam.name == param.name) {
               param.forceUpdate = true;
