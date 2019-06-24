@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,30 +210,6 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 expect(nullValueParamCallbackVal).toBe(false);
                 expect(parameterDefinitionDiffer._fillWrapObj).toHaveBeenCalledWith(jasmine.any(Object), "toChangeData",
                   nullValueParamGroupSpy, nullValueParamSpy)
-            });
-
-            it("should add null parameter if not already at paramDefOld",function(){
-                var paramDefnOld = createParamDefn("dummyOld",1);
-                var paramDefnNew = createParamDefn("dummyNew",1);
-                var paramDefNull = [paramDefnNew.getParameter("dummyNew")];
-
-                var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew,paramDefNull);
-
-                expect(Object.keys(result.toAdd).length).toBe(1);
-                expect(Object.keys(result.toChangeData).length).toBe(1);
-                expect(Object.keys(result.toRemove).length).toBe(1);
-            });
-
-            it("should not add null parameter if already at paramDefOld",function(){
-                var paramDefnOld = createParamDefn("dummy",1);
-                var paramDefnNew = createParamDefn("dummy",1);
-                var paramDefNull = [paramDefnNew.getParameter("dummy")];
-
-                var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew,paramDefNull);
-
-                expect(Object.keys(result.toAdd).length).toBe(0);
-                expect(Object.keys(result.toChangeData).length).toBe(0);
-                expect(Object.keys(result.toRemove).length).toBe(0);
             });
 
             it("should return result with added and removed parameters", function() {
