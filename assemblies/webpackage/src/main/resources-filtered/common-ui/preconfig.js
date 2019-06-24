@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,7 @@ if(!useDebug) {
     "pentaho/common",
 
     "pentaho/_core",
+    "pentaho/csrf",
     "pentaho/module",
     "pentaho/shim",
     "pentaho/util",
@@ -221,6 +222,7 @@ if(!useDebug) {
     "pentaho/theme/impl/Service",
     "pentaho/theme/service",
     "pentaho/theme/LoadThemeAnnotation",
+    "pentaho/csrf/service",
     "pentaho/type/SpecificationContext",
     "pentaho/type/SpecificationScope",
     "pentaho/type/impl/SpecificationProcessor",
