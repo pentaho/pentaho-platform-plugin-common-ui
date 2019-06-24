@@ -75,7 +75,7 @@
   // so the paths of all of the following sub-modules must be configured individually.
   // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
   [
-    "_core", "shim", "util", "lang",
+    "_core", "csrf", "shim", "util", "lang",
     "i18n", "data", "action", "type",
     "visual", "config", "environment",
     "debug", "ccc", "module", "platformBundle", "theme"
@@ -515,6 +515,7 @@
       "pentaho/theme/impl/Service",
       "pentaho/theme/service",
       "pentaho/theme/LoadThemeAnnotation",
+      "pentaho/csrf/service",
       "pentaho/type/SpecificationContext",
       "pentaho/type/SpecificationScope",
       "pentaho/type/impl/SpecificationProcessor",
