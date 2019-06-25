@@ -192,7 +192,8 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
           }
 
           if(timezone == 'client') {
-            return value;
+            this._initDateFormatters();
+            return this.dateFormatters['with-timezone'].format(new Date(value));
           }
 
           // for every other mode (fixed timezone modes), translate the time into the specified timezone
