@@ -20,14 +20,6 @@ define([ "common-ui/util/formatting" ], function( Formatting ) {
 
     describe("normalizeParameterValue", function() {
 
-      it("should return date with 'client' timezone when timezone equals 'client'", function() {
-        var parameter = {
-          attributes: {timezone: "client"}
-        };
-        var expectedTimezone = new Date().toString().match(/([-\+][0-9]+)\s/)[1]; //Current Timezone ("Client Timezone")
-        var normalizedParameterValue = Formatting.normalizeParameterValue(parameter, "java.util.Date", "2019-06-20T15:30:13.000+0100");
-        expect(normalizedParameterValue.substring(normalizedParameterValue.length - 5, normalizedParameterValue.length)).toBe(expectedTimezone);
-      });
       it("should return null if type is null", function() {
         var parameter = {
           attributes: {timezone: "client"}
