@@ -1,7 +1,7 @@
 ---
 title: What's new and changed in the Platform JavaScript APIs beta 4
 description: Describes the new and changed features in the beta 4 of the Platform JavaScript APIs.
-layout: default
+layout: 8.2_default
 ---
 
 ## Platform JavaScript APIs
@@ -11,19 +11,19 @@ layout: default
 The new _Modules API_ brings easy access to functionalities such as _configuration_ and _inversion of control_ 
 to any AMD module.
 You can check the reference documentation at  
-[pentaho.module]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module'}})
+[pentaho.module]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.module'}})
 
 The Modules API levels the ground between regular AMD modules and 
-those that export [Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) types,
+those that export [Type API]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.type'}}) types,
 by removing the magic by which configurations were automatically applied to the latter, 
 via its old custom module format.
 All AMD modules now consume configurations explicitly via the Modules API 
 (or, alternatively, explicitly via the global configuration service module, 
- [pentaho/config/service]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config' | append: '#.service'}})).
+ [pentaho/config/service]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.config' | append: '#.service'}})).
  
 1. An AMD module will now typically request its _Modules API_ module object
    by using the 
-   [pentaho/module!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.metaOf'}}) AMD loader plugin,
+   [pentaho/module!]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.module' | append: '#.metaOf'}}) AMD loader plugin,
    like in the following example:
 
     ```js
@@ -65,10 +65,10 @@ All AMD modules now consume configurations explicitly via the Modules API
    is now done through the one of the following new AMD loader plugin modules, 
    effectively replacing and extending the old `pentaho/service` module:
 
-   * [pentaho/module/instanceOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.instanceOf'}})
-   * [pentaho/module/instancesOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.instancesOf'}})
-   * [pentaho/module/subtypeOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.subtypeOf'}})
-   * [pentaho/module/subtypesOf!]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module' | append: '#.subtypesOf'}})
+   * [pentaho/module/instanceOf!]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.module' | append: '#.instanceOf'}})
+   * [pentaho/module/instancesOf!]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.module' | append: '#.instancesOf'}})
+   * [pentaho/module/subtypeOf!]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.module' | append: '#.subtypeOf'}})
+   * [pentaho/module/subtypesOf!]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.module' | append: '#.subtypesOf'}})
 
    The following example illustrates the use of `pentaho/module/instanceOf` to obtain a 
    registered instance of the `IHomeScreen` interface:
@@ -83,15 +83,15 @@ All AMD modules now consume configurations explicitly via the Modules API
 
 1. Configuration rules no longer distinguish if a `type` or an `instance` module is being configured.
   These must now use the new 
-  [module]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRuleSelector#module'}})
+  [module]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.config.spec.IRuleSelector#module'}})
   property, indistinguishably.
 
 2. Configuration rules have become more powerful as now these can specify dependency modules, 
-   through the [deps]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#deps'}}){{site.starNew}} 
+   through the [deps]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.config.spec.IRule#deps'}}){{site.starNew}} 
    property.
    Configurations can now also be built dynamically, 
    by _specifying a function_{{site.starNew}} in 
-   the [apply]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule#apply'}}) property.
+   the [apply]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.config.spec.IRule#apply'}}) property.
 
    The following example illustrates the use of the new features, 
    in a configuration rule that changes the default color palette used by the stock bar chart visualization:
@@ -169,7 +169,7 @@ The use of _Type API_ types and instances has been greatly simplified.
 
 2. It is now each type's responsibility to apply its own configuration.
    It is nonetheless advisable to use the new 
-   [configure]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Instance#.configure'}}) method. 
+   [configure]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.type.Instance#.configure'}}) method. 
  
 3. The identifiers of all standard type modules have been renamed to using _CamelCase_,
    to match the exported value kind, a type.
@@ -179,8 +179,8 @@ The use of _Type API_ types and instances has been greatly simplified.
    Type API types given a type reference, 
    or instances given their specification, 
    you can use the new 
-   [pentaho.type.loader]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type' | append: '#.loader'}}) service. 
+   [pentaho.type.loader]({{site.refDocsUrlPattern82 | replace: '$', 'pentaho.type' | append: '#.loader'}}) service. 
 
 ### Visualization API
 
-See [What's new and changed in the Visualization API beta 4]({{ "/platform/visual/whats-new-beta-4" | relative_url }}).
+See [What's new and changed in the Visualization API beta 4]({{ "/8.2/platform/visual/whats-new-beta-4" | relative_url }}).

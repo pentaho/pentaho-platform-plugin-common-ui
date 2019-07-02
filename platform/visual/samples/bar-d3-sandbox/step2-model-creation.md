@@ -12,15 +12,16 @@ layout: default
 
 ## Quick facts on Bar charts
 
-The simplest of Bar charts shows a single _series_ of data: 
-a list of pairs of a category and a measure, where each category can only occur in one of the pairs.
+The simplest of Bar charts shows a single _series_ of data — 
+a list of pairs of a _category_ and a _measure_, 
+where each category can only occur in one of the pairs.
 
-Each pair (i.e. each category) is represented by a _bar_ visual element, 
-and is assigned a stripe of the horizontal space and all of the vertical space, 
-in which the height of the bar encodes the measure value.
+Each pair (i.e. each _category_) is represented by a _bar_ visual element, 
+and is assigned a section of the horizontal space and all of the vertical space, 
+in which the height of the bar encodes the _measure_ value.
 
-Thus, the simplest Bar chart has two main data-bound visual degrees of freedom, or, 
-as they are called in the Visualization API, **visual roles**: 
+Thus, the simplest Bar chart has two main _data-bound_ visual degrees of freedom, or, 
+as the the Visualization API calls them, **visual roles**: 
 _Category_ and _Measure_.
 The values of the fields mapped to visual roles are visually encoded using visual variables/properties such as 
 position, size, orientation or color.
@@ -32,7 +33,7 @@ Create a file named `Model.js` and place the following code in it:
 ```js
 define([
   "pentaho/module!_",
-  "pentaho/visual/base/Model"
+  "pentaho/visual/Model"
 ], function(module, BaseModel) {
   
   "use strict";
@@ -42,15 +43,8 @@ define([
     $type: {
       id: module.id,
     
-      // CSS class
-      styleClass: "pentaho-visual-samples-bar-d3",
-    
       // The label may show up in menus
       label: "D3 Bar Chart",
-    
-      // The default view to use to render this visualization is
-      // a sibling module named `ViewD3.js`
-      defaultView: "./ViewD3",
     
       // Properties
       props: [
@@ -85,28 +79,25 @@ define([
       ]
     }
   })
-  .configure({$type: module.config});
+  .configure();
 });
 ```
 
 Remarks:
   - Defines a visualization (model) whose id is the file's AMD module identifier
-    (depending on how AMD is configured, it can be, for example: `pentaho-visual-samples-bar-d3/Model`).
+    (depending on how AMD is configured, it can be, for example: `pentaho/visual/samples/barD3/Model`).
   - Inherits directly from the base visualization model, 
-    [pentaho/visual/base/Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}).
-  - Specifies the [styleClass]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#styleClass'}}),
-    which will later be useful to style the component using CSS.
-  - Specifies the
-    [default view]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Type' | append: '#defaultView'}}) 
-    to use with this model (which you'll create in a moment).
-  - Three main types of property exist: general, visual roles and palettes.
-  - The 
-    [Pentaho module's configuration]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module.IMeta' | append: '#config'}}) 
-    is applied to the type.
+    [pentaho/visual/Model]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}).
+  - Three main types of property exist: general, visual roles and color palettes.
+  - The [configuration of the module]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module.IMeta' | append: '#config'}}) 
+    is automatically applied to the type, by calling the 
+    [configure]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Instance' | append: '#.configure'}}) method.
+
+## Properties description
 
 The following sections explain each of the model properties.
 
-## The `barSize` property
+### The `barSize` property
 
 ```js
 specification = {
@@ -118,16 +109,17 @@ specification = {
 ```
 
 A general property which determines the constant width of bars. 
-It is of 
+It has a 
 [valueType]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#valueType'}})
+of
 [number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}), 
-is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#isRequired'}}) and 
-has a 
+it is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#isRequired'}}) 
+and has a 
 [defaultValue]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.PropertyType' | append: '#defaultValue'}}) 
 of `30`.
 That's as simple as it gets.
 
-## The `category` property
+### The `category` property
 
 ```js
 specification = {
@@ -141,7 +133,7 @@ Represents the _Category_ visual role.
 The property is of a special type, 
 a [visual role property]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.Property'}}).
 
-The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model' | append: '#data'}}) property, 
+The [data]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model' | append: '#data'}}) property, 
 which is inherited from the base visualization model, 
 is given a dataset containing data for fields such as _Product Family_ and _Sales_.
 The value of a visual role contains the names of the fields that are _mapped_ to it,
@@ -162,7 +154,7 @@ the special
 [fields]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.role.PropertyType' | append: '#fields'}})
 attribute is configured.
 
-## The `measure` property
+### The `measure` property
 
 ```js
 specification = {
@@ -177,7 +169,7 @@ Represents the _Measure_ visual role.
 Having a single mode with the `"number"` data type, 
 the visual role accepts a single field of data type `"number"`. 
 
-## The `palette` property
+### The `palette` property
 
 ```js
 specification = {
@@ -189,55 +181,58 @@ specification = {
 ```
 
 Represents a color palette 
-(see [pentaho/visual/color/PaletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})). 
+(see 
+[pentaho/visual/color/PaletteProperty]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PaletteProperty'}})
+). 
 
-The value of the property will default to the highest ranked system color palette that 
-matches the [level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PalettePropertyType#levels'}}) required by it.
+The value of the property will default to the highest 
+[ranked]({{site.refDocsUrlPattern | replace: '$', 'pentaho.module.IMeta' | append: '#ranking'}}) 
+registered color palette that 
+matches the 
+[level]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.color.PalettePropertyType#levels'}}) 
+required by it.
 
-## Register the model module
+## Register the model
 
 Your visualization must be advertised to the platform so that applications like Analyzer and PDI can offer it to users.
 This is done by registering 
-the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) module
-with `pentaho/modules`, as a subtype of `pentaho/visual/base/Model`.
+the visualization's [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.Model'}}) module
+with `pentaho/modules`, as a subtype of `pentaho/visual/Model`.
 
-For such, edit the `package.json` file and make sure it looks like this:
+For such, edit the `package.json` file and add the `config` property, as shown:
 
 ```json
 {
-  "name": "pentaho-visual-samples-bar-d3",
+  "name": "@pentaho/visual-samples-bar-d3",
   "version": "0.0.1",
-
+  "paths": {
+    "pentaho/visual/samples/barD3": "/"
+  },
+  
   "config": {
     "pentaho/modules": {
-      "pentaho-visual-samples-bar-d3/Model": {
-        "base": "pentaho/visual/base/Model"
+      "pentaho/visual/samples/barD3/Model": {
+        "base": "pentaho/visual/Model"
       }
     }
   },
 
-  "dependencies": {
-    "d3": "^4.11.0"
-  },
-  "bundleDependencies": [
-    "d3"
-  ],
   "devDependencies": {
-    "@pentaho/viz-api": "https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta4/pentaho-viz-api-v3.0.0.tgz"
+    "@pentaho/visual-sandbox": "^3.0.0"
   }
 }
 ```
-
-Note the added `config` property.
 
 ## Additional model metadata
 
 The model could still be enriched in several ways, such as:
 
 - Providing localized labels/descriptions for the name of the visualization and that of its properties.
-- Providing standard icons for supported Pentaho themes.
+  Check out the [Localization]({{site.refDocsUrlPattern | replace: '$', 'pentaho.i18n'}}) API to this end.
+- Theming it for certain applications and Pentaho themes.
 
-However, these are all accessory and can be done at a later stage.
-Now you can't wait to see something shining on the screen, so let's move on into creating the view.
+However, these can be done at a later stage, 
+and, now, you can't wait to see something shining on the screen, 
+so let's move on to creating the view type.
 
 **Continue** to [Creating the view](step3-view-creation).

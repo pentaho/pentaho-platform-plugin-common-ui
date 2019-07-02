@@ -10,28 +10,35 @@ layout: default
 
 ## Overview
 
-[Pentaho Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) reports display visualizations that 
-are based on the [Pentaho Visualization API](.).
+[Pentaho Analyzer](https://www.hitachivantara.com/en-us/products/big-data-integration-analytics/pentaho-business-analytics.html) 
+reports display visualizations that are based on the [Pentaho Visualization API](.).
 
-As of version 7.1, the Pentaho platform ships with the _new_ version of the Visualization API, still in **beta**, 
-**side-by-side** with the _previous_ version.
- 
-Analyzer supports visualizations of both formats,
-allowing you 
-to evaluate and immediately take advantage of the new format, and 
-to convert any custom visualizations of the previous format at your own pace.
+As of version 7.1, the Pentaho platform shipped with **beta** versions of the _new_ Visualization API, 
+**side-by-side** with the _previous_ Visualization API version.
+In version 8.3, the Pentaho platform ships with the **release** version of the _new_ Visualization API,
+while still side-by-side with the _previous_ Visualization API version.
 
-All [stock visualizations](https://help.pentaho.com/Documentation/8.2/Products/Analyzer/Visualizations), 
-with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.2/Products/Analyzer/Visualizations#Geo_Map_Visualization), 
-are already available in the new format 
-and you **can choose** which format you want Analyzer to use, by configuring an Analyzer setting
+## Visualization format of stock visualizations
+
+The Analyzer application supports visualizations of both formats,
+allowing you to convert any custom visualizations of the previous format at your own pace.
+
+All [stock visualizations](https://help.pentaho.com/Documentation/8.3/Products/Analyzer/Visualizations), 
+with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.3/Products/Analyzer/Visualizations#Geo_Map_Visualization), 
+are available in the new format.
+
+Fresh Pentaho installations are configured to use the new format stock visualizations, 
+while upgrade installations are configured to keep using the previous format stock visualizations.
+
+You **can choose** which format of **stock** visualizations Analyzer uses 
+by configuring an Analyzer setting
 (see [Changing the visualization format of stock visualizations](#changing-the-visualization-format-of-stock-visualizations)).
 This setting **does not** affect reports that use a custom (non-stock) visualization — 
 these will continue to use their visualization format, whether it is the previous or new.
 
 Once you choose to use the new format of stock visualizations, 
 _viewing_ a previously saved report, with a visualization of the previous format, 
-will not change it in any way. 
+will change the way it displays but not the saved report file.
 However, if you save it, it will be irreversibly upgraded to use the new format.
 If you later decide to switch-back Analyzer to using the previous format of stock visualizations,
 the visualization part of this report will not be available and 
@@ -46,18 +53,10 @@ the report will be displayed in the Pivot table view.
     </li>
 </ol>" type="warning" %}
 
-Fresh Pentaho installations are configured to use the new format stock visualizations, 
-while upgrade installations are configured to keep using the previous format stock visualizations.
-
-
 ## Differences between the stock visualizations of the previous and new formats
 
-The new stock visualizations are **not** totally identical to 
-the corresponding previous ones.
-Most changes are intentional, enabling new features or fixing faulty behaviours, 
-while others are still work in progress, and expected to change when coming out of _beta_.
-
-The following sections describe the differences that _new_ stock visualizations have 
+The new stock visualizations are **not** totally identical to the corresponding previous ones. 
+The following sections describe the most notable differences that _new_ stock visualizations have 
 relative to the _previous_ stock visualizations.
 
 ### Usability and Style
@@ -72,12 +71,13 @@ relative to the _previous_ stock visualizations.
 
 ### Breaking changes
 
-1. Visualization configuration is performed in a different way, 
+1. The change of visualization format requires custom visualizations to be converted, by hand.
+2. Visualization configuration is performed in a different way, 
    so existing Analyzer visualization configurations need to be migrated;
    see [Migrating visualization settings](#migrating-visualization-settings).
-2. Custom translations for properties of stock visualizations may not work anymore.
+3. Custom translations for properties of stock visualizations may not work anymore.
 
-### Work In Progress
+### Known issues
 
 1. Printing of scrolled charts shrinks them to fit (while preserving their aspect-ratio).
 2. Printing only reflects custom configurations that are located in
@@ -110,7 +110,7 @@ through properties in its `analyzer.properties` file,
 located at `pentaho-server/pentaho-solutions/system/analyzer`, 
 in a Pentaho Server installation.
 
-Visualizations of the _new_ format are however configured using the 
+Visualizations of the _new_ format are, however, configured using the 
 [platform-wide JavaScript configuration system](configuration), 
 and so, the Analyzer _previous_ format visualization settings must be migrated to it.
 
@@ -131,7 +131,7 @@ the default value of the "Line width" property of "Line chart" visualizations.
       return [
         {
           select: {
-            application: "pentaho-analyzer",
+            application: "pentaho/analyzer",
             module: "pentaho/visual/models/Line"
           },
           apply: {
@@ -165,13 +165,12 @@ the possible _maximum number of results_ for "Bar chart" visualizations.
       return [
         {
           select: {
-            application: "pentaho-analyzer",
-            module: "pentaho/visual/models/BarHorizontal"
+            application: "pentaho/analyzer",
+            module: "pentaho/visual/models/BarHorizontal",
+            annotation: "pentaho/analyzer/visual/Options"
           },
           apply: {
-            application: {
-              maxValues: [250, 500, 1000, 5000]
-            }
+            maxValues: [250, 500, 1000, 5000]
           }
         }
       ];
@@ -194,7 +193,7 @@ This property allows changing the default discrete color palette.
       return [
         {
           select: {
-            application: "pentaho-analyzer",
+            application: "pentaho/analyzer",
             module: "pentaho/visual/color/palettes/nominalPrimary"
           },
           apply: {
