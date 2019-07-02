@@ -272,43 +272,120 @@ define([
 1. Rename the identifiers of applications used in the `application` selector attribute of any rules;
    use [this correspondence table](../whats-new-release#application-identifiers-changed).
 
-**Before Example**:
-```js
-define({
-  rules: [
-    {
-      select: {
-        module: "./Model",
-        application: "pentaho-analyzer"
-      },
-      apply: {
-        props: {
-          barSize: {defaultValue: 50}
+    **Before Example**:
+    ```js
+    define({
+      rules: [
+        {
+          select: {
+            module: "./Model",
+            application: "pentaho-analyzer"
+          },
+          apply: {
+            props: {
+              barSize: {defaultValue: 50}
+            }
+          }
         }
-      }
-    }
-  ]
-});
-```
+      ]
+    });
+    ```
+    
+    **After Example**:
+    ```js
+    define({
+      rules: [
+        {
+          select: {
+            module: "./Model",
+            application: "pentaho/analyzer"
+          },
+          apply: {
+            props: {
+              barSize: {defaultValue: 50}
+            }
+          }
+        }
+      ]
+    });
+    ```
+2. Convert Analyzer specific options
 
-**After Example**:
-```js
-define({
-  rules: [
-    {
-      select: {
-        module: "./Model",
-        application: "pentaho/analyzer"
-      },
-      apply: {
-        props: {
-          barSize: {defaultValue: 50}
+    **Before Example**:
+    ```js
+    define({
+      rules: [
+        {
+          select: {
+            module: "pentaho/visual/models/Bar",
+            application: "pentaho/analyzer"
+          },
+          apply: {
+            application: {
+              keepLevelOnDrilldown: false
+            }
+          }
         }
-      }
-    }
-  ]
-});
-```
+      ]
+    });
+    ```
+    
+    **After Example**:
+    ```js
+    define({
+      rules: [
+        {
+          select: {
+            module: "pentaho/visual/models/Bar",
+            annotation: "pentaho/analyzer/visual/Options",
+            application: "pentaho/analyzer"
+          },
+          apply: {
+            keepLevelOnDrilldown: false
+          }
+        }
+      ]
+    });
+    ```
+
+3. Convert DET specific options
+    
+    **Before Example**:
+    ```js
+    define({
+      rules: [
+        {
+          select: {
+            module: "pentaho/visual/models/Bar",
+            application: "pentaho/det"
+          },
+          apply: {
+            application: {
+              supportedModes: ["STREAM", "MODEL"]
+            }
+          }
+        }
+      ]
+    });
+    ```
+    
+    **After Example**:
+    ```js
+    define({
+      rules: [
+        {
+          select: {
+            module: "pentaho/visual/models/Bar",
+            annotation: "pentaho/det/visual/Options",
+            application: "pentaho/det"
+          },
+          apply: {
+            supportedModes: ["STREAM", "MODEL"]
+          }
+        }
+      ]
+    });
+    ```
 
 ### Convert the sandbox
 
