@@ -67,7 +67,7 @@ define([
       xhr.setRequestHeader("X-CSRF-SERVICE", url);
       xhr.send();
 
-      if(xhr.status === 200) {
+      if(xhr.status === 204 || xhr.status === 200) {
         return {
           header: xhr.getResponseHeader("X-CSRF-HEADER"),
           parameter: xhr.getResponseHeader("X-CSRF-PARAM"),
