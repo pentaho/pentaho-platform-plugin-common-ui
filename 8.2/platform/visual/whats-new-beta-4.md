@@ -2,7 +2,7 @@
 title: What's new and changed in the Visualization API beta 4
 description: Describes the new and changed features in the beta 4 of the Visualization API.
 parent-title: Visualization API
-layout: default
+layout: 8.2_default
 ---
 
 You might want to take a look at 
@@ -169,7 +169,7 @@ define([
 
 1. Merge the `pentaho/typeInfo` and `pentaho/instanceInfo` sections into a 
    single `pentaho/modules` section.
-2. Rename the advertised model type to upper case, as long as its base type.
+2. Rename the advertised model type to upper case, as well as its base type.
 3. Change rule set configuration modules to be of the type `pentaho/config/spec/IRuleSet`.
 
 **Before Example**:
@@ -213,10 +213,11 @@ define([
 ### Convert Configuration Rules
 
 1. Rename the `type` and `instance` properties to `module`.
-2. Move AMD module dependencies of a rule set module,
+2. Rename any model or view types to upper case.
+3. Move AMD module dependencies of a rule set module,
    that are specific to certain rules, 
    to dependencies of the rules themselves.
-3. Prefer the use of relative module ids in the `module` or `deps` properties.
+4. Prefer the use of relative module ids in the `module` or `deps` properties.
 
 **Before Example**:
 ```js

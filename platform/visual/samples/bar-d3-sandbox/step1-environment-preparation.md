@@ -17,7 +17,7 @@ layout: default
 <pre class='highlight'><code># Clone the sample repository.
 git clone https://github.com/pentaho/pentaho-engineering-samples
 cd pentaho-engineering-samples
-git checkout -b 8.2
+git checkout -b 8.3
 
 # Go to the complete sample's directory.
 cd Samples_for_Extending_Pentaho/javascript-apis/platform/visual-samples-bar-d3
@@ -35,151 +35,70 @@ npm install
   ```shell
     # Create the package.json file.
     npm init
-    # Write "pentaho-visual-samples-bar-d3" as package name.
+    # Write "@pentaho/visual-samples-bar-d3" as the package name.
     # Accept the default for the other fields or write whatever you want.
-
-    # Add and install the Visualization API dev dependency.
+    
+    # Create a file named ".npmrc" with Pentaho's NPM registry configuration.
+    echo '@pentaho:registry=https://nexus.pentaho.org/repository/group-npm' > .npmrc
+    
+    # Add and install the Visualization API development dependency.
     # (the runtime dependency is provided by the platform)
-    npm install https://github.com/pentaho/pentaho-platform-plugin-common-ui/releases/download/v3.0.0-beta4/pentaho-viz-api-v3.0.0.tgz --save-dev
+    npm install @pentaho/visual-sandbox@^3.0.0 --save-dev
 
-    # Copy the sandbox files.
-    ./node_modules/@pentaho/viz-api/init-sandbox
+    # Install the sandbox.
+    npx init-sandbox
   ```
+  
+2. Now, you should edit the just created `package.json` file and add the `paths` property to it,
+   to define the root AMD/RequireJS module identifier as `pentaho/visual/samples/barD3`:
+   
+   ```json
+   {
+     "name": "@pentaho/visual-samples-bar-d3",
+     "version": "0.0.1",
+     
+     "paths": {
+       "pentaho/visual/samples/barD3": "/"
+     },
+     
+     "devDependencies": {
+       "@pentaho/visual-sandbox": "^3.0.0"
+     }
+   }
+   ```
+   
+   See [Pentaho Web Package]({{ '/platform/web-package' | relative_url }}) 
+   for more information about the format of a `package.json` file.
+   
+   {% include callout.html type="warning" content="<h3>Attention</h3>
+   <p>This tutorial assumes the name <code>@pentaho/visual-samples-bar-d3</code> as your package name
+      and the name <code>pentaho/visual/samples/barD3</code> as the root AMD/RequireJS module identifier. 
+      If you which to use different names, 
+      you will have to take care to change all the references to the original names throughout the tutorial.
+   </p>
+   " %}
 
-    To follow this tutorial you should use `pentaho-visual-samples-bar-d3` as your package name, 
-    as it will become your AMD/RequireJS module ID.
+3. You should now also have the `sandbox.html` and `sandbox-data.json` files.
 
-    Alternatively you can choose a different name but will have to change all references 
-    to `pentaho-visual-samples-bar-d3` throughout the tutorial.
-
-2. You should now have the `sandbox.html` and `sandbox-data.json` files.
-
-    Those files provide a minimal sandbox from which sandboxes for specific samples or experiments may be derived.
-    As is, it simply displays the `pentaho/visual/samples/calc` visualization — 
-    the only visualization that comes bundled with the Visualization API.
-
-    If you prefer you can create the files yourself:
-
-    1. Create a file named `sandbox-data.json` and place the following content in it:
-      ```json
-        {
-          "model": [
-              {"name": "productFamily", "type": "string", "label": "Product Family"},
-              {"name": "sales",         "type": "number", "label": "Sales"}
-          ],
-          "rows": [
-              {"c": [{"v": "cars-classic", "f": "Classic Cars"}, 2746782]},
-              {"c": [{"v": "motorcycles", "f": "Motorcycles"}, 753753]},
-              {"c": [{"v": "planes", "f": "Planes"}, 748324]},
-              {"c": [{"v": "ships", "f": "Ships"}, 538982]},
-              {"c": [{"v": "trains", "f": "Trains"}, 165215]},
-              {"c": [{"v": "trucks-and-buses", "f": "Trucks and Buses"}, 756438]},
-              {"c": [{"v": "cars-vintage", "f": "Vintage Cars"}, 1308470]}
-          ]
-        }
-      ```
-
-    2. Create a file named `sandbox.html` and place the following content in it:
-      ```html
-        <!doctype html>
-        <html>
-
-        <head>
-          <style>
-            .pentaho-visual-base-model {
-              border: solid 1px #005da6;
-            }
-          </style>
-
-          <!-- load the VizAPI dev context -->
-          <script type="text/javascript" src="node_modules/@pentaho/viz-api/webcontext.js"></script>
-
-          <script type="text/javascript">
-            require([
-              "pentaho/visual/samples/calc/Model",
-              "pentaho/visual/base/View",
-              "pentaho/data/Table",
-              "json!./sandbox-data.json"
-            ], function(CalcModel, BaseView, Table, dataSpec) {
-        
-              // Create the visualization model.
-              var modelSpec = {
-                "data": new Table(dataSpec),
-                "levels": {fields: ["productFamily"]},
-                "measure": {fields: ["sales"]},
-                "operation": "avg"
-              };
-        
-              var model = new CalcModel(modelSpec);
-        
-              // Create the visualization view.
-              var viewSpec = {
-                width: 400,
-                height: 200,
-                domContainer: document.getElementById("viz_div"),
-                model: model
-              };
-        
-              // These are responsibilities of the visualization container application:
-              // 1. Mark the container with the model's CSS classes, for styling purposes.
-              viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
-        
-              // 2. Set the DOM container dimensions.
-              viewSpec.domContainer.style.width = viewSpec.width + "px";
-              viewSpec.domContainer.style.height = viewSpec.height + "px";
-        
-              // Create the visualization view.
-              BaseView.createAsync(viewSpec)
-                .then(function(view) {
-                  // Handle the execute action.
-                  view.on("pentaho/visual/action/Execute", {
-                    "do": function(event, action) {
-                      alert("Executed " + action.dataFilter.$contentKey);
-                    }
-                  });
-        
-                  // Handle the select action.
-                  view.on("pentaho/visual/action/Select", {
-                    "finally": function(event, action) {
-                      document.getElementById("messages_div").innerText =
-                        "Selected: " + view.model.selectionFilter.$contentKey;
-                    }
-                  });
-        
-                  // Render the visualization.
-                  return view.update();
-                }, onError);
-            }, onError);
-        
-            function onError(error) {
-              alert(error.message);
-            }
-          </script>
-        </head>
-        <body>
-          <!-- div that will contain the visualization -->
-          <div id="viz_div"></div>
-
-          <!-- div that will display messages -->
-          <div id="messages_div"></div>
-        </body>
-        </html>
-      ```
+   Those files provide a minimal sandbox from which sandboxes for specific samples or experiments may be derived.
+   As is, it simply displays the `pentaho/visual/samples/calc` visualization — 
+   the only visualization that comes bundled with the Visualization API.
+   
+   Open each file and get acquainted with it.
 
 ## Visualize it
 
 Open `sandbox.html` in a browser.
 You should see the result of the average operation: `The result is 1002566.29`.
 
-The page shows the simplest (and kind of useless) visualization: a
-calculator, which just displays the result of aggregating the values of
-one column of a data set.
+The page shows the simplest (and kind of useless) visualization: a calculator, 
+which just displays the result of aggregating the values of one column of a dataset.
 
 That's why you have to create your own!
 
-{% include callout.html content="<p>Directly opening the file through the filesystem will not work when using 
+{% include callout.html type="warning" content="<p>Directly opening the file through the filesystem will not work when using 
 Google Chrome (and possibly other browsers), because of security restrictions that disallow the loading of 
-local resources using XHR — a functionality that is required by the VizAPI to load localization bundles and 
+local resources using XHR — a functionality that is required by the Visualization API to load localization bundles and 
 other resources.</p>
 <p>To overcome this limitation you need to serve the project files through an HTTP server. 
 There are several simple-to-use solutions:</p>
@@ -196,8 +115,6 @@ static -p 8000</code></pre>
 <b>Ruby:</b><pre class='highlight'><code>ruby -run -e httpd . -p 8000</code></pre>
 
 After one of the above, you can open <a href='http://localhost:8000/sandbox.html' target='_blank'>http://localhost:8000/sandbox.html</a> in the browser.
-" type="warning" %}
-
+" %}
 
 **Continue** to [Creating the model](step2-model-creation).
-
