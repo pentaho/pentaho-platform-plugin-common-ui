@@ -30,7 +30,7 @@ safe: true
 # * Class:     {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex'}}
 # * Property:  {{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Complex' | append: '#changeset'}}
 #refDocsUrlPattern: /jsdoc/$.html
-refDocsUrlPattern: https://help.pentaho.com/Documentation/8.3/Developer_Center/JavaScript_API/platform/$
+refDocsUrlPattern: https://help.pentaho.com/Documentation/8.3/Developer_Center/Platform_JavaScript_APIs/platform/$
 refDocsUrlPattern82: https://help.pentaho.com/Documentation/8.2/Developer_Center/JavaScript_API/platform/$
 refDocsUrlPattern81: https://help.pentaho.com/Documentation/8.1/Developer_Center/JavaScript_API/platform/$
 refDocsUrlPattern8: https://help.pentaho.com/Documentation/8.0/Developer_Center/JavaScript_API/platform/$

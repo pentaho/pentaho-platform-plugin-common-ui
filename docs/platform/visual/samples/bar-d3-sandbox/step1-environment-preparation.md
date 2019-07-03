@@ -37,7 +37,10 @@ npm install
     npm init
     # Write "@pentaho/visual-samples-bar-d3" as the package name.
     # Accept the default for the other fields or write whatever you want.
-
+    
+    # Create a file named ".npmrc" with Pentaho's NPM registry configuration.
+    echo '@pentaho:registry=https://nexus.pentaho.org/repository/group-npm' > .npmrc
+    
     # Add and install the Visualization API development dependency.
     # (the runtime dependency is provided by the platform)
     npm install @pentaho/visual-sandbox@^3.0.0 --save-dev
