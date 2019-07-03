@@ -78,7 +78,7 @@ npm install
    </p>
    " %}
 
-4. You should now also have the `sandbox.html` and `sandbox-data.json` files.
+3. You should now also have the `sandbox.html` and `sandbox-data.json` files.
 
    Those files provide a minimal sandbox from which sandboxes for specific samples or experiments may be derived.
    As is, it simply displays the `pentaho/visual/samples/calc` visualization — 
