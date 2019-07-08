@@ -14,23 +14,7 @@
  * limitations under the License.
  */
 define([
-  // Core
-  "pentaho/config/service",
-  "pentaho/module/service",
-  "pentaho/module/metaService",
-  "pentaho/module/metaOf",
-  "pentaho/module/subtypeOf",
-  "pentaho/module/subtypesOf",
-  "pentaho/module/instanceOf",
-  "pentaho/module/instancesOf",
-
-  "pentaho/i18n/MessageBundle",
-  "pentaho/i18n/LoadConfigAnnotation",
-
-  "pentaho/theme/main",
-  "pentaho/theme/LoadThemeAnnotation",
-
-  "pentaho/csrf/service",
+  "./platformCore",
 
   // Type API
   "pentaho/type/loader",

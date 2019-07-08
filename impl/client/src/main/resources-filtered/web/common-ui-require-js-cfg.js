@@ -78,7 +78,7 @@
     "_core", "csrf", "shim", "util", "lang",
     "i18n", "data", "action", "type",
     "visual", "config", "environment",
-    "debug", "ccc", "module", "platformBundle", "theme"
+    "debug", "ccc", "module", "platformBundle", "platformCore", "theme"
   ].forEach(function(name) {
     requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
   });
@@ -452,9 +452,9 @@
   requireModules["pentaho/visual/color/palettes/divergentRyb3"] = {type: "pentaho/visual/color/Palette", ranking: -10};
   requireModules["pentaho/visual/color/palettes/divergentRyb5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
 
-  // Copied by hand of /target/requireCfg.bundles.js
+  // Copied by hand from /target/requireCfg.bundles.js
   if(useBundle) {
-    requireCfg.bundles["pentaho/platformBundle"] = [
+    requireCfg.bundles["pentaho/platformCore"] = [
       "pentaho/util/has",
       "pentaho/util/object",
       "pentaho/util/fun",
@@ -516,6 +516,15 @@
       "pentaho/theme/service",
       "pentaho/theme/LoadThemeAnnotation",
       "pentaho/csrf/service",
+      "pentaho/lang/UserError",
+      "pentaho/lang/RuntimeError",
+      "pentaho/lang/Event",
+      "pentaho/lang/EventSource",
+      "pentaho/lang/Collection",
+      "pentaho/util/date"
+    ];
+
+    requireCfg.bundles["pentaho/platformBundle"] = [
       "pentaho/type/SpecificationContext",
       "pentaho/type/SpecificationScope",
       "pentaho/type/impl/SpecificationProcessor",
@@ -524,8 +533,6 @@
       "pentaho/type/InstanceType",
       "pentaho/type/Instance",
       "pentaho/action/States",
-      "pentaho/lang/UserError",
-      "pentaho/lang/RuntimeError",
       "pentaho/action/Execution",
       "pentaho/type/action/_transactionControl",
       "pentaho/type/ReferenceList",
@@ -539,8 +546,6 @@
       "pentaho/type/ValidationError",
       "pentaho/type/Value",
       "pentaho/type/Element",
-      "pentaho/lang/Event",
-      "pentaho/lang/EventSource",
       "pentaho/type/mixins/Container",
       "pentaho/action/Base",
       "pentaho/type/action/Change",
@@ -555,7 +560,6 @@
       "pentaho/type/List",
       "pentaho/type/mixins/DiscreteDomain",
       "pentaho/type/Property",
-      "pentaho/lang/Collection",
       "pentaho/type/PropertyTypeCollection",
       "pentaho/type/action/Replace",
       "pentaho/type/action/ComplexChangeset",
@@ -563,7 +567,6 @@
       "pentaho/type/String",
       "pentaho/type/Number",
       "pentaho/type/Boolean",
-      "pentaho/util/date",
       "pentaho/type/Date",
       "pentaho/type/Object",
       "pentaho/type/Function",

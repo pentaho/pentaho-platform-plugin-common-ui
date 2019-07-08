@@ -96,6 +96,7 @@ if(!useDebug) {
     "pentaho/environment",
     "pentaho/debug",
     "pentaho/ccc",
+    "pentaho/platformCore",
     "pentaho/platformBundle",
 
     "local",
@@ -160,8 +161,8 @@ if(!useDebug) {
     requirePaths[versionMid] = basePath + packagePath;
   });
 
-  // Copied by hand of /target/requireCfg.bundles.js
-  requireCfg.bundles["pentaho/platformBundle"] = [
+  // Copied by hand from /target/requireCfg.bundles.js
+  requireCfg.bundles["pentaho/platformCore"] = [
     "pentaho/util/has",
     "pentaho/util/object",
     "pentaho/util/fun",
@@ -223,6 +224,15 @@ if(!useDebug) {
     "pentaho/theme/service",
     "pentaho/theme/LoadThemeAnnotation",
     "pentaho/csrf/service",
+    "pentaho/lang/UserError",
+    "pentaho/lang/RuntimeError",
+    "pentaho/lang/Event",
+    "pentaho/lang/EventSource",
+    "pentaho/lang/Collection",
+    "pentaho/util/date"
+  ];
+
+  requireCfg.bundles["pentaho/platformBundle"] = [
     "pentaho/type/SpecificationContext",
     "pentaho/type/SpecificationScope",
     "pentaho/type/impl/SpecificationProcessor",
@@ -231,8 +241,6 @@ if(!useDebug) {
     "pentaho/type/InstanceType",
     "pentaho/type/Instance",
     "pentaho/action/States",
-    "pentaho/lang/UserError",
-    "pentaho/lang/RuntimeError",
     "pentaho/action/Execution",
     "pentaho/type/action/_transactionControl",
     "pentaho/type/ReferenceList",
@@ -246,8 +254,6 @@ if(!useDebug) {
     "pentaho/type/ValidationError",
     "pentaho/type/Value",
     "pentaho/type/Element",
-    "pentaho/lang/Event",
-    "pentaho/lang/EventSource",
     "pentaho/type/mixins/Container",
     "pentaho/action/Base",
     "pentaho/type/action/Change",
@@ -262,7 +268,6 @@ if(!useDebug) {
     "pentaho/type/List",
     "pentaho/type/mixins/DiscreteDomain",
     "pentaho/type/Property",
-    "pentaho/lang/Collection",
     "pentaho/type/PropertyTypeCollection",
     "pentaho/type/action/Replace",
     "pentaho/type/action/ComplexChangeset",
@@ -270,7 +275,6 @@ if(!useDebug) {
     "pentaho/type/String",
     "pentaho/type/Number",
     "pentaho/type/Boolean",
-    "pentaho/util/date",
     "pentaho/type/Date",
     "pentaho/type/Object",
     "pentaho/type/Function",

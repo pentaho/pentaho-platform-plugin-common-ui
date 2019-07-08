@@ -30,6 +30,7 @@
     "pentaho/theme": "/pentaho/theme",
     "pentaho/debug": "/pentaho/debug",
     "pentaho/ccc": "/pentaho/ccc",
+    "pentaho/platformCore": "/pentaho/platformCore",
     "pentaho/platformBundle": "/pentaho/platformBundle",
 
     "local": "/util/local",
