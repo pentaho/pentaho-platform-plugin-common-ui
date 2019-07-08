@@ -28,33 +28,22 @@ define([
    * @type {pentaho.csrf.IService}
    * @readOnly
    */
-  return /** @lends pentaho.csrf.IService# */{
-    /**
-     * Gets a CSRF token for a call to a protected service, given its URL.
-     *
-     * @param {string} url - The url of the protected service.
-     *
-     * @return {?({header:string,parameter:string,token:string})} The CSRF token information, if one should be used;
-     * `null`, otherwise.
-     *
-     * @throws {Error} When argument url is not specified.
-     */
+  var service = {
     getToken: function(url) {
 
       if(!url) {
         throw new Error("Argument 'url' is required.");
       }
 
-      url = urlUtil.create(url).href;
-
       var serverBaseUrl = environment.server.root;
       if(serverBaseUrl === null) {
         return null;
       }
-
       serverBaseUrl = serverBaseUrl.href;
 
-      // Check if the request will be cross-site.
+      url = urlUtil.create(url).href;
+
+      // Check if the request will be for the pentaho application.
       if(url.indexOf(serverBaseUrl) !== 0) {
         // Do not send Pentaho CSRF tokens to other sites.
         return null;
@@ -62,7 +51,7 @@ define([
 
       var csrfServiceUrl = serverBaseUrl + "api/system/csrf";
 
-      var xhr = new XMLHttpRequest();
+      var xhr = service.__createXhr();
       xhr.open("GET", csrfServiceUrl, /* async: */false);
       xhr.setRequestHeader("X-CSRF-SERVICE", url);
       xhr.send();
@@ -76,6 +65,13 @@ define([
       }
 
       return null;
+    },
+
+    // Exposed for testing purposes.
+    __createXhr: function() {
+      return new XMLHttpRequest();
     }
   };
+
+  return service;
 });

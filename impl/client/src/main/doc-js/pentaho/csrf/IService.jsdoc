@@ -1,0 +1,59 @@
+/*!
+ * Copyright 2019 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `csrf.IService` interface allows obtaining CSRF tokens to send to Pentaho's CSRF protected endpoints.
+ *
+ * @example <caption>Calling a protected endpoint with XHR</caption>
+ *
+ * require("pentaho/csrf/service", function(csrfService) {
+ *
+ *   var url = "example/pentaho/protected/endpoint";
+ *
+ *   var csrfToken = csrfService.getToken(url);
+ *
+ *   var xhr = new XMLHttpRequest();
+ *
+ *   xhr.open("POST", url, true);
+ *
+ *   if(csrfRToken !== null) {
+ *     xhr.setRequestHeader(csrfRToken.header, csrfRToken.token);
+ *   }
+ *
+ *   xhr.send();
+ *
+ *   // ...
+ * });
+ *
+ * @name IService
+ * @memberOf pentaho.csrf
+ * @interface
+ */
+
+/**
+ * Gets a CSRF token that can be used to call a CSRF protected service, given its URL.
+ *
+ * If the given url is from an origin which is not that of the Pentaho server, `null` is returned.
+ *
+ * @name getToken
+ * @memberOf pentaho.csrf.IService#
+ * @method
+ * @param {string} url - The url of the protected service.
+ *
+ * @return {?pentaho.csrf.IToken} The CSRF token, if one should be used; `null`, otherwise.
+ *
+ * @throws {Error} When argument `url` is not specified.
+ */
