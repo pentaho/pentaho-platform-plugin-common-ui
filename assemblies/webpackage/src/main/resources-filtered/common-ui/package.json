@@ -15,6 +15,7 @@
 
     "pentaho/common": "/dojo/pentaho/common",
     "pentaho/_core": "/pentaho/_core",
+    "pentaho/csrf": "/pentaho/csrf",
     "pentaho/module": "/pentaho/module",
     "pentaho/shim": "/pentaho/shim",
     "pentaho/util": "/pentaho/util",
@@ -29,6 +30,7 @@
     "pentaho/theme": "/pentaho/theme",
     "pentaho/debug": "/pentaho/debug",
     "pentaho/ccc": "/pentaho/ccc",
+    "pentaho/platformCore": "/pentaho/platformCore",
     "pentaho/platformBundle": "/pentaho/platformBundle",
 
     "local": "/util/local",
@@ -117,13 +119,13 @@
         "base": "pentaho/module/Annotation"
       },
       "pentaho/i18n/LoadConfigAnnotation": {
-        "base": "pentaho/config/ExternalAnnotation",
+        "base": "pentaho/config/ExternalAnnotation"
       },
       "pentaho/theme/LoadThemeAnnotation": {
-        "base": "pentaho/module/Annotation",
+        "base": "pentaho/module/Annotation"
       },
       "pentaho/theme/ThemeAnnotation": {
-        "base": "pentaho/module/Annotation",
+        "base": "pentaho/module/Annotation"
       },
 
       "pentaho/type/Instance": {

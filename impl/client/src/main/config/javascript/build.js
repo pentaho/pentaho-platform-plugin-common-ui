@@ -135,6 +135,16 @@
 
   modules: [
     {
+      name: "pentaho/platformCore",
+      excludeShallow: [
+        // Don't want to exclude other pentaho/ modules used by these.
+
+        // Exclude these AMD modules as different environments use different impls.
+        "pentaho/i18n/defaultService",
+        "pentaho/i18n/serverService"
+      ]
+    },
+    {
       name: "pentaho/platformBundle",
       excludeShallow: [
         // Don't want to exclude other pentaho/ modules used by these.
@@ -144,6 +154,8 @@
         "pentaho/i18n/serverService"
       ],
       exclude: [
+        "pentaho/platformCore",
+
         // cgg does not like embedded css.
         "css!pentaho/ccc/visual/theme/tipsy.css"
       ]

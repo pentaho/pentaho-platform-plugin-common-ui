@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,7 @@
  * limitations under the License.
  */
 define([
-  // Core
-  "pentaho/config/service",
-  "pentaho/module/service",
-  "pentaho/module/metaService",
-  "pentaho/module/metaOf",
-  "pentaho/module/subtypeOf",
-  "pentaho/module/subtypesOf",
-  "pentaho/module/instanceOf",
-  "pentaho/module/instancesOf",
-
-  "pentaho/i18n/MessageBundle",
-  "pentaho/i18n/LoadConfigAnnotation",
-
-  "pentaho/theme/main",
-  "pentaho/theme/LoadThemeAnnotation",
+  "./platformCore",
 
   // Type API
   "pentaho/type/loader",
