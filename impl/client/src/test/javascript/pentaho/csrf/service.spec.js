@@ -17,7 +17,7 @@ define(function() {
 
   "use strict";
 
-  fdescribe("pentaho.csrf.service", function() {
+  describe("pentaho.csrf.service", function() {
     var pentahoUrl = "http://pentaho-host:8080/path/";
     var sameAppUrl = pentahoUrl + "some";
     var otherAppUrl = "http://other-origin:8080/service";
