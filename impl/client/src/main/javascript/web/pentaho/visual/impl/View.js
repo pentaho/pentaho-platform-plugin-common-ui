@@ -41,8 +41,8 @@ define([
   var BaseView = Base.extend(module.id, /** @lends pentaho.visual.impl.View# */{
 
     /**
-     * @alias BaseView
-     * @memberOf pentaho.visual.base
+     * @alias View
+     * @memberOf pentaho.visual.impl
      *
      * @class
      * @extends pentaho.lang.Base
