@@ -18,22 +18,33 @@
 define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/lib/jquery" ], function(
   StaticAutocompleteBoxComponent, $) {
 
-  var testInteger = "123456";
-  var testStringWithNumber = "123456 String";
-  createCommonParameters = function(parameter, values) {
-    return {
-      parameter : parameter,
-      param : {
-        values : [ values ]
-      },
-      name : "staticAutocompleteBoxComponent",
-      type : "StaticAutocompleteBoxComponent",
-      htmlObject : "",
-      valuesArray : []
-    };
-  };
+  var testInteger;
+  var testStringWithNumber;
+  var createCommonParameters;
 
-  describe("StaticAutocompleteBoxComponent.update()", function() {
+  beforeEach(function () {
+    testInteger = "123456";
+    testStringWithNumber = "123456 String";
+    createCommonParameters = function(parameter, values) {
+      return {
+        parameter : parameter,
+        param : {
+          values : [ values ]
+        },
+        name : "staticAutocompleteBoxComponent",
+        type : "StaticAutocompleteBoxComponent",
+        htmlObject : "test",
+        valuesArray : []
+      };
+    };
+  });
+
+  afterEach(function () {
+    testInteger = testStringWithNumber = createCommonParameters = null;
+  });
+
+
+  fdescribe("StaticAutocompleteBoxComponent.update()", function() {
 
     it("should not try to parse a string", function() {
       var comp = new StaticAutocompleteBoxComponent();
