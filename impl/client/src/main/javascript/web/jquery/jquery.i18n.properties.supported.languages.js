@@ -54,21 +54,26 @@ define("common-ui/jquery-pentaho-i18n", ["common-ui/jquery-i18n"], function() {
     };
 
     var parseData = function(data, language) {
-        var locale, country, result;
+        var locale, localeLower, country, countryLower, result;
         if (language.length >= 2) {
             locale = language.substring(0, 2);
+            localeLower = locale.toLowerCase();
         }
         if (language.length >= 5) {
             country = language.substring(0, 5);
+            countryLower = country.toLowerCase();
         }
         var parameters = data.split( /\n/ );
         for(var i=0; i<parameters.length; i++ ) {
             var lang = parameters[i].substr(0, parameters[i].indexOf("="));
-            if (lang == locale && result == undefined) {
-                result = locale;
+            var langLower = lang.toLowerCase();
+
+            if (langLower === localeLower && result == undefined) {
+                result = lang;
             }
-            if (lang == country) {
-                result = country;
+
+            if (langLower == countryLower) {
+                result = lang;
             }
         }
         if (result == undefined) {
