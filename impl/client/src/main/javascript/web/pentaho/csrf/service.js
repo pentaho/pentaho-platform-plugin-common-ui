@@ -49,11 +49,15 @@ define([
         return null;
       }
 
-      var csrfServiceUrl = serverBaseUrl + "api/system/csrf";
+      // Sending the URL as a parameter and not as a header to avoid becoming a pre-flight request.
+      var csrfServiceUrl = serverBaseUrl + "api/system/csrf?url=" + encodeURIComponent(url);
 
       var xhr = service.__createXhr();
       xhr.open("GET", csrfServiceUrl, /* async: */false);
-      xhr.setRequestHeader("X-CSRF-SERVICE", url);
+
+      // In Cross-Origin contexts, the session where the token is stored must be the same
+      // as that used by the actual request...
+      xhr.withCredentials = true;
       xhr.send();
 
       if(xhr.status === 204 || xhr.status === 200) {
