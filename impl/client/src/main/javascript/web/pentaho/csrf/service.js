@@ -30,7 +30,6 @@ define([
    */
   var service = {
     getToken: function(url) {
-
       if(!url) {
         throw new Error("Argument 'url' is required.");
       }
@@ -55,20 +54,26 @@ define([
       var xhr = service.__createXhr();
       xhr.open("GET", csrfServiceUrl, /* async: */false);
 
-      // In Cross-Origin contexts, the session where the token is stored must be the same
+      // In cross-origin contexts, the session where the token is stored must be the same
       // as that used by the actual request...
       xhr.withCredentials = true;
-      xhr.send();
-
-      if(xhr.status === 204 || xhr.status === 200) {
-        return {
-          header: xhr.getResponseHeader("X-CSRF-HEADER"),
-          parameter: xhr.getResponseHeader("X-CSRF-PARAM"),
-          token: xhr.getResponseHeader("X-CSRF-TOKEN")
-        };
+      try {
+        xhr.send();
+      } catch(ex) {
+        // a) CORS is not enabled on the server, or
+        // b) this is the origin of an attacker...
+        return null;
       }
 
-      return null;
+      if(xhr.status !== 204 && xhr.status !== 200) {
+        return null;
+      }
+
+      return {
+        header: xhr.getResponseHeader("X-CSRF-HEADER"),
+        parameter: xhr.getResponseHeader("X-CSRF-PARAM"),
+        token: xhr.getResponseHeader("X-CSRF-TOKEN")
+      };
     },
 
     // Exposed for testing purposes.
