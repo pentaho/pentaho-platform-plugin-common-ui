@@ -69,10 +69,16 @@ define([
         return null;
       }
 
+      // When CSRF protection is disabled, the token is not returned.
+      var token = xhr.getResponseHeader("X-CSRF-TOKEN");
+      if(token == null) {
+        return null;
+      }
+
       return {
         header: xhr.getResponseHeader("X-CSRF-HEADER"),
         parameter: xhr.getResponseHeader("X-CSRF-PARAM"),
-        token: xhr.getResponseHeader("X-CSRF-TOKEN")
+        token: token
       };
     },
 
