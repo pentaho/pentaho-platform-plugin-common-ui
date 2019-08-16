@@ -29,7 +29,6 @@
   </scm>
 
   <properties>
-    <jquery.version>1.12.4</jquery.version>
     <dojo.version>1.9.2</dojo.version>
     <angular.version>1.5.8</angular.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
@@ -48,11 +47,6 @@
         <version>${dojo.version}</version>
         <type>zip</type>
         <classifier>src</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>jquery</artifactId>
-        <version>${jquery.version}</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.bower</groupId>
