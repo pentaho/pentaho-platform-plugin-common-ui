@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  *
  */
 
-define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/lib/jquery" ], function(
-  StaticAutocompleteBoxComponent, $) {
+define([
+  "common-ui/prompting/components/StaticAutocompleteBoxComponent",
+  "cdf/lib/jquery"
+], function(StaticAutocompleteBoxComponent, $) {
 
   var testInteger;
   var testStringWithNumber;
@@ -25,11 +27,12 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
   beforeEach(function () {
     testInteger = "123456";
     testStringWithNumber = "123456 String";
+
     createCommonParameters = function(parameter, values) {
       return {
         parameter : parameter,
         param : {
-          values : [ values ]
+          values : [values]
         },
         name : "staticAutocompleteBoxComponent",
         type : "StaticAutocompleteBoxComponent",
@@ -43,8 +46,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
     testInteger = testStringWithNumber = createCommonParameters = null;
   });
 
-
-  fdescribe("StaticAutocompleteBoxComponent.update()", function() {
+  describe("StaticAutocompleteBoxComponent.update()", function() {
 
     it("should not try to parse a string", function() {
       var comp = new StaticAutocompleteBoxComponent();
@@ -99,7 +101,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
         selected : true
       }));
 
-      comp.dashboard = { 
+      comp.dashboard = {
         processChange: function() { }
       };
       comp.htmlObject = 'test';
@@ -107,13 +109,13 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
       var ph = $('<div>').attr('id', comp.htmlObject);
       $('body').append(ph);
 
-      comp.update();  
+      comp.update();
 
-      spyOn(comp.dashboard, 'processChange');      
+      spyOn(comp.dashboard, 'processChange');
        $('input', comp.ph).trigger($.Event( 'keypress', { which: $.ui.keyCode.ENTER } ));
 
-      expect(comp.dashboard.processChange).toHaveBeenCalled();  
-      
+      expect(comp.dashboard.processChange).toHaveBeenCalled();
+
       ph.remove();
     });
 
@@ -126,7 +128,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
         selected : true
       }));
 
-      comp.dashboard = { 
+      comp.dashboard = {
         processChange: function() { }
       };
       comp.htmlObject = 'test';
@@ -135,12 +137,12 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
       $('body').append(ph);
 
       comp.update();
-      
-      spyOn(comp.dashboard, 'processChange');      
+
+      spyOn(comp.dashboard, 'processChange');
       $('input', comp.ph).trigger($.Event( 'keypress', { which: $.ui.keyCode.ESCAPE } ));
 
-      expect(comp.dashboard.processChange).not.toHaveBeenCalled();  
-      
+      expect(comp.dashboard.processChange).not.toHaveBeenCalled();
+
       ph.remove();
     });
 
@@ -153,7 +155,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
         selected : true
       }));
 
-      comp.dashboard = { 
+      comp.dashboard = {
         processChange: function() { }
       };
       comp.htmlObject = 'test';
@@ -162,12 +164,12 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
       $('body').append(ph);
 
       comp.update();
-      
-      spyOn(comp.dashboard, 'processChange');      
+
+      spyOn(comp.dashboard, 'processChange');
       $('input', comp.ph).trigger('focusout');
 
-      expect(comp.dashboard.processChange).toHaveBeenCalled();  
-      
+      expect(comp.dashboard.processChange).toHaveBeenCalled();
+
       ph.remove();
     });
   });
@@ -226,4 +228,5 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
       expect(value).toBe(formattedV + parsedV + testInteger);
     });
   });
+
 });

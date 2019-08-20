@@ -178,29 +178,20 @@ define(function() {
         });
       });
 
-      it("should call CSRF service using a sync GET HTTP method", function() {
+      it("should call CSRF service using a sync GET HTTP method and passing the 'url'" +
+        " parameter in the request's query string", function() {
 
         return require.using(["pentaho/csrf/service"], configAmd, function(csrfService) {
 
           csrfService.__createXhr = createXhrMockFactoryWithStatus(200);
 
           csrfService.getToken(sameAppUrl);
+
+          var urlQueryString = "url=" + encodeURIComponent(sameAppUrl);
+          var expectedUrl = pentahoUrl + "api/system/csrf?" + urlQueryString;
 
           expect(xhrMock.open).toHaveBeenCalledTimes(1);
-          expect(xhrMock.open).toHaveBeenCalledWith("GET", pentahoUrl + "api/system/csrf", false);
-        });
-      });
-
-      it("should call the CSRF service with a X-CSRF-SERVICE header with the protected service URL", function() {
-
-        return require.using(["pentaho/csrf/service"], configAmd, function(csrfService) {
-
-          csrfService.__createXhr = createXhrMockFactoryWithStatus(200);
-
-          csrfService.getToken(sameAppUrl);
-
-          expect(xhrMock.setRequestHeader).toHaveBeenCalledTimes(1);
-          expect(xhrMock.setRequestHeader).toHaveBeenCalledWith("X-CSRF-SERVICE", sameAppUrl);
+          expect(xhrMock.open).toHaveBeenCalledWith("GET", expectedUrl, false);
         });
       });
 
