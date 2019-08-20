@@ -44,7 +44,7 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "cdf/l
   });
 
 
-  describe("StaticAutocompleteBoxComponent.update()", function() {
+  fdescribe("StaticAutocompleteBoxComponent.update()", function() {
 
     it("should not try to parse a string", function() {
       var comp = new StaticAutocompleteBoxComponent();
