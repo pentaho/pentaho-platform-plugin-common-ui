@@ -72,7 +72,7 @@
 
     "common-ui/jquery": "/jquery/jquery.conflict",
     "common-ui/jquery-clean": "/jquery/jquery",
-    "common-ui/handlebars": "/handlebars/handlebars-v4.0.13",
+    "common-ui/handlebars": "/handlebars/handlebars-v4.0.5",
     "common-ui/jquery-i18n": "/jquery/jquery.i18n.properties-min",
     "common-ui/jquery-pentaho-i18n": "/jquery/jquery.i18n.properties.supported.languages",
     "common-ui/bootstrap": "/bootstrap/bootstrap",
