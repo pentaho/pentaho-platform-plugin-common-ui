@@ -33,7 +33,6 @@
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
     <platform.version>9.0.0.0-SNAPSHOT</platform.version>
-    <commons-logging.version>1.1</commons-logging.version>
     <commons-lang.version>2.2</commons-lang.version>
   </properties>
   <dependencies>
