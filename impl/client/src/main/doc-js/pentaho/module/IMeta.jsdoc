@@ -222,6 +222,19 @@
  */
 
 /**
+ * Imports a module, given its identifier.
+ *
+ * The module identifier is first resolved, by using {@link pentaho.module.IMeta##resolveId}.
+ *
+ * @name import
+ * @memberOf pentaho.module.IMeta#
+ * @param {string} moduleId - The identifier of the module to be imported.
+ * @return {Promise.<Object>} A promise to the module namespace object of the imported module.
+ * The namespace object will have a property named `default`, containing the default export of the module
+ * as well as named properties, one for each of the module's named exports.
+ */
+
+/**
  * Gets an annotation associated with this module, given the annotation type or its identifier.
  *
  * Either this module is annotated with the requested annotation, or, optionally,

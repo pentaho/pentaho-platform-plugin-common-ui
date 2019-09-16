@@ -207,6 +207,17 @@ define([
         return moduleUtil.resolveModuleId(moduleId, this.id);
       },
 
+      /** @inheritDoc */
+      "import": function(moduleId) {
+
+        // TODO: need to detect if URL first?
+        moduleId = this.resolveId(moduleId);
+
+        return requireJSUtil.promise(moduleId).then(function(defaultExport) {
+          return {"default": defaultExport};
+        });
+      },
+
       isSubtypeOf: function(baseIdOrAlias) {
         return false;
       },
