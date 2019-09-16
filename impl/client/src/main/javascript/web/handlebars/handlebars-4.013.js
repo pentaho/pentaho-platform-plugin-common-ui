@@ -1525,6 +1525,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return Handlebars;
 	  };
+	  if(!root.Handlebars  || !root.Handlebars.create){
+      	root.Handlebars = Handlebars.create();
+      }
 	};
 
 	module.exports = exports['default'];
