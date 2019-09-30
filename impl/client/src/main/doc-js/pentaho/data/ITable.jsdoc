@@ -118,6 +118,17 @@
  */
 
 /**
+ * Gets a cell property, given its row and column indexes and the property name.
+ *
+ * @name pentaho.data.ITable#getCellProperty
+ * @method
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @param {string} propName The name of the property.
+ * @return {*} The cell property value or undefined, if there is no such cell or property.
+ */
+
+/**
  * Gets the value of a cell, given its row and column indexes.
  *
  * When a cell is missing or has a `null` or `undefined` value,
