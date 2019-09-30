@@ -444,10 +444,7 @@ define([
        * build a corresponding "visual role mapping field info", pointing to the corresponding
        * data table field.
        *
-       * NOTE: ignoring unmapped fields like the GEO ones that Analyzer automatically adds:
-       * "latitude" and "longitude". For now this is ok, but when the GeoMap viz gets converted to VizAPI3,
-       * we'll have to see if these columns should be explicitly mapped or be provided as part of
-       * a GEO entity's sub-properties.
+       * NOTE: ignoring any unmapped/not-requested fields.
        *
        * NOTE: ignoring the fact that Analyzer sometimes does not send visual role mapped fields due to
        * "max rows" configurations. Limiting the number of rows is acceptable, but not the number of columns...

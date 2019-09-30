@@ -48,11 +48,38 @@ define([
   function getDatasetDT1() {
     return {
       model: [
-        {name: "country", type: "string", label: "Country"},
-        {name: "sales",   type: "number", label: "Sales"  }
+        {
+          name: "country",
+          type: "string",
+          label: "Country",
+          p: {
+            "EntityWithGeoAddress": {
+              isAddressProvided: true,
+              type: "Country",
+              roles: ["continent", "Country"]
+            }
+          },
+          members: [
+            {
+              v: "Portugal",
+              f: "Portucale",
+              p: {
+                "geoAddress": {
+                  "continent": "Europe",
+                  "Country": "Portucale"
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: "sales",
+          type: "number",
+          label: "Sales"
+        }
       ],
       rows: [
-        {c: [ {v: "Portugal"}, {v: 12000}] },
+        {c: [ {v: "Portugal", f: "Portucale"}, {v: 12000}] },
         {c: [ {v: "Ireland" }, {v:  6000}] }
       ]
     };
@@ -1445,6 +1472,30 @@ define([
         it("should return a cell with a `null` value for direct nully values", function() {
           expect(dataTable.getCell(10, 1).value).toBe(null);
           expect(dataTable.getCell(11, 1).value).toBe(null);
+        });
+      });
+
+      describe("getCellProperty(i, j, p)", function() {
+
+        var dataTable;
+
+        beforeEach(function() {
+          dataTable = new DataTable(getDatasetDT1());
+        });
+
+        it("should return undefined if the property does not exist", function() {
+          var geoAddress = dataTable.getCellProperty(0, 0, "notExistingProperty");
+
+          expect(geoAddress).toBe(undefined);
+        });
+
+        it("should return the value of the property if it exists", function() {
+          var geoAddress = dataTable.getCellProperty(0, 0, "geoAddress");
+
+          expect(geoAddress).toEqual({
+            "continent": "Europe",
+            "Country": "Portucale"
+          });
         });
       });
     });

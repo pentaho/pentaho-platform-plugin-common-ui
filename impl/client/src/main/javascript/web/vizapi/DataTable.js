@@ -422,17 +422,73 @@ pentaho.DataTable.prototype.setColumnProperty = function(columnIndex, name, valu
     getColumnProperty
     Returns a column property
 
-    columnIndex The index of the column to set the property on
+    columnIndex The index of the column to get the property from
     name        The name of the property
 
     Return      The value of the property
 */
 pentaho.DataTable.prototype.getColumnProperty = function(columnIndex, name) {
-    if( columnIndex >= 0 && columnIndex < this.jsonTable.cols.length) {
-        return this.jsonTable.cols[columnIndex][name];
+    if(columnIndex >= 0 && columnIndex < this.jsonTable.cols.length) {
+        var col = this.jsonTable.cols[columnIndex];
+        var value = col[name];
+
+        var attr;
+        var metadata;
+        if(value === undefined &&
+           (attr = this.getColumnAttribute(columnIndex)) !== null &&
+           (metadata = attr.p) != null) {
+
+            value = metadata[name];
+        }
+
+        return value;
     }
+
     return null;
-}
+};
+
+pentaho.DataTable.prototype.getCellProperty = function(rowIndex, columnIndex, name) {
+
+    var attr;
+    var metadata;
+    var value = this.getValue(rowIndex, columnIndex);
+    if(value != null && (attr = this.getColumnAttribute(columnIndex)) !== null) {
+        var members = attr.members;
+        if(members && members.length > 0) {
+            for(var i = 0; i < members.length; i++) {
+                var member = members[i];
+                if(member.v === value) {
+                    if((metadata = member.p) != null) {
+                        return metadata[name];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    return undefined;
+};
+
+pentaho.DataTable.prototype.getColumnAttribute = function(columnIndex) {
+    var col = this.jsonTable.cols[columnIndex];
+    var attr;
+    var model;
+    var attrs;
+    if((attr = col.attr) &&
+       (model = this.jsonTable.model) &&
+       (attrs = model.attrs) &&
+       attrs.length > 0) {
+
+        for(var i = 0; i < attrs.length; i++) {
+            if(attrs[i].name === attr) {
+                return attrs[i];
+            }
+        }
+    }
+
+    return null;
+};
 
 /****************************************************
     pentaho.DataView
@@ -759,7 +815,14 @@ pentaho.DataView.prototype.setColumnProperty = function(columnIndex, name, value
     Return      The value of the property
 */
 pentaho.DataView.prototype.getColumnProperty = function(columnIndex, name) {
-    return this.dataTable.getColumnProperty(columnIndex, name);
+    var colIdx = this.columns == null ? columnIndex : this.columns[columnIndex];
+    return this.dataTable.getColumnProperty(colIdx, name);
+};
+
+pentaho.DataView.prototype.getCellProperty = function(rowIndex, columnIndex, name) {
+    var rowIdx = this.rows == null ? rowIndex : this.rows[rowIndex];
+    var colIdx = this.columns == null ? columnIndex : this.columns[columnIndex];
+    return this.dataTable.getCellProperty(rowIdx, colIdx, name);
 };
 
 /* TRENDS */
