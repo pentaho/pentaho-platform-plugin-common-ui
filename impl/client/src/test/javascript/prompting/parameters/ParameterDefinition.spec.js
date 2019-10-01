@@ -119,5 +119,15 @@ define([ 'common-ui/prompting/parameters/ParameterDefinition',  'common-ui/promp
         expect(param).not.toBeDefined();
       });
     });
+
+    describe("updateParameter", function() {
+      it("should update the previous parameter to have a new timezone hint if the new parameter has one", function() {
+        parameterDefinition.parameterGroups.push({'name': "test-parameterGroup", 'parameters': [{'name': "param-to-update"}]});
+        var param = {'name': "param-to-update", 'timezoneHint': "0400"};
+        parameterDefinition.updateParameterValue(param);
+        var newParam = parameterDefinition.getParameter("param-to-update");
+        expect(newParam.timezoneHint).toBe("0400");
+      });
+    });
   });
 });

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,6 +151,13 @@ define(['common-ui/jquery-clean'], function ($) {
             if(newParameter.name === oldParam.name){
               var index = group.parameters.indexOf(oldParam);
               group.parameters[index].values = newParameter.values;
+              /*
+               * [BISERVER-14306]
+               * In case this particular parameter has a timezoneHint, we need to persist it
+               */
+              if(newParameter.timezoneHint !== undefined){
+                group.parameters[index].timezoneHint = newParameter.timezoneHint;
+              }
               return;
             }
           }, this );
