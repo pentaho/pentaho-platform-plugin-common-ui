@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,5 +134,77 @@ define([
         expect(text.toSnakeCase()).toBe(undefined);
       });
     });
+
+    describe("escapeForHtmlElement(value)", function() {
+
+      it("should convert null to an empty string", function() {
+        expect(text.escapeForHtmlElement(null)).toBe("");
+      });
+
+      it("should convert undefined to an empty string", function() {
+        expect(text.escapeForHtmlElement(undefined)).toBe("");
+      });
+
+      it("should convert an empty string to an empty string", function() {
+        expect(text.escapeForHtmlElement("")).toBe("");
+      });
+
+      // ---
+
+      it("should convert a < character to a &lt; entity", function() {
+        expect(text.escapeForHtmlElement("a<b")).toBe("a&lt;b");
+      });
+
+      it("should convert a < character to a &lt; entity more than once", function() {
+        expect(text.escapeForHtmlElement("a<b<c")).toBe("a&lt;b&lt;c");
+      });
+
+      it("should convert a < character to a &lt; entity across multiple lines", function() {
+        expect(text.escapeForHtmlElement("a\n<b")).toBe("a\n&lt;b");
+      });
+
+      // ---
+
+      it("should convert a > character to a &gt; entity", function() {
+        expect(text.escapeForHtmlElement("a>b")).toBe("a&gt;b");
+      });
+
+      it("should convert a > character to a &gt; entity more than once", function() {
+        expect(text.escapeForHtmlElement("a>b>c")).toBe("a&gt;b&gt;c");
+      });
+
+      it("should convert a > character to a &gt; entity across multiple lines", function() {
+        expect(text.escapeForHtmlElement("a\n>b")).toBe("a\n&gt;b");
+      });
+
+      // ---
+
+      it("should convert a & character to a &amp; entity", function() {
+        expect(text.escapeForHtmlElement("a&b")).toBe("a&amp;b");
+      });
+
+      it("should convert a & character to a &amp; entity more than once", function() {
+        expect(text.escapeForHtmlElement("a&b&c")).toBe("a&amp;b&amp;c");
+      });
+
+      it("should convert a & character to a &amp; entity across multiple lines", function() {
+        expect(text.escapeForHtmlElement("a\n&b")).toBe("a\n&amp;b");
+      });
+
+      // ---
+
+      it("should convert a \" character to a &quot; entity", function() {
+        expect(text.escapeForHtmlElement("a\"b")).toBe("a&quot;b");
+      });
+
+      it("should convert a \" character to a &quot; entity more than once", function() {
+        expect(text.escapeForHtmlElement("a\"b\"c")).toBe("a&quot;b&quot;c");
+      });
+
+      it("should convert a \" character to a &quot; entity across multiple lines", function() {
+        expect(text.escapeForHtmlElement("a\n\"b")).toBe("a\n&quot;b");
+      });
+    });
+
   }); // pentaho.util.text
 });
