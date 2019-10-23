@@ -32,6 +32,7 @@ define([
    *
    * @name service
    * @memberOf pentaho.module
+   * @type pentaho.module.IService
    *
    * @see pentaho.module.metaService
    */
