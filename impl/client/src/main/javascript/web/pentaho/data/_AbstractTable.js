@@ -169,6 +169,18 @@ define([
       }
     },
 
+    getCellProperty: function(rowIndex, colIndex, propName) {
+      var cell = this.getCell(rowIndex, colIndex);
+      if(cell) {
+        var member = cell.referent;
+        if(member) {
+          return member.property(propName);
+        }
+      }
+
+      return undefined;
+    },
+
     /**
      * Gets the value range of a column, given its index.
      *

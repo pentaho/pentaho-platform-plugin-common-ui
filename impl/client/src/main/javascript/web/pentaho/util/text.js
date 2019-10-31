@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ define(function() {
         var cU = c.toUpperCase();
         if(c !== cU) s = cU + s.substr(1);
       }
+
       return s;
     },
 
@@ -121,7 +122,30 @@ define(function() {
      */
     withPeriod: function(sentence) {
       return sentence && !/[.;!?]/.test(sentence[sentence.length - 1]) ? (sentence + ".") : sentence;
-    }
+    },
+
+    /**
+     * Obtains a value's string representation and escapes it,
+     * so that it can be safely added as child text of an HTML element
+     * to show its content literally.
+     *
+     * @param {*} value - The value whose string representation is to be escaped.
+     *
+     * @return {string} The escaped text.
+     */
+    escapeForHtmlElement: function(value) {
+
+      if(value == null) {
+        return "";
+      }
+
+      // TODO: this is a lousy multi-pass implementation!
+      return value.toString()
+        .replace(/&/gm, "&amp;")
+        .replace(/</gm, "&lt;")
+        .replace(/>/gm, "&gt;")
+        .replace(/"/gm, "&quot;");
+    },
   };
 
   return text;

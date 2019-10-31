@@ -25,8 +25,29 @@ define([
   function getDatasetDT1() {
     return {
       model: [
-        {name: "country", type: "string",  label: "Country", p: {foo: fooValue}, isKey: true,
-          hierarchyName: "Foo", hierarchyOrdinal: 3},
+        {
+          name: "country",
+          type: "string",
+          label: "Country",
+          p: {
+            foo: fooValue
+          },
+          members: [
+            {
+              v: "Portugal",
+              f: "Portucale",
+              p: {
+                "geoAddress": {
+                  "continent": "Europe",
+                  "Country": "Portucale"
+                }
+              }
+            }
+          ],
+          isKey: true,
+          hierarchyName: "Foo",
+          hierarchyOrdinal: 3
+        },
         {name: "sales",   type: "number",  label: "Sales",   p: {bar: barValue}, isContinuous: true},
         {name: "euro",    type: "boolean", label: "Euro"}
       ],
@@ -337,7 +358,7 @@ define([
           dataView2.setSourceRows([2, 1, 3, 0]);
 
           expect(dataView2.getDistinctFormattedValues(0)).toEqual(["true", "false"]);
-          expect(dataView2.getDistinctFormattedValues(1)).toEqual(["Italy", "Ireland", "France", "Portugal"]);
+          expect(dataView2.getDistinctFormattedValues(1)).toEqual(["Italy", "Ireland", "France", "Portucale"]);
           expect(dataView2.getDistinctFormattedValues(2)).toEqual(["1.0", "0.6", "2.4", "1.2"]);
         });
       });
@@ -555,6 +576,23 @@ define([
         });
       });
 
+      describe("getCellProperty(i, j, p)", function() {
+
+        it("should return undefined if the property does not exist", function() {
+          var geoAddress = dataView.getCellProperty(1, 1, "notExistingProperty");
+
+          expect(geoAddress).toBe(undefined);
+        });
+
+        it("should return the value of the property if it exists", function() {
+          var geoAddress = dataView.getCellProperty(1, 1, "geoAddress");
+
+          expect(geoAddress).toEqual({
+            "continent": "Europe",
+            "Country": "Portucale"
+          });
+        });
+      });
     });
   });
 });
