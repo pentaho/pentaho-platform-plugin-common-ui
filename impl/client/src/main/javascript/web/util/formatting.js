@@ -198,7 +198,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
 
           // for every other mode (fixed timezone modes), translate the time into the specified timezone
           if ((parameter.timezoneHint != undefined && $.trim(parameter.timezoneHint).length != 0)
-           && value.match(parameter.timezoneHint.startsWith("+") ? "\\" + parameter.timezoneHint  + '$' : parameter.timezoneHint  + '$'))
+           && value.match(parameter.timezoneHint.indexOf("+") == 0 ? "\\" + parameter.timezoneHint  + '$' : parameter.timezoneHint  + '$'))
           {
             return value;
           }
