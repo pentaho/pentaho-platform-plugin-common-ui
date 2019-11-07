@@ -268,7 +268,7 @@ define([
      */
     _emit: function(event) {
       if(!event) throw error.argRequired("event");
-      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
+      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.lang.Event");
 
       return this._emitGeneric(this, [event], event.type, null, keyArgsEmitEventUnsafe) ? event : null;
     },
