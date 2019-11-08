@@ -1002,7 +1002,7 @@ define([
       it("should throw an error when the argument is of an invalid type", function() {
         expect(function() {
           eventSource._emit({});
-        }).toThrow(errorMatch.argInvalidType("event", "pentaho.type.Event"));
+        }).toThrow(errorMatch.argInvalidType("event", "pentaho.lang.Event"));
       });
 
       it("should call _emitGeneric(this, eventArgs, event.type, null phase)", function() {

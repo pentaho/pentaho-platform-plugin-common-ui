@@ -33,6 +33,7 @@ define([
      * @memberOf pentaho.util
      * @class
      * @extends pentaho.lang.Base
+     * @private
      *
      * @description Creates a bit set instance.
      * @constructor
