@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,10 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       var myself = this;
 
       // Prepare label-value map
-      if (this.labelValueMap === undefined) {
-        this.labelValueMap = {};
-        $.each(this.valuesArray, function(i, item) {
-          this.labelValueMap[item.label] = item.value;
-        }.bind(this));
-      }
+      this.labelValueMap = {};
+      $.each(this.valuesArray, function(i, item) {
+        this.labelValueMap[item.label] = item.value;
+      }.bind(this));
 
       var ph = $('#' + this.htmlObject);
       ph.empty();
@@ -94,14 +92,26 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
 
       var input = $('input', ph);
       input.autocomplete({
-        delay : 0,
+        delay : 500,
         create: function () {
           $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
             // [BISERVER-11863] represent special characters correctly (for example &#39; &amp; &lt; &gt)
             return $("<li></li>").append(myself._createLabelTag(item.label)).appendTo(ul);
           };
+          // [PRD-6038] Ensuring that the cursor is placed at the end of the input box
+          // Opera sometimes sees a carriage return as 2 characters, so we multiple by
+          // 2 to ensure we are getting to the very end.
+          var inputTextLength = 0;
+          if (typeof (myself.getValue()) !== "undefined") {
+            inputTextLength = myself.getValue().length * 2;
+          }
+          $(this)[0].setSelectionRange(inputTextLength, inputTextLength);
         },
         source : function(request, response) {
+          if (myself.prevSelValue !== request.term) {
+            myself.prevSelValue = request.term;
+            myself.dashboard.processChange(myself.name);
+          }
           var term = request.term.toUpperCase();
           var matches = $.map(this.valuesArray, function(tag) {
             // we need unescape label before matching (fix for special characters like as &#39; &amp; &lt; &gt)
@@ -135,13 +145,12 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
         }
       }.bind(this));
 
-      var _inValue;
       input.focus(function() {
-        _inValue = this.getValue();
+        myself.prevSelValue = myself.getValue();
       }.bind(this));
 
       input.focusout(function() {
-        if (_inValue !== this.getValue()) {
+        if (myself.prevSelValue !== myself.getValue()) {
 
           // focusout may override the autocomplete select handler.
           // we need to update the input with the selected value
