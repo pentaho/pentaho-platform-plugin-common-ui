@@ -15,6 +15,7 @@
 *
 */
 define("common-repo/pentaho-ajax",[], function(){});
+
 // see http://developer.mozilla.org/en/docs/AJAX:Getting_Started for other values
 var COMPLETE = 4;
 // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html for other values
@@ -49,23 +50,25 @@ var webAppPath = "/" + pathArray[1];
  *
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoAction( solution, path, action, params, func ) {
-	// execute an Action Sequence on the server
+function pentahoAction(solution, path, action, params, func) {
+  // execute an Action Sequence on the server
 
-	var url = WEB_CONTEXT_BASE + "ViewAction";
+  var url = WEB_CONTEXT_BASE + "ViewAction";
 
-	// create the URL we need
-	var query = "wrapper=false&solution="+solution+"&path="+path+"&action="+action;
+  // create the URL we need
+  var query = "wrapper=false&solution="+solution+"&path="+path+"&action="+action;
+
 	// add any parameters provided
-	if( params ) {
-		var idx;
-		for( idx=0; idx<params.length; idx++ ) {
-			query += "&" +encodeURIComponent( params[idx][0] ) + "=" + encodeURIComponent( params[idx][1] );
-		}
-	}
-	// submit this as a post
-	return pentahoPost( url, query, func );
+  if (params) {
+    for (var idx = 0, P = params.length; idx < P; idx++) {
+      query += "&" + encodeURIComponent(params[idx][0]) + "=" + encodeURIComponent(params[idx][1]);
+    }
+  }
+
+  // submit this as a post
+  return pentahoPost(url, query, func);
 }
+
 /**
  * @param component String
  * @param params Array containing the parameters for the query string
@@ -88,25 +91,25 @@ function pentahoAction( solution, path, action, params, func ) {
  *
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoService( component, params, func, mimeType ) {
-	// execute a web service on the server
-	// create the URL we need
-	var url = WEB_CONTEXT_BASE + "ServiceAction";
+function pentahoService(component, params, func, mimeType) {
+  // execute a web service on the server
+  // create the URL we need
+  var url = WEB_CONTEXT_BASE + "ServiceAction";
 
-	var query = "ajax=true&";
-	if( component ) {
-		query += "component="+component+"&";
-	}
-	// add any parameters provided
-	if( params ) {
-		var idx;
-		for( idx=0; idx<params.length; idx++ ) {
-			query += "&" +encodeURIComponent( params[idx][0] ) + "=" + encodeURIComponent( params[idx][1] );
-		}
-	}
+  var query = "ajax=true&";
+  if (component) {
+    query += "component=" + component + "&";
+  }
 
-	// submit this as a post
-	return pentahoPost( url, query, func, mimeType );
+  // add any parameters provided
+  if (params) {
+    for(var idx = 0, P = params.length; idx < P; idx++) {
+      query += "&" + encodeURIComponent(params[idx][0]) + "=" + encodeURIComponent(params[idx][1]);
+    }
+  }
+
+  // submit this as a post
+  return pentahoPost(url, query, func, mimeType);
 }
 
 /**
@@ -132,71 +135,67 @@ function pentahoService( component, params, func, mimeType ) {
  *
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoGet( url, query, func, mimeType, allowCaching ) {
-	var async = undefined != func && null != func;
+function pentahoGet(url, query, func, mimeType, allowCaching) {
+  var async = undefined != func && null != func;
 
-	// submit a 'get' request
-    var http_request = null;
-	var returnType = "text/xml";
-	if( mimeType ) {
-		returnType = mimeType;
-	}
+  // submit a 'get' request
+  var http_request = null;
+  var returnType = "text/xml";
+  if (mimeType) {
+    returnType = mimeType;
+  }
 
-	// create an HTTP request object
-    if (window.XMLHttpRequest) { // Mozilla, Safari, ...
-        http_request = new XMLHttpRequest();
-        if (http_request.overrideMimeType) {
-            http_request.overrideMimeType(returnType);
-        }
-    } else if (window.ActiveXObject) { // IE
-        try {
-            http_request = new ActiveXObject("Msxml2.XMLHTTP");
-        } catch (e) {
-            try {
-                http_request = new ActiveXObject("Microsoft.XMLHTTP");
-            } catch (e)
-            {
-            	http_request = null;
-            }
-        }
+  // create an HTTP request object
+  if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+    http_request = new XMLHttpRequest();
+    if (http_request.overrideMimeType) {
+      http_request.overrideMimeType(returnType);
     }
-
-    if (!http_request) {
-        throw new Error('Cannot create an XMLHTTP instance');
+  } else if (window.ActiveXObject) { // IE
+    try {
+      http_request = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+    	try {
+        http_request = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (e) {
+        http_request = null;
+      }
     }
+  }
 
-    // set the callback function
-	  if ( async )
-	  {
-	    http_request.onreadystatechange = function() { pentahoResponse(http_request, func); };
-	  }
+  if (!http_request) {
+    throw new Error('Cannot create an XMLHTTP instance');
+  }
 
-	  if (allowCaching !== true) {
-	    var time = new Date().getTime();
-	    query = query + (query.length === 0 ? "" : "&") + time + "=" + time;
-	  }
+  // set the callback function
+  if (async) {
+    http_request.onreadystatechange = function() {
+      pentahoResponse(http_request, func);
+    };
+  }
 
-	  // submit the request
-    http_request.open('GET', url+"?"+query, async );
-    http_request.send(null);
-	if ( !async )
-	{
-		return getResponse( http_request );
-	}
-	else
-	{
-		return null;
-	}
+  if (allowCaching !== true) {
+    var time = new Date().getTime();
+    query = query + (query.length === 0 ? "" : "&") + time + "=" + time;
+  }
+
+  // submit the request
+  http_request.open('GET', url + "?" + query, async);
+  http_request.send(null);
+
+  if (!async) {
+    return getResponse( http_request );
+  }
+
+  return null;
 }
 
-function getUnauthorizedMsg()
-{
-	return "<web-service><unauthorized/></web-service>";
+function getUnauthorizedMsg() {
+  return "<web-service><unauthorized/></web-service>";
 }
 
-function getNotFoundMsg()
-{
-	return "<web-service><not-found/></web-service>";
+function getNotFoundMsg() {
+  return "<web-service><not-found/></web-service>";
 }
 
 /**
@@ -221,41 +220,42 @@ function getNotFoundMsg()
  *
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoPost( url, query, func, mimeType ) {
-	var async = undefined != func && null != func;
+function pentahoPost(url, query, func, mimeType) {
+  var async = undefined != func && null != func;
 
-	var http_request = null;
-	var returnType = "text/xml";
-	if( mimeType ) {
-		returnType = mimeType;
-	}
+  var http_request = null;
+  var returnType = "text/xml";
+  if (mimeType) {
+    returnType = mimeType;
+  }
 
-	// create an HTTP request object
-	if (window.XMLHttpRequest) { // Mozilla, Safari,...
-		http_request = new XMLHttpRequest();
-		if (http_request.overrideMimeType) {
-			http_request.overrideMimeType(returnType);
-		}
-	} else if (window.ActiveXObject) { // IE
-		try {
-			http_request = new ActiveXObject("Msxml2.XMLHTTP");
-		} catch (e) {
-			try {
-				http_request = new ActiveXObject("Microsoft.XMLHTTP");
-			} catch (e)
-			{
-				http_request = null;
-			}
-		}
-	}
-	if (!http_request) {
-		throw new Error('Cannot create XMLHTTP instance');
-	}
+  // create an HTTP request object
+  if (window.XMLHttpRequest) { // Mozilla, Safari,...
+    http_request = new XMLHttpRequest();
+    if (http_request.overrideMimeType) {
+      http_request.overrideMimeType(returnType);
+    }
+  } else if (window.ActiveXObject) { // IE
+    try {
+      http_request = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+      try {
+        http_request = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (e) {
+        http_request = null;
+      }
+    }
+  }
+
+  if (!http_request) {
+    throw new Error('Cannot create XMLHTTP instance');
+  }
 
   // set the callback function
-  if ( async )
-  {
-  	http_request.onreadystatechange = function() { pentahoResponse(http_request, func); };
+  if (async) {
+    http_request.onreadystatechange = function() {
+      pentahoResponse(http_request, func);
+    };
   }
 
   // submit the request
@@ -266,15 +266,13 @@ function pentahoPost( url, query, func, mimeType ) {
   // See http://www.w3.org/TR/XMLHttpRequest/#the-setrequestheader%28%29-method.
   //http_request.setRequestHeader("Content-length", query.length);
   //http_request.setRequestHeader("Connection", "close");
-	http_request.send(query);
-	if ( !async )
-	{
-		return getResponse( http_request );
-	}
-	else
-	{
-		return null;
-	}
+  http_request.send(query);
+
+  if (!async) {
+    return getResponse(http_request);
+  }
+
+  return null;
 }
 
 /**
@@ -293,55 +291,40 @@ function pentahoPost( url, query, func, mimeType ) {
  */
 function pentahoResponse(http_request, func) {
 
-	// see if we got a good response back
-	if (http_request.readyState == COMPLETE ) {
-		try
-		{
-			var content = getResponse( http_request );
+  // see if we got a good response back
+  if (http_request.readyState == COMPLETE) {
+    try {
+      var content = getResponse(http_request);
 
-			// execute the callback function
-			if ( typeof( func ) == "function" )
-			{
-				func( content );
-			}
-			else if ( typeof( func ) == "object" && undefined != func.obj )
-			{
-				func.method.call( func.obj, content );
-			}
-			else if ( typeof( func ) == "string" )
-			{
-				// must be a string
-				eval( func + "( content );" );
-			}
-			else
-			{
-				//func must be null, which means caller wanted to run async, which means we should never get here
-				throw new Error( "Invalid state in pentahoResponse, unrecognized callback function." );
-			}
-		}catch( e )
-		{
-			var msg = e.message;
-			alert( "pentaho-ajax.js.pentahoResponse(): " + e );
-			throw e;
-		}
-	}
+      // execute the callback function
+      if (typeof(func) == "function") {
+        func(content);
+      } else if (typeof(func) == "object" && undefined != func.obj) {
+        func.method.call(func.obj, content);
+      } else if (typeof(func) == "string") {
+        // must be a string
+        eval(func + "( content );");
+      } else {
+        //func must be null, which means caller wanted to run async, which means we should never get here
+        throw new Error("Invalid state in pentahoResponse, unrecognized callback function.");
+      }
+    } catch(e) {
+      alert("pentaho-ajax.js.pentahoResponse(): " + e);
+
+      throw e;
+    }
+  }
 }
 
-function getResponse( http_request )
-{
-	switch ( http_request.status )
-	{
-		case STATUS_OK:
-			return http_request.responseText;
-			break;
-		case STATUS_UNAUTHORIZED:
-			return getUnauthorizedMsg();
-			break;
-		case STATUS_NOT_FOUND:
-			return getNotFoundMsg();
-			break;
-		default:
-			return null;
-			break;
-	}
+function getResponse(http_request) {
+  switch (http_request.status) {
+    case STATUS_OK:
+      return http_request.responseText;
+    case STATUS_UNAUTHORIZED:
+      return getUnauthorizedMsg();
+    case STATUS_NOT_FOUND:
+      return getNotFoundMsg();
+    default:
+      return null;
+  }
 }
