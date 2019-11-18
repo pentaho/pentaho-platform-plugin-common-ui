@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-define("common-repo/pentaho-ajax",[], function(){});
+define("common-repo/pentaho-ajax",["common-repo/pentaho-csrf"], function(){});
 
 // Project: pentaho-platform-plugin-common-ui
 
@@ -91,10 +91,11 @@ function pentahoService(component, params, callback, mimeType) {
   );
 
   var url = FULL_QUALIFIED_URL + "ServiceAction";
+  var csrfToken = csrfUtil.getToken(url);
 
   var query = __buildQueryParams(serviceActionParams);
 
-  return pentahoPost(url, query, callback, mimeType);
+  return pentahoPost(url, query, callback, mimeType, csrfToken);
 }
 
 /**
@@ -112,13 +113,14 @@ function pentahoService(component, params, callback, mimeType) {
  *            callback.obj is the object to call the method callback.method on, e.g. obj.method()
  * @param {String} [mimeType] - specifies the mime type of the response
  * @param {Boolean} [allowCaching] - If not true a unique request string will be generated
+ * @param {Object} [csrfToken] - token for csrf protection
  *
  * @return String containing the server's response if callback is not null or undefined,
  * null if the call is asynchronous.
  *
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoGet(url, query, callback, mimeType, allowCaching) {
+function pentahoGet(url, query, callback, mimeType, allowCaching, csrfToken) {
   var returnType = "text/xml";
   if (mimeType) {
     returnType = mimeType;
@@ -140,6 +142,10 @@ function pentahoGet(url, query, callback, mimeType, allowCaching) {
 
   // submit the request
   http_request.open('GET', url + "?" + query, async);
+  if (csrfToken != null) {
+    http_request.setRequestHeader(csrfToken.header, csrfToken.token);
+  }
+
   http_request.send(null);
 
   if (!async) {
@@ -171,13 +177,14 @@ function getNotFoundMsg() {
  *          - of type object, where the object has the properties obj and method:
  *            callback.obj is the object to call the method callback.method on, e.g. obj.method()
  * @param {String} [mimeType] - specifies the mime type of the response
+ * @param {Object} [csrfToken] - token for csrf protection
  *
  * @return String containing the server's response if callback is not null or undefined,
  * null if the call is asynchronous.
  *
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoPost(url, query, callback, mimeType) {
+function pentahoPost(url, query, callback, mimeType, csrfToken) {
   var returnType = "text/xml";
   if (mimeType) {
     returnType = mimeType;
@@ -195,6 +202,9 @@ function pentahoPost(url, query, callback, mimeType) {
   // submit the request
   http_request.open('POST', url, async);
   http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  if (csrfToken != null) {
+    http_request.setRequestHeader(csrfToken.header, csrfToken.token);
+  }
 
   // These headers are forbidden for security reasons.
   // See http://www.w3.org/TR/XMLHttpRequest/#the-setrequestheader%28%29-method.
