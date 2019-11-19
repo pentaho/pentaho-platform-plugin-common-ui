@@ -57,6 +57,9 @@
     <file context="global">content/common-ui/resources/web/util/URLEncoder.js</file>
     <file context="global">content/common-ui/resources/web/util/SessionExpiryCheckStartingPoint.js</file>
 
+    <file context="global">content/common-ui/resources/web/util/pentaho-csrf.js</file>
+    <file context="global">content/common-ui/resources/web/repo/pentaho-ajax.js</file>
+
     <file context="requirejs">content/common-ui/resources/web/common-ui-require-js-cfg.js</file>
 
     <!-- Example Visualization Plugin. Un-comment to test -->
