@@ -27,18 +27,19 @@
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
 
-        <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
-        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/oop.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/cda.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/models-olap.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/Xmla.js" type="text/javascript"></script>
-        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
-        <script language="javascript" src="../repo/state.js" type="text/javascript"></script>
+        <script src="../util/pentaho-csrf.js" type="text/javascript"></script>
+        <script src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+        <script src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script src="../dataapi/oop.js" type="text/javascript"></script>
+        <script src="../dataapi/app.js" type="text/javascript"></script>
+        <script src="../dataapi/controller.js" type="text/javascript"></script>
+        <script src="../dataapi/xhr.js" type="text/javascript"></script>
+        <script src="../dataapi/cda.js" type="text/javascript"></script>
+        <script src="../dataapi/models-mql.js" type="text/javascript"></script>
+        <script src="../dataapi/models-olap.js" type="text/javascript"></script>
+        <script src="../dataapi/Xmla.js" type="text/javascript"></script>
+        <script src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script src="../repo/state.js" type="text/javascript"></script>
 
         <script type="text/javascript">
 
@@ -48,14 +49,14 @@
 
             // the list of available fields
             var fields = [];
-    
+
             // the filter dialog
             var filterDialog = null;
-            
+
             function doload() {
 
                 dojo.parser.parse();
-            
+
                 // diable the data source list and field list until they are populated
                 document.getElementById('datasource-list').disabled = true;
                 document.getElementById('field-list').disabled = true;
@@ -75,7 +76,7 @@
                     source: {}
                 };
                 var moduleArray = [da_mql, da_olap];
-                pentaho.myapp.app.init(moduleArray);	
+                pentaho.myapp.app.init(moduleArray);
                 pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
 
                 // populate the list of available data sources
@@ -92,7 +93,7 @@
 
             }
 
-            /*  Shows the filter dialog in a mode where the user can, 
+            /*  Shows the filter dialog in a mode where the user can,
                 within the filter dialog, select the field they wish to
                 create a filter on
             */
@@ -116,7 +117,7 @@
                     "value":[],
                     "combinationType":pentaho.pda.Column.OPERATOR_TYPES.AND,
                     "operator":pentaho.pda.Column.CONDITION_TYPES.EQUAL
-                    
+
                 }
                 // turn of the field selection controls
                 filterDialog.enableFieldSelection(false);
@@ -131,7 +132,7 @@
                 // load the list of the available datasources
                 pentaho.myapp.app.getSources(
                     //function to be called for each source as it is added
-                    function(source) {	
+                    function(source) {
                         //console.log(source);
                         var list = document.getElementById('datasource-list');
                         if(list.disabled) {
@@ -140,12 +141,12 @@
                             list.options.length = 0;
                         }
                         var opt = new Option( source.name, source.id );
-                        list.options[list.length] = opt;                        
+                        list.options[list.length] = opt;
                     }
                 );
                 document.getElementById('datasource-list').selectedIndex=-1;
             }
-            
+
             /* displays the list of query elements from the selected data source */
             function showDatasourceFields() {
 
@@ -186,9 +187,9 @@
             function cancelFunc() {
                 filterDialog.hide();
             }
-            
+
             dojo.ready(doload);
-            
+
         </script>
 
     </head>
@@ -196,7 +197,7 @@
     <body class="tundra body" onload="">
 
         <div style="padding: 8px; background-color:white">
-        
+
             <h3>Data API - Filter Dialog</h3>
             This example shows you how to use the query filter dialog.
             <p/>
@@ -217,7 +218,7 @@
             Double click on a field above to see the filter dialog for that field, or click on the 'Add Filter' button below to select the field in the dialog.
             <p/>
             <button id="addbutton" onclick="createFilter()" disabled="true">Add Filter</button>
-            
+
         </div>
 
         <!-- this is the declaration of the filter dialog -->
@@ -225,5 +226,5 @@
         </div>
 
     </body>
-  
+
 </html>
