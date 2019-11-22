@@ -16,7 +16,7 @@ module.exports = function(config) {
       "karma-requirejs",
       "karma-junit-reporter",
       "karma-coverage",
-      "karma-phantomjs-launcher"
+      "karma-chrome-launcher"
     ],
 
     reporters: ["progress", "junit", "coverage"],
@@ -55,7 +55,7 @@ module.exports = function(config) {
 
     autoWatch: false,
 
-    browsers: ["PhantomJS"],
+    browsers: ["ChromeHeadless"],
 
     singleRun: true
   });
