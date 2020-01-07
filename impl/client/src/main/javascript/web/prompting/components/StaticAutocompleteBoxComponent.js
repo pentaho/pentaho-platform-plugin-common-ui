@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,14 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
           if (typeof (myself.getValue()) !== "undefined") {
             inputTextLength = myself.getValue().length * 2;
           }
-          $(this)[0].setSelectionRange(inputTextLength, inputTextLength);
+          // [PRD-6038] Whether or not the inputTextLength has been set, we need to ensure that the last
+          // autocomplete box that has been modified (focused on) retains the selected cursor.  Firefox
+          // and Chrome handle this behind the scenes, but IE11 and Edge go to the last autocomplete box
+          // on the page.  This conditional statement ensures only the last focused autocomplete box has the
+          // cursor range set (thus putting it at the end on the only modified box)
+          if (myself.autoFocus === true) {
+            $(this)[0].setSelectionRange(inputTextLength, inputTextLength);
+          }
         },
         source : function(request, response) {
           if (myself.prevSelValue !== request.term) {
