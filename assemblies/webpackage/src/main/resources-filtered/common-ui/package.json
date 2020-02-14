@@ -84,7 +84,6 @@
     "common-ui/angular-route": "/angular/angular-route",
     "common-ui/angular-animate": "/angular/angular-animate",
     "common-ui/angular-sanitize": "/angular/angular-sanitize",
-    "common-ui/properties-parser": "/angular-translate/properties-parser",
     "common-ui/angular-translate": "/angular-translate/angular-translate",
     "common-ui/angular-translate-loader-partial": "/angular-translate/angular-translate-loader-partial",
     "common-ui/angular-translate-loader-static": "/angular-translate/angular-translate-loader-static-files"

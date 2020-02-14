@@ -287,8 +287,6 @@
   requirePaths["common-ui/angular-sanitize"] = basePath + "/angular/angular-sanitize";
   requireShim["common-ui/angular-sanitize"] = ["common-ui/angular"];
 
-  requirePaths["common-ui/properties-parser"] = basePath + "/angular-translate/properties-parser";
-
   requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate";
   requireShim["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
 

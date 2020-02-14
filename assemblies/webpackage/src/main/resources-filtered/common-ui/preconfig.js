@@ -150,7 +150,6 @@ if(!useDebug) {
     "common-ui/angular-route",
     "common-ui/angular-animate",
     "common-ui/angular-sanitize",
-    "common-ui/properties-parser",
     "common-ui/angular-translate",
     "common-ui/angular-translate-loader-partial",
     "common-ui/angular-translate-loader-static"

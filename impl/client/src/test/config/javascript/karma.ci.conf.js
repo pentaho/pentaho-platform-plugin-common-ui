@@ -26,7 +26,6 @@ module.exports = function(config) {
       // All "bundled" external libs should be excluded.
       "${build.outputDirectory}/web/(pentaho|cache|dataapi|dojo/pentaho)/**/*.js": ["coverage"],
       "${build.outputDirectory}/web/(plugin-handler|prompting|repo|vizapi)/**/*.js": ["coverage"],
-      "${build.outputDirectory}/web/angular-translate/properties-parser.js": ["coverage"],
       "${build.outputDirectory}/web/util/*.js": ["coverage"]
     },
 
