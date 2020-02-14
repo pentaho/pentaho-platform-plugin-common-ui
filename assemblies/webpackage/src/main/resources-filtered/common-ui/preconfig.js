@@ -129,13 +129,6 @@ if(!useDebug) {
     "dojo/i18n",
     "dojo/request/default",
 
-    "common-ui/PluginHandler",
-    "common-ui/Plugin",
-    "common-ui/AngularPluginHandler",
-    "common-ui/AngularPlugin",
-    "common-ui/AnimatedAngularPluginHandler",
-    "common-ui/AnimatedAngularPlugin",
-
     "common-ui/jquery",
     "common-ui/jquery-clean",
     "common-ui/handlebars",

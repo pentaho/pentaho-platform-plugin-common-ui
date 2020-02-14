@@ -63,13 +63,6 @@
     "dojo/i18n": "/dojo/pentaho/common/overrides/dojo/i18n",
     "dojo/request/default": "/dojo/pentaho/common/overrides/dojo/request/default",
 
-    "common-ui/PluginHandler": "/plugin-handler/pluginHandler",
-    "common-ui/Plugin": "/plugin-handler/plugin",
-    "common-ui/AngularPluginHandler": "/plugin-handler/angularPluginHandler",
-    "common-ui/AngularPlugin": "/plugin-handler/angularPlugin",
-    "common-ui/AnimatedAngularPluginHandler": "/plugin-handler/animatedAngularPluginHandler",
-    "common-ui/AnimatedAngularPlugin": "/plugin-handler/animatedAngularPlugin",
-
     "common-ui/jquery": "/jquery/jquery.conflict",
     "common-ui/jquery-clean": "/jquery/jquery",
     "common-ui/handlebars": "/handlebars/handlebars-v4.0.13",

@@ -203,15 +203,6 @@
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
   // endregion
 
-  // region Plugin Handler
-  requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
-  requirePaths["common-ui/Plugin"] = basePath + "/plugin-handler/plugin";
-  requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
-  requirePaths["common-ui/AngularPlugin"] = basePath + "/plugin-handler/angularPlugin";
-  requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
-  requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
-  // endregion
-
   // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 
