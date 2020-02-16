@@ -70,16 +70,7 @@
     "common-ui/jquery-pentaho-i18n": "/jquery/jquery.i18n.properties.supported.languages",
     "common-ui/bootstrap": "/bootstrap/bootstrap",
     "common-ui/ring": "/ring/ring",
-    "common-ui/underscore": "/underscore/underscore",
-    "common-ui/angular": "/angular/angular",
-    "common-ui/angular-i18n": "/angular/i18n",
-    "common-ui/angular-resource": "/angular/angular-resource",
-    "common-ui/angular-route": "/angular/angular-route",
-    "common-ui/angular-animate": "/angular/angular-animate",
-    "common-ui/angular-sanitize": "/angular/angular-sanitize",
-    "common-ui/angular-translate": "/angular-translate/angular-translate",
-    "common-ui/angular-translate-loader-partial": "/angular-translate/angular-translate-loader-partial",
-    "common-ui/angular-translate-loader-static": "/angular-translate/angular-translate-loader-static-files"
+    "common-ui/underscore": "/underscore/underscore"
   },
 
   "map": {
@@ -507,42 +498,6 @@
         "common-ui/underscore"
       ],
       "exports": "ring"
-    },
-    "common-ui/angular-resource": {
-      "deps": [
-        "common-ui/angular"
-      ]
-    },
-    "common-ui/angular-route": {
-      "deps": [
-        "common-ui/angular"
-      ]
-    },
-    "common-ui/angular-animate": {
-      "deps": [
-        "common-ui/angular"
-      ]
-    },
-    "common-ui/angular-sanitize": {
-      "deps": [
-        "common-ui/angular"
-      ]
-    },
-    "common-ui/angular-translate": {
-      "deps": [
-        "pentaho/shim/es5",
-        "common-ui/angular"
-      ]
-    },
-    "common-ui/angular-translate-loader-partial": {
-      "deps": [
-        "common-ui/angular-translate"
-      ]
-    },
-    "common-ui/angular-translate-loader-static": {
-      "deps": [
-        "common-ui/angular-translate"
-      ]
     }
   },
 

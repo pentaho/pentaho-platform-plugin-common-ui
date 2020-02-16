@@ -1,5 +1,5 @@
 # Common-UI #
-Common-ui historically contains commonly used utils/frameworks (e.g. jquery, angular) that are used across the platform.
+Common-ui historically contains commonly used utils/frameworks (e.g. jquery) that are used across the platform.
 As we move forward with OSGI it is expected for these to be removed from common-ui to be deployed in a more modular way.
 
 How to build

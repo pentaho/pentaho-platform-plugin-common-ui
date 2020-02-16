@@ -231,65 +231,6 @@
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
-  // ANGULAR
-  requirePaths["common-ui/angular"] = basePath + "/angular/angular";
-  requireShim["common-ui/angular"] = {
-    deps: ["common-ui/jquery"],
-    exports: "angular",
-    init: function() {
-      // Load i18n for angular.
-      var baseMid = "common-ui/angular-i18n/angular-locale_"; // mid = module id
-      var locale = (typeof SESSION_LOCALE !== "undefined") ? SESSION_LOCALE : "en";
-
-      locale = locale.replace("_", "-").toLowerCase();
-
-      require([baseMid + locale], function() {}, function() {
-        // Couldn"t find the locale specified, fall back.
-        var prev = locale;
-
-        // Strip off the country designation, try to get just the language.
-        locale = (locale.length > 2) ? locale.substring(0, 2) : "en";
-
-        if(typeof console !== "undefined" && console.warn)
-          console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
-
-        require([baseMid + locale], function() {}, function() {
-          // Can't find the language at all, go get english.
-          if(typeof console !== "undefined" && console.warn)
-            console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
-
-          require([baseMid + "en"], function() {});
-        });
-      });
-    }
-  };
-
-  requirePaths["common-ui/angular-i18n"] = basePath + "/angular/i18n";
-
-  requirePaths["common-ui/angular-resource"] = basePath + "/angular/angular-resource";
-  requireShim["common-ui/angular-resource"] = ["common-ui/angular"];
-
-  requirePaths["common-ui/angular-route"] = basePath + "/angular/angular-route";
-  requireShim["common-ui/angular-route"] = ["common-ui/angular"];
-
-  requirePaths["common-ui/angular-animate"] = basePath + "/angular/angular-animate";
-  requireShim["common-ui/angular-animate"] = ["common-ui/angular"];
-
-  requirePaths["common-ui/angular-sanitize"] = basePath + "/angular/angular-sanitize";
-  requireShim["common-ui/angular-sanitize"] = ["common-ui/angular"];
-
-  requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate";
-  requireShim["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
-
-  requirePaths["common-ui/angular-translate-loader-partial"] = basePath +
-      "/angular-translate/angular-translate-loader-partial";
-  requireShim["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
-
-  requirePaths["common-ui/angular-translate-loader-static"] = basePath +
-      "/angular-translate/angular-translate-loader-static-files";
-  requireShim["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
-  // endregion
-
   // region Type API and Visualization Models Packages and Themes
 
   // This file is always in the non-compressed location.
