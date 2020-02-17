@@ -224,9 +224,6 @@
   requirePaths["common-ui/bootstrap"] = basePath + "/bootstrap/bootstrap";
   requireShim["common-ui/bootstrap"] = ["common-ui/jquery"];
 
-  requirePaths["common-ui/ring"] = basePath + "/ring/ring";
-  requireShim["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
-
   requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated

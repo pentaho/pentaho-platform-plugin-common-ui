@@ -99,7 +99,6 @@ if(!useDebug) {
     "common-ui/jquery-i18n",
     "common-ui/jquery-pentaho-i18n",
     "common-ui/bootstrap",
-    "common-ui/ring",
     "common-ui/underscore"
   ].forEach(function(mid) {
     var versionMid = getVersionedModuleId(mid);

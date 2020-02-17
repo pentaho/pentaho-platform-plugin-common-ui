@@ -69,7 +69,6 @@
     "common-ui/jquery-i18n": "/jquery/jquery.i18n.properties-min",
     "common-ui/jquery-pentaho-i18n": "/jquery/jquery.i18n.properties.supported.languages",
     "common-ui/bootstrap": "/bootstrap/bootstrap",
-    "common-ui/ring": "/ring/ring",
     "common-ui/underscore": "/underscore/underscore"
   },
 
@@ -492,12 +491,6 @@
       "deps": [
         "common-ui/jquery"
       ]
-    },
-    "common-ui/ring": {
-      "deps": [
-        "common-ui/underscore"
-      ],
-      "exports": "ring"
     }
   },
 
