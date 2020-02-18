@@ -36,42 +36,6 @@ requireShim[getVersionedModuleId("common-ui/jquery-clean")] = {
   }
 };
 
-// configure cdf's angular shim
-// (not in package.json because functions aren't supported)
-requireShim[getVersionedModuleId("common-ui/angular")] = {
-  deps: [getVersionedModuleId("common-ui/jquery")],
-  exports: "angular",
-  init: function() {
-    // Load i18n for angular.
-    var baseMid = getVersionedModuleId("common-ui/angular-i18n/angular-locale_"); // mid = module id
-    var locale = (typeof SESSION_LOCALE !== "undefined") ? SESSION_LOCALE : "en";
-
-    locale = locale.replace("_", "-").toLowerCase();
-
-    require([baseMid + locale], function() {
-    }, function() {
-      // Couldn't find the locale specified, fall back.
-      var prev = locale;
-
-      // Strip off the country designation, try to get just the language.
-      locale = (locale.length > 2) ? locale.substring(0, 2) : "en";
-
-      if(typeof console !== "undefined" && console.warn)
-        console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
-
-      require([baseMid + locale], function() {
-      }, function() {
-        // Can't find the language at all, go get english.
-        if(typeof console !== "undefined" && console.warn)
-          console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
-
-        require([baseMid + "en"], function() {
-        });
-      });
-    });
-  }
-};
-
 // switch paths to use compressed versions
 if(!useDebug) {
   [
@@ -129,31 +93,13 @@ if(!useDebug) {
     "dojo/i18n",
     "dojo/request/default",
 
-    "common-ui/PluginHandler",
-    "common-ui/Plugin",
-    "common-ui/AngularPluginHandler",
-    "common-ui/AngularPlugin",
-    "common-ui/AnimatedAngularPluginHandler",
-    "common-ui/AnimatedAngularPlugin",
-
     "common-ui/jquery",
     "common-ui/jquery-clean",
     "common-ui/handlebars",
     "common-ui/jquery-i18n",
     "common-ui/jquery-pentaho-i18n",
     "common-ui/bootstrap",
-    "common-ui/ring",
-    "common-ui/underscore",
-    "common-ui/angular",
-    "common-ui/angular-i18n",
-    "common-ui/angular-resource",
-    "common-ui/angular-route",
-    "common-ui/angular-animate",
-    "common-ui/angular-sanitize",
-    "common-ui/properties-parser",
-    "common-ui/angular-translate",
-    "common-ui/angular-translate-loader-partial",
-    "common-ui/angular-translate-loader-static"
+    "common-ui/underscore"
   ].forEach(function(mid) {
     var versionMid = getVersionedModuleId(mid);
     var path = requirePaths[versionMid];

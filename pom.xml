@@ -30,9 +30,7 @@
 
   <properties>
     <dojo.version>1.9.2</dojo.version>
-    <angular.version>1.5.8</angular.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
-    <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
     <pentaho-cdf-plugin.version>9.1.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
     <!-- Removed due to custom changes in the current common-ui version -->
     <!-- (mainly the exporting of the Handlebars global variable) -->
@@ -65,93 +63,6 @@
             <groupId>*</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-mocks</artifactId>
-        <version>${angular.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-resource</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-route</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-animate</artifactId>
-        <version>${angular.version}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>*</artifactId>
-            <groupId>*</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-aria</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-cookies</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-loader</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-message-format</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-messages</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-parse-ext</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-sanitize</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-scenario</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-touch</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>angular-i18n</artifactId>
-        <version>${angular.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>angular-translate</groupId>
-        <artifactId>angular-translate</artifactId>
-        <version>${angular-translate.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

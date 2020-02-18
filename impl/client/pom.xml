@@ -19,7 +19,7 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
+    <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
 
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
@@ -60,70 +60,6 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>requirejs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-mocks</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-resource</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-route</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-animate</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-aria</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-cookies</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-loader</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-message-format</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-messages</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-parse-ext</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-sanitize</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-scenario</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-touch</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>angular-i18n</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>angular-translate</groupId>
-      <artifactId>angular-translate</artifactId>
     </dependency>
   </dependencies>
 
