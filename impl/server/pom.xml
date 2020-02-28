@@ -282,12 +282,6 @@
       <version>${pentaho-reporting.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-vfs2</artifactId>
-      <version>${commons-vfs2.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <finalName>common-ui-${project.version}</finalName>
