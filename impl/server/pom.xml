@@ -35,6 +35,7 @@
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
     <platform.version>9.1.0.0-SNAPSHOT</platform.version>
     <commons-lang.version>2.2</commons-lang.version>
+    <encryption-support.version>9.1.0.0-SNAPSHOT</encryption-support.version>
   </properties>
   <dependencies>
     <dependency>
@@ -303,6 +304,12 @@
       <artifactId>libbase</artifactId>
       <version>${pentaho-reporting.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.pentaho</groupId>
+      <artifactId>pentaho-encryption-support</artifactId>
+      <version>${encryption-support.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
