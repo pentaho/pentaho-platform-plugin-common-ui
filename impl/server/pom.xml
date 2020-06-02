@@ -15,7 +15,7 @@
   <url>http://www.pentaho.com</url>
   <properties>
     <commons-vfs2.version>2.2</commons-vfs2.version>
-    <simple-jndi.version>0.11.1</simple-jndi.version>
+    <simple-jndi.version>1.0.3</simple-jndi.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
     <pentaho-connections.version>9.1.0.0-SNAPSHOT</pentaho-connections.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
@@ -276,7 +276,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>simple-jndi</groupId>
+      <groupId>pentaho</groupId>
       <artifactId>simple-jndi</artifactId>
       <version>${simple-jndi.version}</version>
       <scope>test</scope>
