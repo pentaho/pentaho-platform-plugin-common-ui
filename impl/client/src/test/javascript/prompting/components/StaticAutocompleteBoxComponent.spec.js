@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,33 @@ define([
 
       expect(comp.param.values[0].label).toBe(testInteger);
       expect(comp.param.values[0].value).toBe(testInteger);
+    });
+
+    it("should not call autocomplete search", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("StringParameter", {
+        type : "java.lang.String",
+        label : testInteger,
+        value : testInteger
+      }));
+
+      expect(comp.pendingChanges).toBe(undefined);
+      comp.update();
+      expect(comp.pendingChanges).toBe(undefined);
+    });
+
+    it("should call autocomplete search", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("StringParameter", {
+        type : "java.lang.String",
+        label : testInteger,
+        value : testInteger
+      }));
+
+      expect(comp.pendingChanges).toBe(undefined);
+      comp.pendingChanges = true;
+      comp.update();
+      expect(comp.pendingChanges).toBe(false);
     });
 
     it("should not try to parse a number", function() {
@@ -146,7 +173,34 @@ define([
       ph.remove();
     });
 
-    it("shoud fire a change in the dashboard on focusout", function() {
+    it("should fire a change in the dashboard when input changes", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("IntegerParameter", {
+        type : "java.lang.Integer",
+        label : testStringWithNumber,
+        value : testStringWithNumber,
+        selected : true
+      }));
+
+      comp.dashboard = {
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();
+
+      spyOn(comp.dashboard, 'processChange');
+      $('input', comp.ph).text("Test");
+      $('input', comp.ph).autocomplete( 'search');
+      expect(comp.dashboard.processChange).toHaveBeenCalled();
+
+      ph.remove();
+    });
+
+    it("should fire a change in the dashboard on focusout", function() {
       var comp = new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("IntegerParameter", {
         type : "java.lang.Integer",
@@ -172,6 +226,7 @@ define([
 
       ph.remove();
     });
+
   });
 
   describe("getValue", function() {

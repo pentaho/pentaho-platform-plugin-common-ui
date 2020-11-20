@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,8 +75,8 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       ph.empty();
 
       var html = '<input type="text" id="' + this.htmlObject + '-input"';
+      var initialValue;
       if (this.parameter) {
-        var initialValue;
         $.each(this.param.values, function(i, v) {
           if (v.selected) {
         	initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
@@ -118,15 +118,20 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
           if (myself.prevSelValue !== request.term) {
             myself.prevSelValue = request.term;
             myself.dashboard.processChange(myself.name);
+            this.pendingChanges = true;
+            // Return a empty array to resolve callback
+            response([]);
+          } else {
+            var term = request.term.toUpperCase();
+            var matches = $.map(this.valuesArray, function(tag) {
+              // we need unescape label before matching (fix for special characters like as &#39; &amp; &lt; &gt)
+              if (myself._createLabelTag(tag.label).text().toUpperCase().indexOf(term) >= 0) { // PRD-3745
+                return tag;
+              }
+            });
+            response(matches);
           }
-          var term = request.term.toUpperCase();
-          var matches = $.map(this.valuesArray, function(tag) {
-            // we need unescape label before matching (fix for special characters like as &#39; &amp; &lt; &gt)
-            if (myself._createLabelTag(tag.label).text().toUpperCase().indexOf(term) >= 0) { // PRD-3745
-              return tag;
-            }
-          });
-          response(matches);
+
         }.bind(this),
 
         // change() is called on blur
@@ -174,6 +179,12 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       }.bind(this));
 
       this._doAutoFocus();
+      //BISERVER-14512: It was a problem that suggestion of autocomplete just appear for a moment and then dissapear.
+      // This behaviour was because when is call dashboard.update it forces a new instance of input
+      if( this.pendingChanges ) {
+        input.autocomplete( 'search', initialValue );
+        this.pendingChanges = false;
+      }
     },
 
     /**
