@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -846,8 +846,9 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      * @param {Parameter} param
      * @param {String} name
      * @param {Object} value
+     * @param {Object} options
      */
-    parameterChanged: function(param, name, value) {
+    parameterChanged: function(param, name, value, options) {
 
       if(this.onParameterChanged) {
         var paramCallback = this.onParameterChanged[name] ?
@@ -870,7 +871,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         this.nullValueParams.push(param);
       }
 
-      this._setTimeoutRefreshPrompt();
+      this._setTimeoutRefreshPrompt(options);
       this.parametersChanged = true;
 
       if(this.onStateChanged != null) {
@@ -883,12 +884,18 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
     *
     * @name PromptPanel#_setTimeoutRefreshPrompt
     * @method
+    * @param {Object} options
     * @private
     *
     */
-    _setTimeoutRefreshPrompt: function() {
+    _setTimeoutRefreshPrompt: function(options) {
       var myself = this;
-      setTimeout(function() { myself.refreshPrompt(); }, 0);
+      setTimeout(function() {
+        if(!options) {
+          options = {};
+        }
+        myself.refreshPrompt(options.isForceRefresh, options.isSuppressSubmit);
+        }, 0);
     },
 
     /**
@@ -915,15 +922,19 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      * If the new parameter definition is undefined (default impl) no re-initialization will be done.
      *
      * @name PromptPanel#refreshPrompt
-     * @param {Boolean} isForceRefresh The flag indicates ability to update all components regardless of the difference previos and new xml from server
+     * @param {Boolean} isForceRefresh The flag indicates ability to update all components regardless of the difference
+     * previous and new xml from server
+     * @param {boolean} isSuppressSubmit The flag indicates to suppress submit
      * @method
      */
-    refreshPrompt: function(isForceRefresh) {
+    refreshPrompt: function(isForceRefresh, isSuppressSubmit) {
       try {
         this.isForceRefresh = isForceRefresh;
+        this.isSuppressSubmit = isSuppressSubmit;
         this.getParameterDefinition(this, this.refresh.bind(this));
       } catch(e) {
         this.isForceRefresh = undefined;
+        this.isSuppressSubmit = undefined;
         console.log(e);
         alert("Exception caught attempting to execute refreshCallback");
       }
@@ -1408,18 +1419,27 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         fireSubmit = (noAutoAutoSubmit != null) && !noAutoAutoSubmit;
       }
 
-      if(this.forceSubmit || fireSubmit) {
+      if(this.isRefresh) {
+        this.dashboard.components.forEach(function(component) {
+          if(component.needsUpdateOnNextRefresh && !this.dashboard.isComponentUpdating(component)){
+            this.dashboard.updateComponent(component);
+          }
+        }, this);
+      }
+
+      if(!this.isSuppressSubmit && (this.forceSubmit || fireSubmit)) {
         this.submit(this, {isInit: !this.isRefresh});
+      }
+
+      if(this.onAfterUpdate) {
+        this.onAfterUpdate();
       }
 
       this.diff = null;
       this.isRefresh = null;
       this.forceSubmit = false;
       this.isForceRefresh = undefined;
-
-      if(this.onAfterUpdate) {
-        this.onAfterUpdate();
-      }
+      this.isSuppressSubmit = undefined;
     },
 
     /**
@@ -1671,7 +1691,8 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         allowAutoSubmit: paramDefn.allowAutoSubmit(),
         parametersChanged: this.parametersChanged,
         autoSubmit: this.autoSubmit,
-        page: paramDefn.page
+        page: paramDefn.page,
+        isSuppressSubmit: this.isSuppressSubmit
       };
       return result;
     },

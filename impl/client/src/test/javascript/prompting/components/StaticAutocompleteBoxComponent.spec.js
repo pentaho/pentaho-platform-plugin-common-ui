@@ -70,9 +70,12 @@ define([
         value : testInteger
       }));
 
-      expect(comp.pendingChanges).toBe(undefined);
+      spyOn(comp, "_finalizeSource" ).and.callFake(function() {});
+
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
       comp.update();
-      expect(comp.pendingChanges).toBe(undefined);
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      expect(comp._finalizeSource).not.toHaveBeenCalled();
     });
 
     it("should call autocomplete search", function() {
@@ -83,10 +86,13 @@ define([
         value : testInteger
       }));
 
-      expect(comp.pendingChanges).toBe(undefined);
-      comp.pendingChanges = true;
+      spyOn(comp, "_finalizeSource" ).and.callFake(function() {});
+
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      comp.needsUpdateOnNextRefresh = true;
       comp.update();
-      expect(comp.pendingChanges).toBe(false);
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      expect(comp._finalizeSource).toHaveBeenCalled();
     });
 
     it("should not try to parse a number", function() {
