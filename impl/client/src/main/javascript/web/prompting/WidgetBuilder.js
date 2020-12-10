@@ -128,7 +128,6 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
             }.bind(widget);
           }
           return widget;
-
         }
       };
     });

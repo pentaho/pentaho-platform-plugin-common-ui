@@ -846,7 +846,9 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      * @param {Parameter} param
      * @param {String} name
      * @param {Object} value
-     * @param {Object} options
+     * @param {Object} [options] - The options object.
+     * @param {boolean} [options.isForceRefresh=false] - Indicates that will force refresh on this call
+     * @param {boolean} [options.isSuppressSubmit=false] - Indicates that will suppress submit on this call
      */
     parameterChanged: function(param, name, value, options) {
 
@@ -1666,6 +1668,8 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      *                     <li>'parametersChanged' &lt;Boolean&gt; - True if the parameters have changed, False otherwise</li>
      *                     <li>'autoSubmit' &lt;Boolean&gt; - True is the prompt is in auto submit mode, False otherwise</li>
      *                     <li>'page' &lt;Number&gt; - The number of the page</li>
+     *                     <li>'isSuppressSubmit' &lt;Boolean&gt; True if is to suppress submit, False otherwise</li>
+     *                     <li>'isForceRefresh' &lt;Boolean&gt; True if is to force refresh, False otherwise</li>
      *                   </ul>
      * @example
      * var currentState = api.operation.state();
@@ -1678,7 +1682,9 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      * //     "allowAutoSubmit":false,
      * //     "parametersChanged":false,
      * //     "autoSubmit":false,
-     * //     "page":1
+     * //     "page":1,
+     * //     "isSuppressSubmit":false,
+     * //     "isForceRefresh":false
      * //   }
      */
     getState: function() {
@@ -1692,7 +1698,8 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         parametersChanged: this.parametersChanged,
         autoSubmit: this.autoSubmit,
         page: paramDefn.page,
-        isSuppressSubmit: this.isSuppressSubmit
+        isSuppressSubmit: this.isSuppressSubmit,
+        isForceRefresh: this.isForceRefresh
       };
       return result;
     },

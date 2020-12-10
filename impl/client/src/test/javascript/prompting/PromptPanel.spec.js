@@ -811,6 +811,39 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
         expect(panel.isForceRefresh).not.toBeDefined();
         expect(window.setTimeout).toHaveBeenCalled();
       });
+
+      it("should update component if needsUpdateOnNextRefresh", function (){
+        paramDefn.showParameterUI.and.returnValue(true);
+        panel.isRefresh = true;
+
+        var needUpdateOnNextRefreshComponent = {
+          needsUpdateOnNextRefresh: true,
+        }
+        panel.dashboard.isComponentUpdating = function(component){
+          return false;
+        }
+        panel.dashboard.components.push(needUpdateOnNextRefreshComponent);
+        panel.init(true);
+        expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(needUpdateOnNextRefreshComponent);
+      });
+
+      it("should not call submit if isSuppressSubmit is set", function () {
+        paramDefn.showParameterUI.and.returnValue(true);
+        panel.isRefresh = false;
+        panel.isSuppressSubmit = true;
+
+        panel.init(true);
+        expect(panel.submit).not.toHaveBeenCalled();
+      });
+
+      it("should call submit if isSuppressSubmit is not set", function () {
+        paramDefn.showParameterUI.and.returnValue(true);
+        panel.isRefresh = false;
+        panel.isSuppressSubmit = false;
+
+        panel.init(true);
+        expect(panel.submit).toHaveBeenCalled();
+      });
     });
 
     it("hide", function() {

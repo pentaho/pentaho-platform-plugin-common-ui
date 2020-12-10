@@ -95,6 +95,33 @@ define([
       expect(comp._finalizeSource).toHaveBeenCalled();
     });
 
+    it("should set needsUpdateOnNextRefresh", function () {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("IntegerParameter", {
+        type : "java.lang.Integer",
+        label : testStringWithNumber,
+        value : testStringWithNumber,
+        selected : true
+      }));
+
+      comp.dashboard = {
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();
+
+      spyOn(comp.dashboard, 'processChange');
+      $('input', comp.ph).text("Test");
+      $('input', comp.ph).autocomplete( 'search');
+      expect(comp.dashboard.processChange).toHaveBeenCalled();
+      expect(comp.needsUpdateOnNextRefresh).toBe(true);
+      ph.remove();
+    });
+
     it("should not try to parse a number", function() {
       var comp = new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("IntegerParameter", {

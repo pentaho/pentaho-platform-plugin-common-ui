@@ -57,8 +57,10 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
   return BaseComponent.extend(/** @lends StaticAutocompleteBoxComponent# */{
 
     /**
-     * Indicates if needs update on next refresh.
+     * Gets a value that indicates if the component needs to be updated on the next refresh of its prompt panel,
+     * even if the component would otherwise not be selected for update.
      * @type {boolean}
+     * @default false
      */
     needsUpdateOnNextRefresh: false,
 
@@ -81,7 +83,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
         this.labelValueMap[item.label] = item.value;
       }.bind(this));
 
-      // Obtain initial value
+      // Obtain initial value.
       var initialValue = null;
       if(this.parameter) {
         $.each(this.param.values, function(i, v) {
@@ -91,28 +93,27 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
         }.bind(this));
       }
 
-      // Verify if element already exists
+      // Verify if element already exists.
       var input = $('input', ph);
       if(input.length === 0) {
-        // Initialize autocomplete
+        // Initialize autocomplete.
         this._createAndInitializeInputAutocompleteElement(ph, initialValue);
       } else if(initialValue !== this.prevSelValue) {
         //Update current value
         input.val(initialValue);
       }
 
-      //BISERVER-14512: It was a problem that suggestion of autocomplete just appear for a moment and then dissapear.
-      // This behaviour was because when is call dashboard.update it forces a new instance of input
+      // BISERVER-14512: It was a problem that suggestion of autocomplete just appear for a moment and then dissapear.
+      // This behaviour was because when is call dashboard.update it forces a new instance of input.
       if(this.needsUpdateOnNextRefresh) {
         this.needsUpdateOnNextRefresh = false;
         this._finalizeSource(this.prevSelValue, this._searchResponseCallback)
         this._searchResponseCallback = null;
       }
-
     },
 
     /**
-     * Returns the value assigned to the component
+     * Returns the value assigned to the component.
      *
      * @returns {String} The string inserted in the text area, parsed using the common-ui formatters
      */
@@ -131,7 +132,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
     _createAndInitializeInputAutocompleteElement: function(ph, initialValue) {
       var html = '<input type="text" id="' + this.htmlObject + '-input"';
 
-      if (initialValue !== null) {
+      if (initialValue != null) {
         html += ' value="' + initialValue + '"';
       }
 
@@ -145,25 +146,24 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
           $(input).data('ui-autocomplete')._renderItem = function (ul, item) {
             // [BISERVER-11863] represent special characters correctly (for example &#39; &amp; &lt; &gt)
             return $("<li></li>").append(this._createLabelTag(item.label)).appendTo(ul);
-
-            // [PRD-6038] Ensuring that the cursor is placed at the end of the input box
-            // Opera sometimes sees a carriage return as 2 characters, so we multiple by
-            // 2 to ensure we are getting to the very end.
-            var inputTextLength = 0;
-            if(typeof (this.getValue()) !== "undefined") {
-              inputTextLength = this.getValue().length * 2;
-            }
-            // [PRD-6038] Whether or not the inputTextLength has been set, we need to ensure that the last
-            // autocomplete box that has been modified (focused on) retains the selected cursor.  Firefox
-            // and Chrome handle this behind the scenes, but IE11 and Edge go to the last autocomplete box
-            // on the page.  This conditional statement ensures only the last focused autocomplete box has the
-            // cursor range set (thus putting it at the end on the only modified box)
-            if(this.autoFocus === true){
-              input[0].setSelectionRange(inputTextLength, inputTextLength);
-            }
-          };
+          }
+          // [PRD-6038] Ensuring that the cursor is placed at the end of the input box
+          // Opera sometimes sees a carriage return as 2 characters, so we multiple by
+          // 2 to ensure we are getting to the very end.
+          var inputTextLength = 0;
+          if(typeof (this.getValue()) !== "undefined") {
+            inputTextLength = this.getValue().length * 2;
+          }
+          // [PRD-6038] Whether or not the inputTextLength has been set, we need to ensure that the last
+          // autocomplete box that has been modified (focused on) retains the selected cursor.  Firefox
+          // and Chrome handle this behind the scenes, but IE11 and Edge go to the last autocomplete box
+          // on the page.  This conditional statement ensures only the last focused autocomplete box has the
+          // cursor range set (thus putting it at the end on the only modified box)
+          if(this.autoFocus === true){
+            input[0].setSelectionRange(inputTextLength, inputTextLength);
+          }
         }.bind(this),
-        source : function(request, response) {
+        source: function(request, response) {
           if (this.prevSelValue !== request.term) {
             this.prevSelValue = request.term;
             this._searchResponseCallback = response;
@@ -228,7 +228,8 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       var searchTerm = term.toUpperCase();
       var matches = $.map(this.valuesArray, function(tag) {
         // we need unescape label before matching (fix for special characters like as &#39; &amp; &lt; &gt)
-        if (this._createLabelTag(tag.label).text().toUpperCase().indexOf(searchTerm) >= 0) { // PRD-3745
+        // PRD-3745
+        if (this._createLabelTag(tag.label).text().toUpperCase().indexOf(searchTerm) >= 0) {
           return tag;
         }
       }.bind(this));
