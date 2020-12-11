@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,37 @@ define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/parameters/Par
       expect(panel.type).toEqual('ScrollingPromptPanelLayoutComponent');
       expect(buildPanelComponentsFn).toHaveBeenCalled();
       expect(panel.promptPanel).toBeDefined();
+    });
+
+    it("should call parameterChanged with isSuppressSubmit a true if component has needsUpdateOnNextRefresh set", function() {
+      var buildPanelComponentsFn = jasmine.createSpy('buildPanelComponents');
+      var parameterChangedFn = jasmine.createSpy("parameterChanged");
+      var args = {
+        buildPanelComponents: buildPanelComponentsFn,
+        promptPanel: {
+          parameterChanged: parameterChangedFn
+        }
+      };
+
+      var customComponentObject = {
+        needsUpdateOnNextRefresh: true,
+        parameter: 'parameter',
+        param: 'param',
+        getValue: function() {
+          return "value";
+        }
+      }
+      var customComponent = {
+        build: function () {
+          return customComponentObject;
+        }
+      };
+
+      spyOn(WidgetBuilder, '_findBuilderFor').and.returnValue(customComponent);
+      var panel = WidgetBuilder.build(args, 'custom-component');
+      panel.postChange();
+      expect(args.promptPanel.parameterChanged).toHaveBeenCalledWith(
+          customComponentObject.param, customComponentObject.parameter, customComponentObject.getValue(), {isSuppressSubmit:true});
     });
 
     it("distinguishes textbox and autocompletebox properly", function() {
