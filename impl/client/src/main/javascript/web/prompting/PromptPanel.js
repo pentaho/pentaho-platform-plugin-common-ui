@@ -1433,15 +1433,19 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         this.submit(this, {isInit: !this.isRefresh});
       }
 
-      if(this.onAfterUpdate) {
-        this.onAfterUpdate();
+      try{
+        if(this.onAfterUpdate) {
+          this.onAfterUpdate();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.diff = null;
+        this.isRefresh = null;
+        this.forceSubmit = false;
+        this.isForceRefresh = undefined;
+        this.isSuppressSubmit = undefined;
       }
-
-      this.diff = null;
-      this.isRefresh = null;
-      this.forceSubmit = false;
-      this.isForceRefresh = undefined;
-      this.isSuppressSubmit = undefined;
     },
 
     /**
