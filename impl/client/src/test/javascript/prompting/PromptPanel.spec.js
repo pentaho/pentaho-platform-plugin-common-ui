@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -330,7 +330,6 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
       var Logger = require("cdf/Logger");
       spyOn(Logger, "warn");
       panel.submit();
-      expect(panel.forceAutoSubmit).toBeFalsy();
       expect(Logger.warn).toHaveBeenCalled();
     });
 
@@ -680,6 +679,7 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
         spyOn(panel, "submit");
         panel.paramDefn = paramDefn;
         panel.dashboard = dash;
+        panel.dashboard.components = [];
         spyOn(panel, "buildPanelComponents");
         spyOn(panel, "update");
         panel._multiListBoxTopValuesByParam = {
@@ -810,6 +810,39 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
         expect(panel.isRefresh).toBeNull();
         expect(panel.isForceRefresh).not.toBeDefined();
         expect(window.setTimeout).toHaveBeenCalled();
+      });
+
+      it("should update component if needsUpdateOnNextRefresh", function (){
+        paramDefn.showParameterUI.and.returnValue(true);
+        panel.isRefresh = true;
+
+        var needUpdateOnNextRefreshComponent = {
+          needsUpdateOnNextRefresh: true,
+        }
+        panel.dashboard.isComponentUpdating = function(component){
+          return false;
+        }
+        panel.dashboard.components.push(needUpdateOnNextRefreshComponent);
+        panel.init(true);
+        expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(needUpdateOnNextRefreshComponent);
+      });
+
+      it("should not call submit if isSuppressSubmit is set", function () {
+        paramDefn.showParameterUI.and.returnValue(true);
+        panel.isRefresh = false;
+        panel.isSuppressSubmit = true;
+
+        panel.init(true);
+        expect(panel.submit).not.toHaveBeenCalled();
+      });
+
+      it("should call submit if isSuppressSubmit is not set", function () {
+        paramDefn.showParameterUI.and.returnValue(true);
+        panel.isRefresh = false;
+        panel.isSuppressSubmit = false;
+
+        panel.init(true);
+        expect(panel.submit).toHaveBeenCalled();
       });
     });
 
@@ -1496,6 +1529,7 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
       expect(state.parametersChanged).toBe(panel.parametersChanged);
       expect(state.autoSubmit).toBe(panel.autoSubmit);
       expect(state.page).toBe(paramDefn.page);
+      expect(state.isSuppressSubmit).toBe(panel.isSuppressSubmit);
     });
 
     describe("setState", function() {

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,66 @@ define([
       expect(comp.param.values[0].value).toBe(testInteger);
     });
 
+    it("should not call autocomplete search", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("StringParameter", {
+        type : "java.lang.String",
+        label : testInteger,
+        value : testInteger
+      }));
+
+      spyOn(comp, "_finalizeSource" ).and.callFake(function() {});
+
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      comp.update();
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      expect(comp._finalizeSource).not.toHaveBeenCalled();
+    });
+
+    it("should call autocomplete search", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("StringParameter", {
+        type : "java.lang.String",
+        label : testInteger,
+        value : testInteger
+      }));
+
+      spyOn(comp, "_finalizeSource" ).and.callFake(function() {});
+
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      comp.needsUpdateOnNextRefresh = true;
+      comp.update();
+      expect(comp.needsUpdateOnNextRefresh).toBe(false);
+      expect(comp._finalizeSource).toHaveBeenCalled();
+    });
+
+    it("should set needsUpdateOnNextRefresh", function () {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("IntegerParameter", {
+        type : "java.lang.Integer",
+        label : testStringWithNumber,
+        value : testStringWithNumber,
+        selected : true
+      }));
+
+      comp.dashboard = {
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();
+
+      spyOn(comp.dashboard, 'processChange');
+      $('input', comp.ph).text("Test");
+      $('input', comp.ph).autocomplete( 'search');
+      expect(comp.dashboard.processChange).toHaveBeenCalled();
+      expect(comp.needsUpdateOnNextRefresh).toBe(true);
+      ph.remove();
+    });
+
     it("should not try to parse a number", function() {
       var comp = new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("IntegerParameter", {
@@ -101,7 +161,7 @@ define([
         selected : true
       }));
 
-      comp.dashboard = {
+      comp.dashboard = { 
         processChange: function() { }
       };
       comp.htmlObject = 'test';
@@ -109,13 +169,13 @@ define([
       var ph = $('<div>').attr('id', comp.htmlObject);
       $('body').append(ph);
 
-      comp.update();
+      comp.update();  
 
-      spyOn(comp.dashboard, 'processChange');
+      spyOn(comp.dashboard, 'processChange');      
        $('input', comp.ph).trigger($.Event( 'keypress', { which: $.ui.keyCode.ENTER } ));
 
-      expect(comp.dashboard.processChange).toHaveBeenCalled();
-
+      expect(comp.dashboard.processChange).toHaveBeenCalled();  
+      
       ph.remove();
     });
 
@@ -128,7 +188,7 @@ define([
         selected : true
       }));
 
-      comp.dashboard = {
+      comp.dashboard = { 
         processChange: function() { }
       };
       comp.htmlObject = 'test';
@@ -137,16 +197,16 @@ define([
       $('body').append(ph);
 
       comp.update();
-
-      spyOn(comp.dashboard, 'processChange');
+      
+      spyOn(comp.dashboard, 'processChange');      
       $('input', comp.ph).trigger($.Event( 'keypress', { which: $.ui.keyCode.ESCAPE } ));
 
-      expect(comp.dashboard.processChange).not.toHaveBeenCalled();
-
+      expect(comp.dashboard.processChange).not.toHaveBeenCalled();  
+      
       ph.remove();
     });
 
-    it("shoud fire a change in the dashboard on focusout", function() {
+    it("should fire a change in the dashboard when input changes", function() {
       var comp = new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("IntegerParameter", {
         type : "java.lang.Integer",
@@ -166,10 +226,37 @@ define([
       comp.update();
 
       spyOn(comp.dashboard, 'processChange');
-      $('input', comp.ph).trigger('focusout');
-
+      $('input', comp.ph).text("Test");
+      $('input', comp.ph).autocomplete( 'search');
       expect(comp.dashboard.processChange).toHaveBeenCalled();
 
+      ph.remove();
+    });
+
+    it("should fire a change in the dashboard on focusout", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("IntegerParameter", {
+        type : "java.lang.Integer",
+        label : testStringWithNumber,
+        value : testStringWithNumber,
+        selected : true
+      }));
+
+      comp.dashboard = { 
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();
+      
+      spyOn(comp.dashboard, 'processChange');      
+      $('input', comp.ph).trigger('focusout');
+
+      expect(comp.dashboard.processChange).toHaveBeenCalled();  
+      
       ph.remove();
     });
   });
@@ -228,5 +315,4 @@ define([
       expect(value).toBe(formattedV + parsedV + testInteger);
     });
   });
-
 });
