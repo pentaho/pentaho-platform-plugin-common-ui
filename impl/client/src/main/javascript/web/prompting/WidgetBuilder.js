@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,11 +120,14 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
           var widget = this._findBuilderFor(args, type).build(args);
           if (widget.parameter && widget.param) {
             widget.postChange = function () {
-              args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue());
+              var options = {};
+              if(this.needsUpdateOnNextRefresh) {
+               options = {isSuppressSubmit: true};
+              }
+              args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue(), options);
             }.bind(widget);
           }
           return widget;
-
         }
       };
     });
