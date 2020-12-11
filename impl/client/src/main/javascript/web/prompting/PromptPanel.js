@@ -1437,8 +1437,6 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
         if(this.onAfterUpdate) {
           this.onAfterUpdate();
         }
-      } catch (error) {
-        console.log(error);
       } finally {
         this.diff = null;
         this.isRefresh = null;
