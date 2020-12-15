@@ -146,7 +146,8 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
           $(input).data('ui-autocomplete')._renderItem = function (ul, item) {
             // [BISERVER-11863] represent special characters correctly (for example &#39; &amp; &lt; &gt)
             return $("<li></li>").append(this._createLabelTag(item.label)).appendTo(ul);
-          }
+          }.bind(this);
+
           // [PRD-6038] Ensuring that the cursor is placed at the end of the input box
           // Opera sometimes sees a carriage return as 2 characters, so we multiple by
           // 2 to ensure we are getting to the very end.
