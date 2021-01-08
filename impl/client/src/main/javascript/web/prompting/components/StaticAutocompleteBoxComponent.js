@@ -84,7 +84,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       }.bind(this));
 
       // Obtain initial value.
-      var initialValue = null;
+      var initialValue;
       if(this.parameter) {
         $.each(this.param.values, function(i, v) {
           if(v.selected) {
@@ -98,7 +98,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       if(input.length === 0) {
         // Initialize autocomplete.
         this._createAndInitializeInputAutocompleteElement(ph, initialValue);
-      } else if(initialValue !== this.prevSelValue) {
+      } else if(initialValue !== this.prevSelValue && initialValue !== undefined) {
         //Update current value
         input.val(initialValue);
       }
@@ -132,7 +132,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
     _createAndInitializeInputAutocompleteElement: function(ph, initialValue) {
       var html = '<input type="text" id="' + this.htmlObject + '-input"';
 
-      if (initialValue != null) {
+      if (initialValue !== undefined) {
         html += ' value="' + initialValue + '"';
       }
 
