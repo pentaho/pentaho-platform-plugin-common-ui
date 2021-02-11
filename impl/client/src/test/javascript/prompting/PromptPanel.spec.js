@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -725,7 +725,7 @@ define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
       });
 
       it("should not init dashboard without showing panel and without submitting", function() {
-        panel.init();
+        panel.init(true);
         expect(panel.update).not.toHaveBeenCalled();
         expect(paramDefn.showParameterUI).toHaveBeenCalled();
         expect(paramDefn.mapParameters).toHaveBeenCalled();
