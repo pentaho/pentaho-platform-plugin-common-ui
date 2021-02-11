@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2020 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1418,7 +1418,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
 
         // Must submit, independently of auto-submit value.
         // All parameters are initialized, fire the submit
-        fireSubmit = (noAutoAutoSubmit != null) && !noAutoAutoSubmit;
+        fireSubmit = !noAutoAutoSubmit;
       }
 
       if(this.isRefresh) {
