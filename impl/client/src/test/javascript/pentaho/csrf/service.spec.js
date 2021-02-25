@@ -188,7 +188,7 @@ define(function() {
           csrfService.getToken(sameAppUrl);
 
           var urlQueryString = "url=" + encodeURIComponent(sameAppUrl);
-          var expectedUrl = pentahoUrl + "api/system/csrf?" + urlQueryString;
+          var expectedUrl = pentahoUrl + "api/csrf/token?" + urlQueryString;
 
           expect(xhrMock.open).toHaveBeenCalledTimes(1);
           expect(xhrMock.open).toHaveBeenCalledWith("GET", expectedUrl, false);
