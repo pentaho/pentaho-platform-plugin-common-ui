@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,17 @@ define([ "common-ui/util/util" ], function( Util ) {
         expect( Util.normalizeDojoLocale( 'xy-z' ) ).toBe( 'en' );
         expect( Util.normalizeDojoLocale( 'xy-zt-' ) ).toBe( 'en' );
       });
+    });
+  });
+
+  describe("updateTimezoneFormat", function() {
+
+    it("should return correctly formatted timezone", function() {
+      expect( Util.updateTimezoneFormat( '+0500' ) ).toBe( '+05:00' );
+      expect( Util.updateTimezoneFormat( '-0545' ) ).toBe( '-05:45' );
+      expect( Util.updateTimezoneFormat( '+600' ) ).toBe( '+6:00' );
+      expect( Util.updateTimezoneFormat( '+0000' ) ).toBe( '+00:00' );
+      expect( Util.updateTimezoneFormat( '+00' ) ).toBe( '+00' );
     });
   });
 

@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -219,6 +219,23 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
      */
     normalizeDojoLocale: function(locale) {
       return locale.match( /^[a-z]{2}(?:[-_][a-z]{2}){0,2}$/i ) ? locale.replace( /_/g, "-" ).toLowerCase() : "en";
+    },
+
+    /**
+     * Converts timezone string without ":" (ex: "+0500" ) to a compatible timezone string including ":"
+     * Although most browsers support this format, the standard for a timezone string should be "+00:00" for example.
+     * @name util#updateTimezoneFormat
+     * @method
+     * @param {String} timezone will be in the format of "[+|-]xxx[x] Ex: +600 or +0000 or -0530
+     * @return {String} timezone string including ":" separating hours and minutes, or the exact same string if the format provided is not correct"
+     */
+    updateTimezoneFormat: function(timezone) {
+      var timezoneHintSize = timezone.length;
+      if (timezone.indexOf(":") == -1 && timezoneHintSize >= 4){
+        var indexToInsert = timezoneHintSize == 4 ? 2 : 3;
+        return timezone.slice(0, indexToInsert) + ":" + timezone.slice(indexToInsert);
+      }
+      return timezone;
     }
   }
 });
