@@ -49,7 +49,7 @@ define([
       }
 
       // Sending the URL as a parameter and not as a header to avoid becoming a pre-flight request.
-      var csrfServiceUrl = serverBaseUrl + "api/system/csrf?url=" + encodeURIComponent(url);
+      var csrfServiceUrl = serverBaseUrl + "api/csrf/token?url=" + encodeURIComponent(url);
 
       var xhr = service.__createXhr();
       xhr.open("GET", csrfServiceUrl, /* async: */false);
