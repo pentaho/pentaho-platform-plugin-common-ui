@@ -224,15 +224,16 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
     /**
      * Converts timezone string without ":" (ex: "+0500" ) to a compatible timezone string including ":"
      * Although most browsers support this format, the standard for a timezone string should be "+00:00" for example.
-     * @name util#updateTimezoneFormat
+     * @name util#convertTimezoneToStandardFormat
      * @method
-     * @param {String} timezone will be in the format of "[+|-]xxx[x] Ex: +600 or +0000 or -0530
+     * @param {String} timezone will be in the format of "<+|->[x]xxx either by itself or ending a date. Ex: +600 or +0000 or -0530 or 2020-11-01T00:00:00.000-0700
      * @return {String} timezone string including ":" separating hours and minutes, or the exact same string if the format provided is not correct"
      */
-    updateTimezoneFormat: function(timezone) {
-      var timezoneHintSize = timezone.length;
-      if (timezone.indexOf(":") == -1 && timezoneHintSize >= 4){
-        var indexToInsert = timezoneHintSize == 4 ? 2 : 3;
+    convertTimezoneToStandardFormat: function(timezone) {
+      var tzRegex = /^.*[+-]{1}\d{3,4}$/;
+      var match = timezone.match(tzRegex);
+      if (match && match.length > 0) {
+        var indexToInsert = timezone.length - 2;
         return timezone.slice(0, indexToInsert) + ":" + timezone.slice(indexToInsert);
       }
       return timezone;

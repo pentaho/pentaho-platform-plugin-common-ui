@@ -44,14 +44,23 @@ define([ "common-ui/util/util" ], function( Util ) {
     });
   });
 
-  describe("updateTimezoneFormat", function() {
+  describe("convertTimezoneToStandardFormat", function() {
 
     it("should return correctly formatted timezone", function() {
-      expect( Util.updateTimezoneFormat( '+0500' ) ).toBe( '+05:00' );
-      expect( Util.updateTimezoneFormat( '-0545' ) ).toBe( '-05:45' );
-      expect( Util.updateTimezoneFormat( '+600' ) ).toBe( '+6:00' );
-      expect( Util.updateTimezoneFormat( '+0000' ) ).toBe( '+00:00' );
-      expect( Util.updateTimezoneFormat( '+00' ) ).toBe( '+00' );
+      expect( Util.convertTimezoneToStandardFormat( '+0500' ) ).toBe( '+05:00' );
+      expect( Util.convertTimezoneToStandardFormat( '-0545' ) ).toBe( '-05:45' );
+      expect( Util.convertTimezoneToStandardFormat( '+600' ) ).toBe( '+6:00' );
+      expect( Util.convertTimezoneToStandardFormat( '+0000' ) ).toBe( '+00:00' );
+      expect( Util.convertTimezoneToStandardFormat( '+00:00' ) ).toBe( '+00:00' );
+      expect( Util.convertTimezoneToStandardFormat( '+00' ) ).toBe( '+00' );
+      expect( Util.convertTimezoneToStandardFormat( '+00567' ) ).toBe( '+00567' );
+      expect( Util.convertTimezoneToStandardFormat( 'something' ) ).toBe( 'something' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000' ) ).toBe( '2020-11-01T00:00:00.000' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000-0700' ) ).toBe( '2020-11-01T00:00:00.000-07:00' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000+600' ) ).toBe( '2020-11-01T00:00:00.000+6:00' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000+07456' ) ).toBe( '2020-11-01T00:00:00.000+07456' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.0000700' ) ).toBe( '2020-11-01T00:00:00.0000700' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000+07:30' ) ).toBe( '2020-11-01T00:00:00.000+07:30' );
     });
   });
 
