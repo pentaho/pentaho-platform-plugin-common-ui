@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,26 @@ define([ "common-ui/util/util" ], function( Util ) {
         expect( Util.normalizeDojoLocale( 'xy-z' ) ).toBe( 'en' );
         expect( Util.normalizeDojoLocale( 'xy-zt-' ) ).toBe( 'en' );
       });
+    });
+  });
+
+  describe("convertTimezoneToStandardFormat", function() {
+
+    it("should return correctly formatted timezone", function() {
+      expect( Util.convertTimezoneToStandardFormat( '+0500' ) ).toBe( '+05:00' );
+      expect( Util.convertTimezoneToStandardFormat( '-0545' ) ).toBe( '-05:45' );
+      expect( Util.convertTimezoneToStandardFormat( '+600' ) ).toBe( '+6:00' );
+      expect( Util.convertTimezoneToStandardFormat( '+0000' ) ).toBe( '+00:00' );
+      expect( Util.convertTimezoneToStandardFormat( '+00:00' ) ).toBe( '+00:00' );
+      expect( Util.convertTimezoneToStandardFormat( '+00' ) ).toBe( '+00' );
+      expect( Util.convertTimezoneToStandardFormat( '+00567' ) ).toBe( '+00567' );
+      expect( Util.convertTimezoneToStandardFormat( 'something' ) ).toBe( 'something' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000' ) ).toBe( '2020-11-01T00:00:00.000' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000-0700' ) ).toBe( '2020-11-01T00:00:00.000-07:00' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000+600' ) ).toBe( '2020-11-01T00:00:00.000+6:00' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000+07456' ) ).toBe( '2020-11-01T00:00:00.000+07456' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.0000700' ) ).toBe( '2020-11-01T00:00:00.0000700' );
+      expect( Util.convertTimezoneToStandardFormat( '2020-11-01T00:00:00.000+07:30' ) ).toBe( '2020-11-01T00:00:00.000+07:30' );
     });
   });
 
