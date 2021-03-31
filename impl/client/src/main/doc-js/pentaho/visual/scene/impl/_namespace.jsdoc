@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * The `impl` namespace contains implementation classes related to visual scenes.
  *
- * @name pentaho.visual.role.scene.impl
+ * @name pentaho.visual.scene.impl
  * @namespace
  * @private
  */
