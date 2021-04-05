@@ -1,5 +1,5 @@
 /*!
- * Copyright 2017 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2017 - 2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,76 +14,51 @@
  * limitations under the License.
  */
 
+/* eslint-disable max-len */
+
 define(function() {
 
   "use strict";
 
-  /*
-   * In this file you can add configuration rules that fine tune the look and behaviour
+  /**
+   * In this file you can add configuration rules that fine-tune the look and behaviour
    * of visualizations when displayed in different applications.
    *
-   * Known Application Ids:
-   * 1. PDI Data Inspection - "pentaho/det"
-   * 2. Pentaho Analyzer - "pentaho/analyzer"
-   * 3. Pentaho Analyzer in Dashboards - "pentaho/dashboardDesigner"
-   * 4. Pentaho CDF/CDE - "pentaho/cdf"
+   * Below, you'll find several examples of configuration rules which can be individually uncommented and experimented.
+   * Links to the documentation of the options being configured are provided.
    *
-   * Stock visualizations' model ids:
-   * 1. AreaStacked - "pentaho/visual/models/AreaStacked"
-   * 2. Line - "pentaho/visual/models/Line"
-   * 3. Column - "pentaho/visual/models/Bar"
-   * 4. Bar - "pentaho/visual/models/BarHorizontal"
-   * 5. Stacked Column - "pentaho/visual/models/BarStacked"
-   * 6. Stacked Bar - "pentaho/visual/models/BarStackedHorizontal"
-   * 7. 100% Stacked Column - "pentaho/visual/models/BarNormalized"
-   * 8. 100% Stacked Bar - "pentaho/visual/models/BarNormalizedHorizontal"
-   * 9. Column-Line Combo - "pentaho/visual/models/BarLine"
-   * 10. Scatter - "pentaho/visual/models/Scatter"
-   * 11. Bubble - "pentaho/visual/models/Bubble"
-   * 12. Pie - "pentaho/visual/models/Pie"
-   * 13. Donut - "pentaho/visual/models/Donut"
-   * 14. Sunburst - "pentaho/visual/models/Sunburst"
-   * 15. Heat Grid - "pentaho/visual/models/HeatGrid"
-   * 16. Geo Map - "pentaho/geo/visual/Model"
+   * For help on configuration, please check the following help topics:
+   * 1. [General information on configuration](https://help.pentaho.com/Documentation/9.2/Developer_center/Configuration_API)
+   * 2. [Configuring a visualization](https://help.pentaho.com/Documentation/9.2/Developer_center/Configuring_a_visualization)
    *
-   * Stock visualizations' view ids:
-   * 1. AreaStacked - "pentaho/ccc/visual/AreaStacked"
-   * 2. Line - "pentaho/ccc/visual/Line"
-   * 3. Column - "pentaho/ccc/visual/Bar"
-   * 4. Bar - "pentaho/ccc/visual/BarHorizontal"  Normalized
-   * 5. Stacked Column - "pentaho/ccc/visual/BarStacked"
-   * 6. Stacked Bar - "pentaho/ccc/visual/BarStackedHorizontal"
-   * 7. 100% Stacked Column - "pentaho/ccc/visual/BarNormalized"
-   * 8. 100% Stacked Bar - "pentaho/ccc/visual/BarNormalizedHorizontal"
-   * 9. Column-Line Combo - "pentaho/ccc/visual/BarLine"
-   * 10. Scatter - "pentaho/ccc/visual/Scatter"
-   * 11. Bubble - "pentaho/ccc/visual/Bubble"
-   * 12. Pie - "pentaho/ccc/visual/Pie"
-   * 13. Donut - "pentaho/ccc/visual/Donut"
-   * 14. Sunburst - "pentaho/ccc/visual/Sunburst"
-   * 15. Heat Grid - "pentaho/ccc/visual/HeatGrid"
-   * 16. Geo Map - "pentaho/geo/visual/View"
+   * If you need to know the identifiers of well-known modules, check the following help topics:
+   * 1. [Ids of Well-Known Applications](https://help.pentaho.com/Documentation/9.2/Developer_center/Configuration_API#Known_values_of_Pentaho_platform_environment_variables)
+   * 2. [Ids of Stock Visualization Models and Views](https://help.pentaho.com/Documentation/9.2/Developer_center/Stock_visualizations_identifiers)
+   * 3. [Ids of Stock Color Palettes](https://help.pentaho.com/Documentation/9.2/Developer_center/Stock_color_palettes_identifiers)
    *
-   * Sample visualization model ids:
-   * 1. Calculator - "pentaho/visual/samples/calc/Model"
+   * Almost all stock visualizations are based on the CCC charting library.
+   * To experiment with CCC options and styles you can use the [CCC playground](https://webdetails.github.io/ccc).
+   * You can also check the [CCC reference documentation](https://webdetails.github.io/ccc/charts/jsdoc).
    *
-   * Stock color palettes' ids:
-   * 1. pentaho/visual/color/palettes/nominalPrimary
-   * 2. pentaho/visual/color/palettes/nominalNeutral
-   * 3. pentaho/visual/color/palettes/nominalLight
-   * 4. pentaho/visual/color/palettes/nominalDark
-   * 5. pentaho/visual/color/palettes/quantitativeBlue3
-   * 6. pentaho/visual/color/palettes/quantitativeBlue5
-   * 7. pentaho/visual/color/palettes/quantitativeGray3
-   * 8. pentaho/visual/color/palettes/quantitativeGray5
-   * 9. pentaho/visual/color/palettes/divergentRyb3
-   * 10. pentaho/visual/color/palettes/divergentRyb5
-   * 11. pentaho/visual/color/palettes/divergentRyg3
-   * 12. pentaho/visual/color/palettes/divergentRyg5
+   * After changing this file, it is sufficient to refresh the browser to test any changes.
    */
-  return {
+  return /** @type {pentaho.config.spec.IRuleSet} */{
     rules: [
-      // Example Rule 1 - Hide the Pie chart from both PDI Preview and Pentaho Analyzer
+      // region Example Rules
+      // #region
+      /**
+       * Example Rule 1 - Hide a visualization from an application's menu.
+       *
+       * - For PDI Data Inspection and Pentaho Analyzer
+       * _ For the Pie visualization model
+       * - Hide from the applications' menu(s)
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -96,7 +71,19 @@ define(function() {
       },
       */
 
-      // Example Rule 1.b - Show the Sample calculator visualization (hidden by default)
+      /**
+       * Example Rule 2 - Show a visualization in an application's menu.
+       *
+       * - For any application
+       * - For the sample Calculator visualization model
+       * - Show it in the applications' menu(s) (this visualization is hidden by default)
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -108,7 +95,19 @@ define(function() {
       },
       */
 
-      // Example Rule 2 - Change the menu label of the 100% Stacked Bar chart in Pentaho Analyzer
+      /**
+       * Example Rule 3 - Change the label of a visualization in an application's menu.
+       *
+       * - For Pentaho Analyzer
+       * - For the 100% Stacked Bar visualization model
+       * - Change its menu label
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#label
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -121,8 +120,19 @@ define(function() {
       },
       */
 
-      // Example Rule 3 - Change the default dot shape of Line and Bar/Line charts, in any application,
-      //   and hide the option from the user.
+      /**
+       * Example Rule 4 - Change the shape of data points in a line visualization and hide the option.
+       *
+       * - For any application
+       * - For the Line and Bar/Line visualizations models
+       * - Change the shape of data points and hide the option from the user
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -142,7 +152,23 @@ define(function() {
       },
       */
 
-      // Example Rule 4 - Use CCC extension points to change the Donut CCC view's inner radius, in Pentaho Analyzer.
+      /**
+       * Example Rule 5 - Change the inner radius of the donut visualization.
+       *
+       * - For Pentaho Analyzer
+       * - For the Donut visualization view
+       * - Change the Donut's inner radius, using CCC extension points
+       *
+       * Note that the Donut chart is really just a Pie chart with a non-zero inner radius.
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.charts.PieChart.html#extensionPoints
+       * @see https://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.ext.PiePlotExtensionPoints.html#slice
+       * @see https://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.marks.PieChartWedgeExtensionPoint.html#innerRadiusEx
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -157,21 +183,44 @@ define(function() {
       },
       */
 
-      // Example Rule 5 - Change the colors of the default discrete color palette, in any application.
+      /**
+       * Example Rule 6 - Change the colors of a well-known color palette.
+       *
+       * - For any application
+       * - For the primary nominal color palette (which is the default discrete color palette)
+       * - Change its colors
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette#colors
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
           module: "pentaho/visual/color/palettes/nominalPrimary"
         },
         apply: {
-          colors: [
-            "red", "#00FF00", "rgb(0,0,255)"
-          ]
+          colors: ["red", "#00FF00", "rgb(0,0,255)"]
         }
       },
       */
 
-      // Example Rule 6 - Change the colors of the bar chart visualization, in any application
+      /**
+       * Example Rule 7 - Change the color palette of a visualization to a new one.
+       *
+       * - For any application
+       * - For the Bar visualization model
+       * - Change its color palette to a newly defined one
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -190,8 +239,19 @@ define(function() {
       },
       */
 
-      // Example Rule 7 - Change the colors of the bar chart visualization, in any application,
-      // by using a registered palette
+      /**
+       * Example Rule 8 - Change the color palette of a visualization to a registered one.
+       *
+       * - For any application
+       * - For the Bar visualization model
+       * - Change its color palette to a registered one
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalLight
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
        {
         select: {
@@ -212,8 +272,21 @@ define(function() {
       },
       */
 
-      // Example Rule 8 - Reduce the ranking of the "nominalPrimary" palette,
-      // so that another palette gets chosen first instead.
+      /**
+       * Example Rule 9 - Change the ranking of a registered color palette.
+       *
+       * - For any application
+       * - For the special "pentaho/modules" module
+       * - Change the ranking of the nominal primary color palette,
+       *   so that it is not the default discrete color palette anymore
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
+       * @see https://help.pentaho.com/Documentation/9.2/Developer_center/Platform_JavaScript_APIs/platform/pentaho.module.spec.IInstanceMeta#ranking
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
@@ -227,11 +300,23 @@ define(function() {
       },
       */
 
-      // Example Rule 9 - Disable the continuous date strategy, to revert
-      // to the old behavior (Before 8.1) that represents Time dimensions in a discrete axis.
+      /**
+       * Example Rule 10 - Disable date levels using a continuous axis.
+       *
+       * - For Pentaho Analyzer
+       * - For the *Continuous Date* visual role adaptation strategy
+       * - Disable it; date levels will be represented in a discrete axis, instead of in a continuous axis
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * [Viz. API 2 Style]
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
+          application: "pentaho/analyzer",
           module: "pentaho/visual/role/adaptation/EntityWithTimeIntervalKeyStrategy"
         },
         apply: {
@@ -240,11 +325,23 @@ define(function() {
       },
       */
 
-      // Example Rule 10 - Disable the continuous number strategy, to revert to
-      // representing dimensions having a number keys in a discrete axis.
+      /**
+       * Example Rule 11 - Disable numeric levels using a continuous axis.
+       *
+       * - For Pentaho Analyzer
+       * - For the *Continuous Number* visual role adaptation strategy
+       * - Disable it; numeric levels will be represented in a discrete axis, instead of in a continuous axis
+       *
+       * Uncomment the following comment block to activate the rule.
+       *
+       * [Viz. API 2 Style]
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
       /*
       {
         select: {
+          application: "pentaho/analyzer",
           module: "pentaho/visual/role/adaptation/EntityWithNumberKeyStrategy"
         },
         apply: {
@@ -252,6 +349,297 @@ define(function() {
         }
       }
       */
+
+      // #endregion
+
+      // region Styles For Pentaho Analyzer
+      // #region
+
+      /*
+       * The following rules contain several useful options of CCC stock visualization views.
+       *
+       * The rules are targeting Pentaho Analyzer, for convenience, but can be used for other applications, if desired.
+       *
+       * Unlike the rules in the _Example Rules_ section, above, the following rules are active by default, albeit with
+       * every option commented out.
+       *
+       * Uncomment the desired options.
+       */
+
+      /**
+       * Configuration of the Discrete Color Legend of CCC Stock Visualizations
+       *
+       * - For Pentaho Analyzer
+       * - For All CCC Stock Visualization Views
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
+      {
+        select: {
+          application: "pentaho/analyzer",
+          module: "pentaho/ccc/visual/Abstract"
+        },
+        apply: {
+          extension: {
+            /**
+             * The behavior of the legend panel when "overflow" of legend items occurs.
+             *
+             * When 'clip', all legend items are rendered but the overflow in the legend panel is hidden.
+             * When 'collapse' and when overflow is detected, the whole legend panel is collapsed; the legend is not displayed.
+             *
+             * The inherited value is `"collapse"`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.LegendPanel.html#overflow
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // legendOverflow: "clip",
+
+            /**
+             * Maximum number of legend items to show.
+             *
+             * When set to `null`, the number of legend items is not limited.
+             *
+             * When set to a non-`null` value, the legend is considered to be in "overflow" when the number of legend items is greater,
+             * which may cause hiding the legend altogether (according to `legendOverflow`).
+             *
+             * The inherited value is `20`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.LegendPanel.html#itemCountMax
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // legendItemCountMax: null,
+
+            /**
+             * The maximum size of the legend panel.
+             *
+             * When the legend is docked at left or right, *size*, when specified as a single number or percentage,
+             * refers to the legend panel's _width_. Otherwise, when docked at top or bottom, it refers to its _height_.
+             *
+             * When set to `null`, the _size_ of the legend panel is not limited.
+             *
+             * The inherited value is `"30%"`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.Panel.html#sizeMax
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // legendItemSizeMax: "60%",
+
+            // Other, assorted legend styles.
+            // @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.LegendPanel.html
+
+            // [Viz. API 2 Style] Uncomment:
+            // legendPaddings:  10,
+            // [Viz. API 2 Style] Uncomment:
+            // legendMargins: null,
+            // [Viz. API 2 Style] Uncomment:
+            // legendItemSize:  null,
+            // [Viz. API 2 Style] Uncomment:
+            // legendItemPadding: {left: 1, right: 1, top: 2, bottom: 2},
+            // [Viz. API 2 Style] Uncomment:
+            // legendTextMargin: null,
+            // [Viz. API 2 Style] Uncomment:
+            // legendArea_lineWidth:   1,
+            // [Viz. API 2 Style] Uncomment:
+            // legendLabel_textDecoration: null
+          }
+        }
+      },
+
+      /**
+       * Configuration of Discrete X Axis of CCC Stock Visualizations.
+       *
+       * Also contains common Discrete X/Y Axis options.
+       *
+       * - For Pentaho Analyzer
+       * - For CCC Stock Visualization Views which (may) show a Discrete X Axis
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
+      {
+        select: {
+          application: "pentaho/analyzer",
+          module: [
+            "pentaho/ccc/visual/Bar",
+            "pentaho/ccc/visual/BarStacked",
+            "pentaho/ccc/visual/BarNormalized",
+            "pentaho/ccc/visual/Line",
+            "pentaho/ccc/visual/AreaStacked",
+            "pentaho/ccc/visual/BarLine",
+            "pentaho/ccc/visual/HeatGrid"
+          ]
+        },
+        apply: {
+          extension: {
+            /**
+             * The maximum height of the X axis panel.
+             *
+             * When set to `null`, the X axis height may grow as needed to fit its content,
+             * however limited to the initial height of the visualization.
+             * When the axis height increases, the (initially) available height for the plot/drawing is diminished.
+             * If, then, the plot is not configured to allow the visualization to grow, it effectively reduces the
+             * available plot height. As such, it's considered a best practice to limit the axis height by some amount,
+             * absolute or relative (as a percentage).
+             *
+             * When set to a non-`null` value, the axis's tick labels are trimmed when they don't fit the available space,
+             * while still showing the full value when hovered over.
+             *
+             * The inherited value is `90`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.Panel.html#sizeMax
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // xAxisSizeMax: "50%",
+
+            /**
+             * The minimum width of discrete X axis categorical bands.
+             *
+             * When `null` the categorical bands can be as small as needed
+             * for the visualization to fit into the available width.
+             *
+             * When not `null`, horizontal scrollbars may appear.
+             *
+             * The inherited value is `18`, except for the "HeatGrid", for which it is `30`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.DiscreteCartesianAxis.html#bandSizeMin
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // xAxisBandSizeMin: null,
+
+            /**
+             * Chooses how to deal with overlapping, discrete X axis' tick labels.
+             *
+             * - `"hide"` - hide the labels that overlap.
+             * - `"leave"` - let labels overlap.
+             * - `"rotate"` - attempt to rotate labels so that these do not overlap; if these always overlap, then let them overlap.
+             * - `"rotatethenhide"` - attempt to rotate labels so that these do not overlap; if these always overlap, hide some.
+             *
+             * When `"rotate"` or `"rotatethenhide"`, the attempted rotations depend on the value of the options
+             * `xAxisLabelRotationDirection` and `xAxisLabelDesiredAngles`.
+             *
+             * The inherited value is `"rotatethenhide"`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.DiscreteCartesianAxis.html#overlappedLabelsMode
+             */
+            // xAxisOverlappedLabelsMode: "rotatethenhide",
+
+            /**
+             * The automatic rotation direction of discrete X axis tick labels.
+             *
+             * This option only applies when `xAxisOverlappedLabelsMode` is one of `"rotate"` or `"rotatethenhide"`.
+             *
+             * The angle `0` corresponds to horizontally laid out labels, aligned with the X-axis.
+             *
+             * - `"clockwise"` - labels rotate in a clockwise direction;
+             * - `"counterclockwise"` - labels rotate in a counter-clockwise direction.
+             *
+             * When, `xAxisLabelDesiredAngles` is specified, this option affects the meaning of positive angle:
+             * - `"clockwise"` - positive label angles are measured in a clockwise direction;
+             * - `"counterclockwise"` - positive label label angles are measures in a counter-clockwise direction.
+             *
+             * The inherited value is `"clockwise"`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.DiscreteCartesianAxis.html#labelRotationDirection
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // xAxisLabelRotationDirection: "counterclockwise",
+
+            /**
+             * The automatic rotation angles of discrete X axis tick labels (in radians).
+             *
+             * This option only applies when `xAxisOverlappedLabelsMode` is one of `"rotate"` or `"rotatethenhide"`.
+             *
+             * The angle `0` corresponds to horizontally laid out labels, aligned with the X-axis.
+             *
+             * The angles are measured from the X-axis in a direction according to `xAxisLabelRotationDirection`:
+             * - `"clockwise"` - positive label angles are measured in a clockwise direction;
+             * - `"counterclockwise"` - positive label label angles are measures in a counter-clockwise direction.
+             *
+             * The angles are tested for no-label-overlap in the specified order.
+             * The first angle for which tick labels do not overlap is chosen.
+             *
+             * When explicitly set to `null`, the _first_ possible angle which causes labels to not overlap is chosen.
+             *
+             * The inherited value is `[0, 40 * (Math.PI / 180)]`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.DiscreteCartesianAxis.html#labelDesiredAngles
+             */
+            // xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
+
+            /**
+             * The minimum spacing between two consecutive discrete axis tick labels
+             * below which they are considered overlapping (in ems).
+             *
+             * The related options `xAxisOverlappedLabelsMode` and `yAxisOverlappedLabelsMode` control
+             * what happens when discrete labels overlap.
+             *
+             * The inherited value is `0`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.FlattenedDiscreteCartesianAxis.html#labelSpacingMin
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // discreteAxisLabelSpacingMin: 0.25
+          }
+        }
+      },
+
+      /**
+       * Configuration of Discrete Y Axis of CCC Stock Visualizations.
+       *
+       * - For Pentaho Analyzer
+       * - For CCC Stock Visualization Views which show a Discrete Y Axis
+       *
+       * @type {pentaho.config.spec.IRule}
+       */
+      {
+        select: {
+          application: "pentaho/analyzer",
+          module: [
+            "pentaho/ccc/visual/BarHorizontal",
+            "pentaho/ccc/visual/BarStackedHorizontal",
+            "pentaho/ccc/visual/BarNormalizedHorizontal",
+            "pentaho/ccc/visual/HeatGrid"
+          ]
+        },
+        apply: {
+          extension: {
+            /**
+             * The maximum width of the Y axis panel.
+             *
+             * When set to `null`, the Y axis width may grow as needed to fit its content,
+             * however limited to the initial width of the visualization.
+             * When the axis width increases, the (initially) available width for the plot/drawing is diminished.
+             * If, then, the plot is not configured to allow the visualization to grow, it effectively reduces the
+             * available plot width. As such, it's considered a best practice to limit the axis width by some amount,
+             * absolute or percentual.
+             *
+             * When set to a non-`null` value, the axis's tick labels are trimmed when they don't fit the available space,
+             * while still showing the full value when hovered over.
+             *
+             * The inherited value is `117`, except for the "HeatGrid", for which it is `80`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.Panel.html#sizeMax
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // yAxisSizeMax: "50%",
+
+            /**
+             * The minimum height of discrete Y axis categorical bands.
+             *
+             * When `null` the categorical bands can be as small as needed
+             * for the visualization to fit into the available height.
+             *
+             * When not `null`, vertical scrollbars may appear.
+             *
+             * The inherited value is `30`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.DiscreteCartesianAxis.html#bandSizeMin
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // yAxisBandSizeMin: null
+          }
+        }
+      }
+      // #endregion
     ]
   };
 });
