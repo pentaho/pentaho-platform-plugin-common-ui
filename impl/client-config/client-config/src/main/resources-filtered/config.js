@@ -446,9 +446,81 @@ define(function() {
       },
 
       /**
-       * Configuration of Discrete X Axis of CCC Stock Visualizations.
+       * Configurations which are common to X and Y cartesian axes of CCC Stock Visualizations.
        *
-       * Also contains common Discrete X/Y Axis options.
+       * @type {pentaho.config.spec.IRule}
+       */
+      {
+        select: {
+          application: "pentaho/analyzer",
+          module: [
+            "pentaho/ccc/visual/Bar",
+            "pentaho/ccc/visual/BarStacked",
+            "pentaho/ccc/visual/BarNormalized",
+            "pentaho/ccc/visual/BarHorizontal",
+            "pentaho/ccc/visual/BarStackedHorizontal",
+            "pentaho/ccc/visual/BarNormalizedHorizontal",
+            "pentaho/ccc/visual/Line",
+            "pentaho/ccc/visual/AreaStacked",
+            "pentaho/ccc/visual/BarLine",
+            "pentaho/ccc/visual/HeatGrid",
+            "pentaho/ccc/visual/Bubble",
+            "pentaho/ccc/visual/Scatter"
+          ]
+        },
+        apply: {
+          extension: {
+            /**
+             * Indicates if the cartesian axes' title panels should be visible.
+             *
+             * When `true`, the title panel will be visible even if the title text is empty.
+             * When `false`, the title panel will be hidden.
+             * When `null`, the title panel will be visible if the title is not empty.
+             *
+             * @type {boolean|null}
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.TitlePanel.html#visible
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // axisTitleVisible: null,
+
+            /**
+             * The alignment of the cartesian axes' title panels.
+             *
+             * @type {string|null}
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.panels.DockedPanel.html#align
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // xAxisTitleAlign: null,
+            // [Viz. API 2 Style] Uncomment:
+            // x2AxisTitleAlign: null,
+            // [Viz. API 2 Style] Uncomment:
+            // x3AxisTitleAlign: null,
+            // [Viz. API 2 Style] Uncomment:
+            // yAxisTitleAlign: null,
+            // [Viz. API 2 Style] Uncomment:
+            // y2AxisTitleAlign: null,
+            // [Viz. API 2 Style] Uncomment:
+            // y3AxisTitleAlign: null,
+
+            /**
+             * The minimum spacing between two consecutive discrete axis tick labels
+             * below which they are considered overlapping (in ems).
+             *
+             * The related options `xAxisOverlappedLabelsMode` and `yAxisOverlappedLabelsMode` control
+             * what happens when discrete labels overlap.
+             *
+             * The inherited value is `0`.
+             *
+             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.FlattenedDiscreteCartesianAxis.html#labelSpacingMin
+             */
+            // [Viz. API 2 Style] Uncomment:
+            // discreteAxisLabelSpacingMin: 0.25
+          }
+        }
+      },
+
+      /**
+       * Configuration of Discrete X Axis of CCC Stock Visualizations.
        *
        * - For Pentaho Analyzer
        * - For CCC Stock Visualization Views which (may) show a Discrete X Axis
@@ -563,21 +635,7 @@ define(function() {
              *
              * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.DiscreteCartesianAxis.html#labelDesiredAngles
              */
-            // xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
-
-            /**
-             * The minimum spacing between two consecutive discrete axis tick labels
-             * below which they are considered overlapping (in ems).
-             *
-             * The related options `xAxisOverlappedLabelsMode` and `yAxisOverlappedLabelsMode` control
-             * what happens when discrete labels overlap.
-             *
-             * The inherited value is `0`.
-             *
-             * @see http://webdetails.github.io/ccc/charts/jsdoc/symbols/pvc.options.axes.FlattenedDiscreteCartesianAxis.html#labelSpacingMin
-             */
-            // [Viz. API 2 Style] Uncomment:
-            // discreteAxisLabelSpacingMin: 0.25
+            // xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)]
           }
         }
       },
