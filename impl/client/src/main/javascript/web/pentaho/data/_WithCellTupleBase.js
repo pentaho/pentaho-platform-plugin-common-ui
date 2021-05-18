@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,18 @@ define([
     // keyArgs: structure
     constructor: function(keyArgs) {
       this.cellTupleBase = CellTuple.Adhoc.to([], keyArgs);
-      this.cellTupleBase.constructor = CellTuple.Adhoc;
+
+      // Rhino complains that `constructor` is a read-only property,
+      // if we set this.cellTupleBase.constructor directly.
+      // However, per the above call, from Class.to, and then to pentaho.util.Object.applyClass,
+      // it is a writable property. This is probably a Rhino bug.
+      // Anyway, this goes around that by redefining the property.
+      Object.defineProperty(this.cellTupleBase, "constructor", {
+        // enumerable: false,
+        configurable: true,
+        writable: true,
+        value: CellTuple.Adhoc
+      });
     },
 
     // keyArgs: {}
