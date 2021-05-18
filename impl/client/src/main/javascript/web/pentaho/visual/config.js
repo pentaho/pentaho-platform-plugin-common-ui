@@ -28,6 +28,13 @@ define(function() {
   var vizApiFont = "10px OpenSansRegular";
   var maxHorizontalTextWidth = 117;
 
+  var MS_PER_DAY = 864e5;
+  var MS_PER_WEEK = 7 * MS_PER_DAY;
+  var MS_PER_MONTH = 30 * MS_PER_DAY;
+
+  var dayFormatCached = null;
+  var monthFormatCached = null;
+
   var numberFormatCache = {};
   var numberStyle = {
     group: " ",
@@ -265,71 +272,110 @@ define(function() {
         select: {
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
-        apply: {
-          extension: {
-            margins:  0,
-            paddings: 0,
+        deps: [
+          "pentaho/environment"
+        ],
+        apply: function(environment) {
+          return {
+            extension: {
+              margins:  0,
+              paddings: 0,
 
-            // Chart
-            contentMargins: {top: 30, bottom: 30},
+              // Chart
+              contentMargins: {top: 30, bottom: 30},
 
-            // Cartesian Axes
-            axisComposite: false,
-            axisSizeMax: "50%",
-            xAxisPosition: "bottom",
-            yAxisPosition: "left",
+              // Cartesian Axes
+              axisComposite: false,
+              axisSizeMax: "50%",
+              xAxisPosition: "bottom",
+              yAxisPosition: "left",
 
-            panelSizeRatio: 0.8,
+              panelSizeRatio: 0.8,
 
-            // . title
-            axisTitleVisible: true,
-            axisTitleSizeMax: "20%",
-            axisTitleLabel_textMargin: 0,
+              // . title
+              axisTitleVisible: true,
+              axisTitleSizeMax: "20%",
+              axisTitleLabel_textMargin: 0,
 
-            xAxisTitleAlign: "left",
-            x2AxisTitleAlign: "left",
-            x3AxisTitleAlign: "left",
+              xAxisTitleAlign: "left",
+              x2AxisTitleAlign: "left",
+              x3AxisTitleAlign: "left",
 
-            yAxisTitleAlign: "top",
-            y2AxisTitleAlign: "top",
-            y3AxisTitleAlign: "top",
+              yAxisTitleAlign: "top",
+              y2AxisTitleAlign: "top",
+              y3AxisTitleAlign: "top",
 
-            // . label
-            discreteAxisLabel_ibits: 0,
-            discreteAxisLabel_imask: "ShowsActivity|Hoverable",
+              // . label
+              discreteAxisLabel_ibits: 0,
+              discreteAxisLabel_imask: "ShowsActivity|Hoverable",
 
-            axisLabel_textMargin: 10,
+              axisLabel_textMargin: 10,
 
-            xAxisOverlappedLabelsMode: "rotatethenhide",
-            xAxisLabelRotationDirection: "clockwise",
-            xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
+              xAxisOverlappedLabelsMode: "rotatethenhide",
+              xAxisLabelRotationDirection: "clockwise",
+              xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
 
-            numericAxisTickFormatter: function(value, precision) {
-              return getNumberFormatter(this.axis, precision, this.base)(value);
-            },
+              numericAxisTickFormatter: function(value, precision) {
+                return getNumberFormatter(this.axis, precision, this.base)(value);
+              },
 
-            // . grid
-            axisGrid: false,
-            continuousAxisGrid: true,
+              timeSeriesAxisTickFormatter: function(value) {
+                // Use the Intl API to achieve localized date formatting.
 
-            axisGrid_lineWidth:   1,
-            axisGrid_strokeStyle: "#CCC",
+                switch(this.base) {
+                  case MS_PER_DAY:
+                  case MS_PER_WEEK:
+                    if(dayFormatCached == null) {
+                      // Empty array is to use the browser's default locale.
+                      dayFormatCached = new Intl.DateTimeFormat(environment.locale || [], {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric"
+                      });
+                    }
 
-            // . rule
-            axisRule_lineWidth: 1,
-            axisRule_strokeStyle: "#999999",
+                    return dayFormatCached.format(value);
 
-            // . ticks
-            axisTicks: true,
-            axisMinorTicks: false,
-            continuousAxisDesiredTickCount: 5,
-            continuousAxisLabelSpacingMin:  2, // 2em = 20px
+                  case MS_PER_MONTH:
+                    if(monthFormatCached == null) {
+                      // Empty array is to use the browser's default locale.
+                      monthFormatCached = new Intl.DateTimeFormat(environment.locale || [], {
+                        year: "numeric",
+                        month: "numeric"
+                      });
+                    }
 
-            axisTicks_lineWidth:   1,
-            axisTicks_strokeStyle: "#999999",
-            xAxisTicks_height:     3, // Account for part of the tick that gets hidden by the rule
-            yAxisTicks_width:      3
-          }
+                    return monthFormatCached.format(value);
+
+                  default:
+                    // Use the base format.
+                    return this.format(value);
+                }
+              },
+
+              // . grid
+              axisGrid: false,
+              continuousAxisGrid: true,
+
+              axisGrid_lineWidth:   1,
+              axisGrid_strokeStyle: "#CCC",
+
+              // . rule
+              axisRule_lineWidth: 1,
+              axisRule_strokeStyle: "#999999",
+
+              // . ticks
+              axisTicks: true,
+              axisMinorTicks: false,
+              continuousAxisDesiredTickCount: 5,
+              continuousAxisLabelSpacingMin:  2, // 2em = 20px
+
+              axisTicks_lineWidth:   1,
+              axisTicks_strokeStyle: "#999999",
+              xAxisTicks_height:     3, // Account for part of the tick that gets hidden by the rule
+              yAxisTicks_width:      3
+            }
+          };
         }
       },
 
@@ -1082,4 +1128,3 @@ define(function() {
   }
 
 });
-
