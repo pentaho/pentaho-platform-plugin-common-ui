@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,22 @@ define([
      cYrL-Mn" (or any other combination), and each of these variations.
     */
     var locale = readVar(spec, "locale", defaultSpec);
+    if(locale) {
+      // Java sends these non BCP-47 conforming separators.
+      locale = locale.replace(/[_/]/, "-");
+
+      // Validate that it is a valid locale; discard, otherwise.
+      // TODO: The current testing environment, PhantomJS, does not support Intl.
+      if(typeof Intl !== "undefined") {
+        try {
+          // eslint-disable-next-line no-new
+          new Intl.Locale(locale);
+        } catch(error) {
+          locale = null;
+        }
+      }
+    }
+
     this.locale = locale && locale.toLowerCase();
 
     var propSpec = readVar(spec, "user");
