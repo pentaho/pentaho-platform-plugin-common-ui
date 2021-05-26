@@ -42,7 +42,7 @@ define([
         var bundleInfo = __getBundleInfo(localRequire, bundlePath);
         var serverUrl = environment.server.root;
 
-        // Taking into account embedded scenarios when the host
+        // Taking into account embedded scenarios, where the host
         // is not the Pentaho Server / PDI
         var bundleUrl = "json!" + serverUrl +
           "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
