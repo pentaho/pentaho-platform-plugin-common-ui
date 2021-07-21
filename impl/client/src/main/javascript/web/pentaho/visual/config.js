@@ -273,9 +273,10 @@ define(function() {
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
         deps: [
-          "pentaho/environment"
+          "pentaho/environment",
+          "pentaho/util/domWindow"
         ],
-        apply: function(environment) {
+        apply: function(environment, domWindow) {
           return {
             extension: {
               margins:  0,
@@ -337,6 +338,16 @@ define(function() {
                     return dayFormatCached.format(value);
 
                   case MS_PER_MONTH:
+                    // IE 11's Intl implementation has the problem that it formats this something like "2 of 2021",
+                    // instead of using / or - separators.
+                    // Month/year formatting locales typically differ only in the specific separator used and not
+                    // in the order between month and year.
+                    // So, for IE 11 (and below), just use the default Protovis format which should differ only in
+                    // the used separator.
+                    if(domWindow && ("ActiveXObject" in domWindow)) {
+                      return this.format(value);
+                    }
+
                     if(monthFormatCached == null) {
                       // Empty array is to use the browser's default locale.
                       monthFormatCached = new Intl.DateTimeFormat(environment.locale || [], {
