@@ -342,7 +342,7 @@ define(function() {
                     // instead of using / or - separators.
                     // Month/year formatting locales typically differ only in the specific separator used and not
                     // in the order between month and year.
-                    // SO, For IE 11 (and below), just use the default Protovis format which should differ only in
+                    // So, for IE 11 (and below), just use the default Protovis format which should differ only in
                     // the used separator.
                     if(domWindow && ("ActiveXObject" in domWindow)) {
                       return this.format(value);
