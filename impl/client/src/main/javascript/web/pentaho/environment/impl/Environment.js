@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/util/url"
-], function(url) {
+  "pentaho/util/url",
+  "pentaho/util/domWindow"
+], function(url, domWindow) {
 
   "use strict";
 
@@ -66,8 +67,9 @@ define([
       locale = locale.replace(/[_/]/, "-");
 
       // Validate that it is a valid locale; discard, otherwise.
-      // TODO: The current testing environment, PhantomJS, does not support Intl.
-      if(typeof Intl !== "undefined") {
+      // TODO: The current testing environment, PhantomJS, does not support `Intl`.
+      // TODO: IE11 also does not support `Intl.Locale`...
+      if((typeof Intl !== "undefined") && Intl.Locale) {
         try {
           // eslint-disable-next-line no-new
           new Intl.Locale(locale);
