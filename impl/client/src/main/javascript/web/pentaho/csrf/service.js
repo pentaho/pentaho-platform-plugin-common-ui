@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2019-2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ define([
       }
 
       // Sending the URL as a parameter and not as a header to avoid becoming a pre-flight request.
-      var csrfServiceUrl = serverBaseUrl + "api/system/csrf?url=" + encodeURIComponent(url);
+      var csrfServiceUrl = serverBaseUrl + "api/csrf/token?url=" + encodeURIComponent(url);
 
       var xhr = service.__createXhr();
       xhr.open("GET", csrfServiceUrl, /* async: */false);

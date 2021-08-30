@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2019-2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,12 @@ pho.csrfUtil = (function() {
       }
 
       // Sending the URL as a parameter and not as a header to avoid becoming a pre-flight request.
-      var csrfServiceUrl = FULL_QUALIFIED_URL + "api/system/csrf?url=" + encodeURIComponent(url);
+      var csrfServiceUrl = FULL_QUALIFIED_URL + "api/csrf/token?url=" + encodeURIComponent(url);
 
       var xhr = new XMLHttpRequest();
       xhr.open("GET", csrfServiceUrl, /* async: */false);
 
-      // In cross-origin contexts, the session where the token is stored must be the same
-      // as that used by the actual request...
+      // The session where the token is stored must be the same as that used by the actual request.
       xhr.withCredentials = true;
       try {
         xhr.send();
