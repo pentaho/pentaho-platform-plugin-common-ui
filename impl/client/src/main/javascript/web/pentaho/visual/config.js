@@ -1,5 +1,5 @@
 /*!
- * Copyright 2016 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2016 - 2021 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,7 +305,7 @@ define(function() {
             xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
 
             numericAxisTickFormatter: function(value, precision) {
-              return getNumberFormatter(precision, this.base)(value);
+              return getNumberFormatter(this.axis, precision, this.base)(value);
             },
 
             // . grid
@@ -972,19 +972,22 @@ define(function() {
     return scene.isOn() ? scene.color : getPvc().toGrayScale(scene.color);
   }
 
-  function getNumberFormatter(precision, base) {
-    var useAbrev = (base >= 1000);
-    var key = useAbrev + "|" + precision;
+  function getNumberFormatter(axis, precision, base) {
+    var useAbbrev = (base >= 1000);
+    var key = useAbbrev + "|" + precision;
     var numberFormat = numberFormatCache[key];
     if(!numberFormat) {
       // #,0 A
       // #,0.0 A
       // #,0.00 A
       var depPlacesMask = precision ? ("." + new Array(precision + 1).join("0")) : ".##";
-      var mask = "#,0" + depPlacesMask + (useAbrev ? " A" : "");
+      var mask = "#,0" + depPlacesMask + (useAbbrev ? " A" : "");
 
-      numberFormat = getPvc().data.numberFormat(mask);
-      numberFormat.style(numberStyle);
+      // Inherit the dimension's numeric format style,
+      // which in turn inherits from the chart option's numeric format style,
+      // which in turn inherits from the chart class' numeric format style.
+      var formatProto = axis.role.grouping.singleDimensionType.format().number();
+      numberFormat = getPvc().data.numberFormat(mask, formatProto);
       numberFormatCache[key] = numberFormat;
     }
 
