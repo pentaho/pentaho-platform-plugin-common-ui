@@ -1043,7 +1043,7 @@ define(function() {
       // Inherit the dimension's numeric format style,
       // which in turn inherits from the chart option's numeric format style,
       // which in turn inherits from the chart class' numeric format style.
-      var formatProto = axis.role.grouping.singleDimensionType.format().number();
+      var formatProto = axis.role.grouping.firstDimensionType().format().number();
       numberFormat = getPvc().data.numberFormat(mask, formatProto);
       numberFormatCache[key] = numberFormat;
     }
