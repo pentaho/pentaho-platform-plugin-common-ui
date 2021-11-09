@@ -34,6 +34,7 @@ define(function() {
 
   var dayFormatCached = null;
   var monthFormatCached = null;
+  var supportsIntlDateTime = typeof Intl !== "undefined" && typeof Intl.DateTimeFormat === "function";
 
   var numberFormatCache = {};
   var numberStyle = {
@@ -322,6 +323,12 @@ define(function() {
 
               timeSeriesAxisTickFormatter: function(value) {
                 // Use the Intl API to achieve localized date formatting.
+
+                // TODO: Needed by PDI/DET on Linux, due to SWT/WebKit version.
+                // Remove after PDI-19372 is done.
+                if(!supportsIntlDateTime) {
+                  return this.format(value);
+                }
 
                 switch(this.base) {
                   case MS_PER_DAY:
