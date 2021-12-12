@@ -5,10 +5,10 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl-client-config-umbrella</artifactId>
-    <version>9.3.0.0-SNAPSHOT</version>
+    <version>9.3.0.0-9</version>
   </parent>
   <artifactId>common-ui-impl-client-config-folder-enabler</artifactId>
-  <version>9.3.0.0-SNAPSHOT</version>
+  <version>9.3.0.0-9</version>
   <packaging>bundle</packaging>
   <properties>
     <felix-configadmin.version>1.8.8</felix-configadmin.version>
