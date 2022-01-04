@@ -125,8 +125,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                   div.setAttribute("id", id);
                   div.setAttribute("color", ''+color);
                   cell.addEventListener("click", lang.hitch(this, this.usedColorClick));
-                  cell.addEventListener("mouseover", event => this.style.borderColor = 'black' );
-                  cell.addEventListener("mouseleave", event => this.style.borderColor = '' );
+                  cell.addEventListener("mouseover", function(event) { this.style.borderColor = 'black'; } );
+                  cell.addEventListener("mouseleave", function(event) { this.style.borderColor = ''; } );
                   cell.appendChild(div);
 
                   if((idx % 10) == 9) {
