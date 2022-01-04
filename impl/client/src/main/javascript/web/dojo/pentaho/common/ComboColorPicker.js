@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -123,9 +123,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                       }
                   }
                   div.setAttribute("id", id);
-
                   div.setAttribute("color", ''+color);
-                  on(cell, 'onclick', this, 'usedColorClick');
+                  cell.addEventListener("click", lang.hitch(this, this.usedColorClick));
+                  cell.addEventListener("mouseover", function(event) { this.style.borderColor = 'black'; } );
+                  cell.addEventListener("mouseleave", function(event) { this.style.borderColor = ''; } );
                   cell.appendChild(div);
 
                   if((idx % 10) == 9) {

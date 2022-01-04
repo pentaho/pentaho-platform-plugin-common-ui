@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ define(["dojo/_base/declare", "dojo/_base/lang", "dijit/form/_FormWidget", "dojo
         "dojo/i18n",
   "dijit/ColorPalette"],
   function(declare, lang, _FormWidget, ColorPicker, templateStr, domClass, style, geometry, domStyle, baseFx, focus){
+		var isDragging = false;
+
     return declare("pentaho.common.CustomColorPicker",[ColorPicker],
 		{
 
@@ -86,7 +88,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "dijit/form/_FormWidget", "dojo
 					left: newLeft + "px",
 					top: newTop + "px"
 				});
-				this._updateColor(false);
+				this._updateColor(true);
 			}
 		},
 
@@ -106,9 +108,20 @@ define(["dojo/_base/declare", "dojo/_base/lang", "dijit/form/_FormWidget", "dojo
 				}).play();
 			}else{
 				domStyle.set(this.hueCursorNode, "top", ypos + "px");
+				this._updateColor(true);
+			}
+		},
+		_onMouseDown: function(/* Event */evt){
+			this.isDragging = true;
+		},
+		_onMouseMove: function(/* Event */evt){
+			if(this.isDragging) {
 				this._updateColor(false);
 			}
+		},
+		_onMouseUp: function(/* Event */evt){
+			this.isDragging = false;
+			this._updateColor(true);
 		}
-
 	});
 });
