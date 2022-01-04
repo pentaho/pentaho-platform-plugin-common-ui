@@ -13,9 +13,13 @@
 		<td valign="top" class="dojoxColorPickerRightPad">
 			<div class="dojoxHuePicker">
 				<!-- Forcing ABS in style attr due to dojo DND issue with not picking it up form the class. -->
-				<img role="status" data-dojo-attach-point="hueCursorNode" tabIndex="0" class="dojoxHuePickerPoint" title="${huePickerTitle}" alt="${huePickerTitle}" src="${_huePickerPointer}" style="position: absolute; top: 0px; left: 0px;">
+				<img role="status" data-dojo-attach-point="hueCursorNode" tabIndex="0" class="dojoxHuePickerPoint"
+						 title="${huePickerTitle}" alt="${huePickerTitle}" src="${_huePickerPointer}"
+						 style="position: absolute; top: 0px; left: 0px;"
+						 dojoAttachEvent="onclick: _setHuePoint, onmousedown: _onMouseDown, onmousemove: _onMouseMove, onmouseup: _onMouseUp">
 				<div class="dojoxHuePickerUnderlay" data-dojo-attach-point="hueNode">
-				    <img role="presentation" alt="" dojoAttachEvent="onclick: _setHuePoint, onmousedown: _stopDrag" src="${_hueUnderlay}">
+				    <img role="presentation" alt="" src="${_hueUnderlay}"
+								 dojoAttachEvent="onclick: _setHuePoint, onmousedown: _stopDrag">
 				</div>
 			</div>
 		</td>
