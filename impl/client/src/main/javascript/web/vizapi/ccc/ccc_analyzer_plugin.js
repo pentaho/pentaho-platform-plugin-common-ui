@@ -23,11 +23,15 @@ define([
     "dojo/_base/declare",
     "dojo/_base/array"
 ], function(def, pvc, VizController, Messages, declare, array){
-    pentaho = typeof pentaho != "undefined" ? pentaho : {};
+    if(!window.pentaho){
+        window.pentaho = {}
+    }
+
     pentaho.visualizations || (pentaho.visualizations = {});
     
-    // If necessary, declare **global** variable, initializing it with an array
-    analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
+    if(!window.analyzerPlugins){
+        window.analyzerPlugins = []
+    }
 
     
     analyzerPlugins.push({
