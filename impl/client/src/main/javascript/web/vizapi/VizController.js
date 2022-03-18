@@ -358,6 +358,9 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
     return;
   }
   try {
+    if(!window.currentView){
+      window.currentView = null;
+    }
     currentView = new pentaho.DataView(this.dataTable);
 
     var className = visualization['class'];
