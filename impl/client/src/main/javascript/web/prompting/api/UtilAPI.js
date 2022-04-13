@@ -32,7 +32,7 @@ define(["common-ui/prompting/parameters/ParameterXmlParser", "common-ui/promptin
      *
      * @name UtilAPI#parseParameterXml
      * @method
-     * @param  {String} xmlString    String with the xml. The format is described on {@link http://wiki.pentaho.com/display/Reporting/Specification+for+the+BI-Server+Plugin+Parameter-XML+format|the wiki page}.
+     * @param  {String} xmlString    String with the xml. The format is described on {@link https://pentaho-community.atlassian.net/wiki/display/Reporting/Specification+for+the+BI-Server+Plugin+Parameter-XML+format|the wiki page}.
      * @return {ParameterDefinition} Parameter Definition instance
      */
     this.parseParameterXml = function(xmlString) {
