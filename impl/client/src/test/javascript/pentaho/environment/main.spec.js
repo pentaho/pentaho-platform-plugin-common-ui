@@ -128,7 +128,7 @@ define([
     testEnvironmentProperty("user.home", "user.home", "ABC");
 
     testEnvironmentProperty("theme", "theme", "ABC");
-    testEnvironmentProperty("locale", "locale", "ABC", "abc");
+    testEnvironmentProperty("locale", "locale", "PT", "pt");
 
     testEnvironmentProperty("reservedChars", "reservedChars", "ABC");
   });

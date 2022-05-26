@@ -60,6 +60,8 @@
  *
  * Locales are converted to lower-case. Case differences are not significant.
  *
+ * Locales with an invalid syntax are discarded.
+ *
  * @name locale
  * @memberOf pentaho.environment.spec.IEnvironment#
  * @type {?nonEmptyString}

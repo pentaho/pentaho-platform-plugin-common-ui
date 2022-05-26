@@ -28,6 +28,14 @@ define(function() {
   var vizApiFont = "10px OpenSansRegular";
   var maxHorizontalTextWidth = 117;
 
+  var MS_PER_DAY = 864e5;
+  var MS_PER_WEEK = 7 * MS_PER_DAY;
+  var MS_PER_MONTH = 30 * MS_PER_DAY;
+
+  var dayFormatCached = null;
+  var monthFormatCached = null;
+  var supportsIntlDateTime = typeof Intl !== "undefined" && typeof Intl.DateTimeFormat === "function";
+
   var numberFormatCache = {};
   var numberStyle = {
     group: " ",
@@ -265,71 +273,127 @@ define(function() {
         select: {
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
-        apply: {
-          extension: {
-            margins:  0,
-            paddings: 0,
+        deps: [
+          "pentaho/environment",
+          "pentaho/util/domWindow"
+        ],
+        apply: function(environment, domWindow) {
+          return {
+            extension: {
+              margins:  0,
+              paddings: 0,
 
-            // Chart
-            contentMargins: {top: 30, bottom: 30},
+              // Chart
+              contentMargins: {top: 30, bottom: 30},
 
-            // Cartesian Axes
-            axisComposite: false,
-            axisSizeMax: "50%",
-            xAxisPosition: "bottom",
-            yAxisPosition: "left",
+              // Cartesian Axes
+              axisComposite: false,
+              axisSizeMax: "50%",
+              xAxisPosition: "bottom",
+              yAxisPosition: "left",
 
-            panelSizeRatio: 0.8,
+              panelSizeRatio: 0.8,
 
-            // . title
-            axisTitleVisible: true,
-            axisTitleSizeMax: "20%",
-            axisTitleLabel_textMargin: 0,
+              // . title
+              axisTitleVisible: true,
+              axisTitleSizeMax: "20%",
+              axisTitleLabel_textMargin: 0,
 
-            xAxisTitleAlign: "left",
-            x2AxisTitleAlign: "left",
-            x3AxisTitleAlign: "left",
+              xAxisTitleAlign: "left",
+              x2AxisTitleAlign: "left",
+              x3AxisTitleAlign: "left",
 
-            yAxisTitleAlign: "top",
-            y2AxisTitleAlign: "top",
-            y3AxisTitleAlign: "top",
+              yAxisTitleAlign: "top",
+              y2AxisTitleAlign: "top",
+              y3AxisTitleAlign: "top",
 
-            // . label
-            discreteAxisLabel_ibits: 0,
-            discreteAxisLabel_imask: "ShowsActivity|Hoverable",
+              // . label
+              discreteAxisLabel_ibits: 0,
+              discreteAxisLabel_imask: "ShowsActivity|Hoverable",
 
-            axisLabel_textMargin: 10,
+              axisLabel_textMargin: 10,
 
-            xAxisOverlappedLabelsMode: "rotatethenhide",
-            xAxisLabelRotationDirection: "clockwise",
-            xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
+              xAxisOverlappedLabelsMode: "rotatethenhide",
+              xAxisLabelRotationDirection: "clockwise",
+              xAxisLabelDesiredAngles: [0, 40 * (Math.PI / 180)],
 
-            numericAxisTickFormatter: function(value, precision) {
-              return getNumberFormatter(this.axis, precision, this.base)(value);
-            },
+              numericAxisTickFormatter: function(value, precision) {
+                return getNumberFormatter(this.axis, precision, this.base)(value);
+              },
 
-            // . grid
-            axisGrid: false,
-            continuousAxisGrid: true,
+              timeSeriesAxisTickFormatter: function(value) {
+                // Use the Intl API to achieve localized date formatting.
 
-            axisGrid_lineWidth:   1,
-            axisGrid_strokeStyle: "#CCC",
+                // TODO: Needed by PDI/DET on Linux, due to SWT/WebKit version.
+                // Remove after PDI-19372 is done.
+                if(!supportsIntlDateTime) {
+                  return this.format(value);
+                }
 
-            // . rule
-            axisRule_lineWidth: 1,
-            axisRule_strokeStyle: "#999999",
+                switch(this.base) {
+                  case MS_PER_DAY:
+                  case MS_PER_WEEK:
+                    if(dayFormatCached == null) {
+                      // Empty array is to use the browser's default locale.
+                      dayFormatCached = new Intl.DateTimeFormat(environment.locale || [], {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric"
+                      });
+                    }
 
-            // . ticks
-            axisTicks: true,
-            axisMinorTicks: false,
-            continuousAxisDesiredTickCount: 5,
-            continuousAxisLabelSpacingMin:  2, // 2em = 20px
+                    return dayFormatCached.format(value);
 
-            axisTicks_lineWidth:   1,
-            axisTicks_strokeStyle: "#999999",
-            xAxisTicks_height:     3, // Account for part of the tick that gets hidden by the rule
-            yAxisTicks_width:      3
-          }
+                  case MS_PER_MONTH:
+                    // IE 11's Intl implementation has the problem that it formats this something like "2 of 2021",
+                    // instead of using / or - separators.
+                    // Month/year formatting locales typically differ only in the specific separator used and not
+                    // in the order between month and year.
+                    // So, for IE 11 (and below), just use the default Protovis format which should differ only in
+                    // the used separator.
+                    if(domWindow && ("ActiveXObject" in domWindow)) {
+                      return this.format(value);
+                    }
+
+                    if(monthFormatCached == null) {
+                      // Empty array is to use the browser's default locale.
+                      monthFormatCached = new Intl.DateTimeFormat(environment.locale || [], {
+                        year: "numeric",
+                        month: "numeric"
+                      });
+                    }
+
+                    return monthFormatCached.format(value);
+
+                  default:
+                    // Use the base format.
+                    return this.format(value);
+                }
+              },
+
+              // . grid
+              axisGrid: false,
+              continuousAxisGrid: true,
+
+              axisGrid_lineWidth:   1,
+              axisGrid_strokeStyle: "#CCC",
+
+              // . rule
+              axisRule_lineWidth: 1,
+              axisRule_strokeStyle: "#999999",
+
+              // . ticks
+              axisTicks: true,
+              axisMinorTicks: false,
+              continuousAxisDesiredTickCount: 5,
+              continuousAxisLabelSpacingMin:  2, // 2em = 20px
+
+              axisTicks_lineWidth:   1,
+              axisTicks_strokeStyle: "#999999",
+              xAxisTicks_height:     3, // Account for part of the tick that gets hidden by the rule
+              yAxisTicks_width:      3
+            }
+          };
         }
       },
 
@@ -1082,4 +1146,3 @@ define(function() {
   }
 
 });
-
