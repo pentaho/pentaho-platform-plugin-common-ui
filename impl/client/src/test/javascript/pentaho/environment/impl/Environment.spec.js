@@ -26,7 +26,7 @@ define([
     var environmentSpec = {
       application: "APP-1",
       theme: "THEME-1",
-      locale: "LOCALE-1",
+      locale: "pt-PT",
       user: {
         id:   "USER-1",
         home: "USER-HOME-1"
@@ -74,7 +74,7 @@ define([
     var defaultEnvironmentSpec = {
       application: "APP",
       theme: "THEME",
-      locale: "LOCALE",
+      locale: "pt-BR",
       user: {
         id:   "USER",
         home: "USER-HOME"
@@ -159,6 +159,25 @@ define([
         environment = new Environment(environmentSpec);
 
         expectEnvironmentAndSpec(environment, environmentSpec);
+      });
+
+      it("should normalize locale separators", function() {
+
+        var environment = new Environment({locale: "pt_PT"});
+
+        expect(environment.locale).toBe("pt-pt");
+
+        environment = new Environment({locale: "pt/PT"});
+
+        expect(environment.locale).toBe("pt-pt");
+      });
+
+      // TODO: activate test when the testing JS Engine supports Intl.
+      xit("should ignore an invalid locale", function() {
+
+        var environment = new Environment({locale: "fooo"});
+
+        expect(environment.locale).toBe(null);
       });
     });
 
