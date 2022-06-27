@@ -1235,6 +1235,11 @@ define([
         options.multiChartColumnsMax = value;
       }
 
+      value = model.multiChartMax;
+      if(value != null) {
+        options.multiChartMax = value;
+      }
+
       value = model.multiChartRangeScope;
       if(value) {
         options.numericAxisDomainScope = value;

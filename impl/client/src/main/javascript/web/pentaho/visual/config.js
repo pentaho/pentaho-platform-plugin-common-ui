@@ -179,7 +179,7 @@ define(function() {
             },
 
             // Multi-chart
-            multiChartMax: 50,
+            //multiChartMax: 50,
 
             errorMessage_visible: false,
             noDataMessage_visible: false,
