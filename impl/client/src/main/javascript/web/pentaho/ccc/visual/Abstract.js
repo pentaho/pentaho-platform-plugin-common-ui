@@ -1603,6 +1603,14 @@ define([
         this._chart.render();
       }
 
+      if(this._hasChartMessages()) {
+        var spec = this.lastChartMessage();
+        this.model.sendMessage({
+          msgId: spec.msgId,
+          msgDesc: spec.msgDesc
+        });
+      }
+
       // Render may fail due to required visual roles, invalid data, etc.
       var error = this._chart.getLastRenderError();
       if(error) {
@@ -1614,6 +1622,14 @@ define([
       }
 
       return null;
+    },
+
+    _hasChartMessages: function() {
+      return this._chart && this._chart._lastRenderMessage;
+    },
+
+    lastChartMessage: function() {
+      return this._chart._lastRenderMessage;
     },
 
     _convertCccError: function(error) {
