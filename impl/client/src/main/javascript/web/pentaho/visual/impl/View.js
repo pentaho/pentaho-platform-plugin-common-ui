@@ -388,8 +388,7 @@ define([
       }
 
       return this;
-    },
-
+    }
     // endregion
   }, /** @lends pentaho.visual.impl.View */{
 

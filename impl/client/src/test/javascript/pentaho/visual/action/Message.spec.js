@@ -14,64 +14,64 @@
  * limitations under the License.
  */
 define([
-    "pentaho/visual/action/Base",
-    "pentaho/visual/action/Message",
-    "tests/pentaho/util/errorMatch"
+  "pentaho/visual/action/Base",
+  "pentaho/visual/action/Message",
+  "tests/pentaho/util/errorMatch"
 ], function (BaseAction, MessageAction, errorMatch) {
 
-    "use strict";
+  "use strict";
 
-    describe("pentaho.visual.action.Message", function () {
+  describe("pentaho.visual.action.Message", function () {
 
-        it("should be defined", function() {
+    it("should be defined", function () {
 
-            expect(typeof MessageAction).toBe("function");
-        });
-
-        it("should extend visual.action.Base", function() {
-
-            expect(MessageAction.prototype instanceof BaseAction).toBe(true);
-        });
-
-        describe("#code", function () {
-
-            it("should throw when setting a non string value", function () {
-
-                expect(function() {
-                    var messageAction = new MessageAction({code: 1, description: "XPTO"});
-                }).toThrow(errorMatch.argInvalidType("code", ["string"], "number"));
-            });
-
-            it("should return null when setting empty string", function () {
-                var messageAction = new MessageAction({code: "", description: "XPTO"});
-                expect(messageAction.code).toBe(null);
-            });
-
-            it("should return the set value", function () {
-                var messageAction = new MessageAction({code: "XPTO", description: "OTPX"});
-                expect(messageAction.code).toBe("XPTO");
-            });
-        });
-
-        describe("#code", function () {
-
-            it("should throw when setting a non string value", function () {
-
-                expect(function() {
-                    var messageAction = new MessageAction({code: "XPTO", description: 1});
-                }).toThrow(errorMatch.argInvalidType("description", ["string"], "number"));
-            });
-
-            it("should return null when setting empty string", function () {
-                var messageAction = new MessageAction({code: "XPTO", description: ""});
-                expect(messageAction.description).toBe(null);
-            });
-
-            it("should return the set value", function () {
-                var messageAction = new MessageAction({code: "XPTO", description: "OTPX"});
-                expect(messageAction.description).toBe("OTPX");
-            });
-        });
-
+      expect(typeof MessageAction).toBe("function");
     });
+
+    it("should extend visual.action.Base", function () {
+
+      expect(MessageAction.prototype instanceof BaseAction).toBe(true);
+    });
+
+    describe("#code", function () {
+
+      it("should throw when setting a non string value", function () {
+
+        expect(function () {
+          var messageAction = new MessageAction({code: 1, description: "XPTO"});
+        }).toThrow(errorMatch.argInvalidType("code", ["string"], "number"));
+      });
+
+      it("should return null when setting empty string", function () {
+        var messageAction = new MessageAction({code: "", description: "XPTO"});
+        expect(messageAction.code).toBe(null);
+      });
+
+      it("should return the set value", function () {
+        var messageAction = new MessageAction({code: "XPTO", description: "OTPX"});
+        expect(messageAction.code).toBe("XPTO");
+      });
+    });
+
+    describe("#description", function () {
+
+      it("should throw when setting a non string value", function () {
+
+        expect(function () {
+          var messageAction = new MessageAction({code: "XPTO", description: 1});
+        }).toThrow(errorMatch.argInvalidType("description", ["string"], "number"));
+      });
+
+      it("should return null when setting empty string", function () {
+        var messageAction = new MessageAction({code: "XPTO", description: ""});
+        expect(messageAction.description).toBe(null);
+      });
+
+      it("should return the set value", function () {
+        var messageAction = new MessageAction({code: "XPTO", description: "OTPX"});
+        expect(messageAction.description).toBe("OTPX");
+      });
+    });
+
+  });
 });

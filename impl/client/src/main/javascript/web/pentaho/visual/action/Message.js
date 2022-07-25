@@ -17,7 +17,7 @@
 define([
     "pentaho/module!_",
     "./Base",
-    "../../util/text",
+    "pentaho/util/text",
     "pentaho/lang/UserError",
     "pentaho/lang/ArgumentInvalidTypeError"
 ], function(module, ActionBase, textUtil, UserError, ArgumentInvalidTypeError) {
@@ -35,7 +35,7 @@ define([
          * @amd pentaho/visual/action/Message
          *
          * @classDesc The `Message` action is a synchronous action that
-         * is performed when there is a message to be shown to the user, which does not break functionality
+         * is performed when there is a message to be shown to the user, which does not break functionality.
 
          * @description Creates a _message_ action given its specification.
          * @param {pentaho.visual.action.spec.IMessage} [spec] A _message_ action specification.
@@ -51,7 +51,7 @@ define([
         },
 
         /**
-         * Gets or sets the _code_ of this action.
+         * Gets or sets the _code_ of this message.
          *
          * When set to an empty string, `null` will be set.
          * A `null` value will not pass validation.
@@ -100,6 +100,7 @@ define([
                 errors = [];
                 errors.push(new UserError("Message 'code' cannot be Null"));
             }
+
             if (this.__description === null) {
                 errors = errors || [];
                 errors.push(new UserError("Message 'description' cannot be Null"));
@@ -116,14 +117,14 @@ define([
     });
 
     /**
-     * Return the non empty string of value, or Null
+     * Return the non empty string of value, or `null`.
      *
      * @param {string} argName - The argument name, for error purposes.
      * @param {string} value - The argument value.
      *
-     * @return {nonEmptyString} A non empty string or null.
+     * @return {nonEmptyString} A non empty string or `null`.
      *
-     * @throws {pentaho.lang.ArgumentInvalidTypeError} When `value` is not a `string`
+     * @throws {pentaho.lang.ArgumentInvalidTypeError} When `value` is not a `string`.
      */
     function __returnValueOrThrow(argName, value) {
         if (typeof value !== "string") {
