@@ -19,8 +19,9 @@ define([
   "../types/MaxChartsPerRow",
   "../types/MultiChartRangeScope",
   "../types/MultiChartOverflow",
+  "../types/MultiChartMax",
   "pentaho/i18n!../i18n/model"
-], function(module, BaseModel, MaxChartsPerRow, MultiChartRangeScope, MultiChartOverflow, bundle) {
+], function(module, BaseModel, MaxChartsPerRow, MultiChartRangeScope, MultiChartOverflow, MultiChartMax, bundle) {
 
   "use strict";
 
@@ -37,6 +38,12 @@ define([
           valueType:  MaxChartsPerRow,
           isRequired: true,
           defaultValue: 3
+        },
+        {
+          name: "multiChartMax",
+          valueType:  MultiChartMax,
+          isRequired: true,
+          defaultValue: 50
         },
         {
           name: "multiChartRangeScope",

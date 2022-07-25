@@ -1235,6 +1235,11 @@ define([
         options.multiChartColumnsMax = value;
       }
 
+      value = model.multiChartMax;
+      if(value != null) {
+        options.multiChartMax = value;
+      }
+
       value = model.multiChartRangeScope;
       if(value) {
         options.numericAxisDomainScope = value;
@@ -1598,9 +1603,14 @@ define([
         this._chart.render();
       }
 
+      var msgSpec = this._chart.getLastRenderMessage();
+      if(msgSpec != null) {
+        this.model.message( msgSpec );
+      }
+
       // Render may fail due to required visual roles, invalid data, etc.
       var error = this._chart.getLastRenderError();
-      if(error) {
+      if(error != null) {
         return Promise.reject(this._convertCccError(error));
       }
 
