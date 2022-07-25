@@ -26,7 +26,7 @@ define([
         $type: {
             id: module.id,
             mixins: [EnumMixin],
-            domain: [50, 100, 150, 200]
+            domain: [50, 100, 150, 200, 250]
         }
     })
         .localize({$type: bundle.structured.MultiChartMax})

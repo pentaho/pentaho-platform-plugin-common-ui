@@ -1603,17 +1603,14 @@ define([
         this._chart.render();
       }
 
-      if(this._hasChartMessages()) {
-        var spec = this.lastChartMessage();
-        this.model.sendMessage({
-          msgId: spec.msgId,
-          msgDesc: spec.msgDesc
-        });
+      var msgSpec = this._chart.getLastRenderMessage();
+      if(msgSpec != null) {
+        this.model.message( msgSpec );
       }
 
       // Render may fail due to required visual roles, invalid data, etc.
       var error = this._chart.getLastRenderError();
-      if(error) {
+      if(error != null) {
         return Promise.reject(this._convertCccError(error));
       }
 
@@ -1622,14 +1619,6 @@ define([
       }
 
       return null;
-    },
-
-    _hasChartMessages: function() {
-      return this._chart && this._chart._lastRenderMessage;
-    },
-
-    lastChartMessage: function() {
-      return this._chart._lastRenderMessage;
     },
 
     _convertCccError: function(error) {

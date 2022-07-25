@@ -390,13 +390,6 @@ define([
       return this;
     },
 
-    get hasChartWarnings() {
-      return this._chart && this._chart._lastMultiWarning && this._chart._lastMultiWarning.length > 0; // && this._chart._multiWarning.length > 0
-    },
-
-    get chartWarning() {
-      return this._chart._lastMultiWarning;
-    }
     // endregion
   }, /** @lends pentaho.visual.impl.View */{
 
