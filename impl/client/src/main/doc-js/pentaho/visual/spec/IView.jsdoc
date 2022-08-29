@@ -42,3 +42,13 @@
  * @memberOf pentaho.visual.spec.IView#
  * @type {pentaho.visual.Model}
  */
+
+/**
+ * The visualization view configRules.
+ *
+ * This property is optional.
+ *
+ * @name configRules
+ * @memberOf pentaho.visual.spec.IView#
+ * @type {pentaho.type.String}
+ */
