@@ -42,3 +42,16 @@
  * @memberOf pentaho.visual.spec.IView#
  * @type {pentaho.visual.Model}
  */
+
+/**
+ * The instance-level view configuration.
+ * Contrast this with the class-level view configuration, supported by some view classes, and which affects all instances of a view class.
+ * When both class and instance-level configuration are supported by a view class, the instance-level configuration takes precedence.
+ * For more information on supported configuration options, see the documentation of the specific view class.
+ *
+ * This property is optional.
+ *
+ * @name config
+ * @memberOf pentaho.visual.spec.IView#
+ * @type {object}
+ */
