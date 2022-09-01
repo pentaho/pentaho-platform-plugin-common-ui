@@ -131,7 +131,6 @@ define([
       "measures": "value"
     },
 
-
     /* Some CCC measure visual roles accept multiple fields.
      * We call them generic measure visual roles...
      *
@@ -179,13 +178,13 @@ define([
     _discreteColorRole: "columns",
     // endregion
 
-	constructor: function(viewSpec) {
+    constructor: function (viewSpec) {
       this.base(viewSpec);
       var config = arg.optional(viewSpec, "config", "viewSpec");
-      if(config){      
+      if (config) {
         this.extension = config.extension;
-		}
-	},
+      }
+    },
     // region VizAPI implementation
 
     /** @inheritDoc */
