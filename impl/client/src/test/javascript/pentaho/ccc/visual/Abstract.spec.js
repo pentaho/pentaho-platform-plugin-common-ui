@@ -17,7 +17,7 @@ define([
   "pentaho/ccc/visual/Abstract",
   "pentaho/visual/Model",
   "pentaho/data/Table"
-], function(AbstractView,Model,Table) {
+], function(AbstractView, Model, Table) {
 
   "use strict";
 
@@ -66,7 +66,7 @@ define([
           var DerivedView2 = DerivedView.extend();
 
           expect(DerivedView2.prototype.extension).toBe(null);
-        });		
+        });
       });
 
       describe("#extensionEffective", function() {
@@ -138,63 +138,62 @@ define([
         });
       });
     });
-	
+
     function getSampleViewSpec(config) {
 
       var dataTable = new Table(
         {
           model: [
-            { name: "country", type: "string", label: "Country" },
-            { name: "sales", type: "number", label: "Sales" }
+            {name: "country", type: "string", label: "Country"},
+            {name: "sales", type: "number", label: "Sales"}
           ],
           rows: [
-            { c: [{ v: "Portugal" }, { v: 12000 }] },
-            { c: [{ v: "Ireland" }, { v: 6000 }] }
+            {c: [{v: "Portugal"}, {v: 12000}]},
+            {c: [{v: "Ireland"}, {v: 6000}]}
           ]
         }
       );
-      var model = new Model({ data: dataTable, isAutoUpdate: false });
+      var model = new Model({data: dataTable, isAutoUpdate: false});
       var elem = document.createElement("div");
-      return { model: model, domContainer: elem, config: config };
+      return {model: model, domContainer: elem, config: config};
     }
 
-    describe("#constructor", function () {
+    describe("#constructor", function() {
 
-      it("should expose config.extension in the extension property", function () {
+      it("should expose config.extension in the extension property", function() {
 
-        var config = { extension: { foo: "bar" } };
+        var config = {extension: {foo: "bar"}};
         var viewSpec = getSampleViewSpec(config);
         var view = new AbstractView(viewSpec);
 
         expect(view.extension).toEqual(config.extension);
       });
 
-      it("should have a default null extension property", function () {
+      it("should have a default null extension property", function() {
 
         var viewSpec = getSampleViewSpec();
         var view = new AbstractView(viewSpec);
-        
+
         expect(view.extension).toEqual(null);
       });
     });
 
-    describe("#extension", function () {
+    describe("#extension", function() {
 
-      it("should respect a specified object value", function () {
+      it("should respect a specified object value", function() {
 
         var viewSpec = getSampleViewSpec();
         var view = new AbstractView(viewSpec);
 
-        var extension = { foo: "bar" };
+        var extension = {foo: "bar"};
         view.extension = extension;
 
         expect(view.extension).toEqual(extension);
       });
 
+      it("should read the local value and not an inherited base value", function() {
 
-      it("should read the local value and not an inherited base value", function () {
-
-        var classExtension = { foo: "barInherited" };
+        var classExtension = {foo: "barInherited"};
         var DerivedView = AbstractView.extend({
           extension: classExtension
         });
@@ -204,30 +203,30 @@ define([
 
         expect(view.extension).toBe(null);
 
-        var extension = { foo: "barLocal" };
+        var extension = {foo: "barLocal"};
         view.extension = extension;
         expect(view.extension).toEqual(extension);
       });
     });
-    describe("#extensionEffective", function () {
+    describe("#extensionEffective", function() {
 
-      it("should reflect a locally specified object value", function () {
+      it("should reflect a locally specified object value", function() {
 
         var viewSpec = getSampleViewSpec();
         var view = new AbstractView(viewSpec);
 
-        var extension = { foo: "bar" };
+        var extension = {foo: "bar"};
         view.extension = extension;
 
         expect(view.extensionEffective).toEqual(extension);
       });
 
-      it("should reuse the initially determined object value", function () {
+      it("should reuse the initially determined object value", function() {
 
         var viewSpec = getSampleViewSpec();
         var view = new AbstractView(viewSpec);
 
-        var extension = { foo: "bar" };
+        var extension = {foo: "bar"};
         view.extension = extension;
 
         var result1 = view.extensionEffective;
@@ -236,9 +235,9 @@ define([
         expect(result1).toBe(result2);
       });
 
-      it("should reflect an inherited object value", function () {
+      it("should reflect an inherited object value", function() {
 
-        var extension = { foo: "bar" };
+        var extension = {foo: "bar"};
         var DerivedView = AbstractView.extend({
           extension: extension
         });
@@ -249,15 +248,15 @@ define([
         expect(view.extensionEffective).toEqual(extension);
       });
 
-      it("should merge local and inherited object values", function () {
+      it("should merge local and inherited object values", function() {
 
         var DerivedView = AbstractView.extend({
-          extension: { foo: "bar" }
+          extension: {foo: "bar"}
         });
 
         var viewSpec = getSampleViewSpec();
         var view = new DerivedView(viewSpec);
-        view.extension = { bar: "foo" };
+        view.extension = {bar: "foo"};
 
         expect(view.extensionEffective).toEqual({
           foo: "bar",
@@ -265,15 +264,15 @@ define([
         });
       });
 
-      it("should override inherited properties with local properties", function () {
+      it("should override inherited properties with local properties", function() {
 
         var DerivedView = AbstractView.extend({
-          extension: { foo: "barInherited" }
+          extension: {foo: "barInherited"}
         });
 
         var viewSpec = getSampleViewSpec();
         var view = new DerivedView(viewSpec);
-        view.extension = { foo: "barLocal" };
+        view.extension = {foo: "barLocal"};
 
         expect(view.extensionEffective).toEqual({
           foo: "barLocal"

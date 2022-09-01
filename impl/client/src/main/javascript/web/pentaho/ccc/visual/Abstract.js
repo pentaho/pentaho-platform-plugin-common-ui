@@ -178,10 +178,10 @@ define([
     _discreteColorRole: "columns",
     // endregion
 
-    constructor: function (viewSpec) {
+    constructor: function(viewSpec) {
       this.base(viewSpec);
       var config = arg.optional(viewSpec, "config", "viewSpec");
-      if (config) {
+      if(config) {
         this.extension = config.extension;
       }
     },
