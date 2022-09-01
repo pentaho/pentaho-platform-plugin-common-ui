@@ -31,12 +31,13 @@ define([
   "pentaho/data/TableView",
   "pentaho/util/logger",
   "pentaho/util/spec",
+  "pentaho/util/arg",
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/i18n!view",
   "css!./theme/tipsy.css"
 ], function(module, BaseView, Model, UserError, def, pvc, pv, util, dataUtil, OrFilter, AndFilter, IsEqualFilter,
-            O, visualColorUtils, DataView, logger, specUtil, debugMgr, DebugLevels, bundle) {
+            O, visualColorUtils, DataView, logger, specUtil, arg, debugMgr, DebugLevels, bundle) {
 
   "use strict";
 
@@ -177,6 +178,13 @@ define([
     _discreteColorRole: "columns",
     // endregion
 
+    constructor: function(viewSpec) {
+      this.base(viewSpec);
+      var config = arg.optional(viewSpec, "config", "viewSpec");
+      if(config) {
+        this.extension = config.extension;
+      }
+    },
     // region VizAPI implementation
 
     /** @inheritDoc */
