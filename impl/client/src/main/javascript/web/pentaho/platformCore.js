@@ -15,6 +15,7 @@
  */
 define([
   "pentaho/config/service",
+  "pentaho/config/impl/Service",
   "pentaho/module/service",
   "pentaho/module/metaService",
   "pentaho/module/metaOf",

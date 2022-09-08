@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2022 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,14 +60,18 @@ define([
      */
     var __ruleCounter = 0;
 
-    var ConfigurationService = Base.extend(module.id, /** @lends pentaho._core.config.Service# */{
+    // NOTE: the JSDoclets in this file are pointing to `pentaho.config.impl`,
+    // and not `pentaho._core.config` (where the file really resides).
+    // The former is the module namespace in which the final, **core-bound**
+    // configuration service class is re-exported and made available to the user.
+    var ConfigurationService = Base.extend(module.id, /** @lends pentaho.config.impl.Service# */{
 
       /**
        * @classDesc The `Service` class is an in-memory implementation of
        * the {@link pentaho.config.IService} interface.
        *
        * @alias Service
-       * @memberOf pentaho._core.config
+       * @memberOf pentaho.config.impl
        * @class
        * @extends pentaho.lang.Base
        * @implements {pentaho.config.IService}
