@@ -22,9 +22,10 @@ define([
   "../../util/object",
   "../../util/requireJS",
   "../../util/fun",
+  "../../util/arg",
   "../../module/util",
   "../../module/Annotation"
-], function(module, Base, SortedList, ArgumentRequiredError, specUtil, O, requireJSUtil, F, moduleUtil, Annotation) {
+], function(module, Base, SortedList, ArgumentRequiredError, specUtil, O, requireJSUtil, F, argUtil, moduleUtil, Annotation) {
 
   "use strict";
 
@@ -272,7 +273,34 @@ define([
       },
 
       /** @inheritDoc */
-      selectAsync: function(moduleId, annotationId) {
+      selectAsync: function(moduleId, annotationId, keyArgs) {
+
+        var localConfigPromise = this._selectLocalAsync(moduleId, annotationId);
+        if (!argUtil.optional(keyArgs, "inherit")) {
+          return localConfigPromise;
+        }
+
+        var ancestor = this.__getAncestorModule(moduleId);
+        if (ancestor === null) {
+          return localConfigPromise;
+        }
+
+        // Array of configuration promises, where the local config promise is the last element,
+        // and the "oldest" ancestor, the first one.
+        var configPromises = [localConfigPromise];
+        do {
+          configPromises.unshift(this._selectLocalAsync(ancestor.id, annotationId));
+        } while((ancestor = ancestor.ancestor) !== null);
+
+        return Promise.all(configPromises).then(__mergeConfigs);
+      },
+
+      __getAncestorModule: function(moduleId) {
+        var module = core.moduleMetaService.get(moduleId);
+        return module !== null && module.kind === "type" ? module.ancestor : null;
+      },
+
+      _selectLocalAsync: function(moduleId, annotationId) {
 
         var internalConfigsPromise = this.__selectInternalAsync(moduleId, annotationId);
 

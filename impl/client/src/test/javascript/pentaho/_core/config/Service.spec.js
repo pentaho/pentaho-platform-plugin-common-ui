@@ -975,6 +975,334 @@ define([
         });
       });
 
+      describe("inheriting", function() {
+        // type modules:
+        //  - T1 > T2 > T3
+        //  - T4
+        //
+        // instance modules:
+        // - I1, of type T4
+        //
+        // modules with no own configuration:
+        // - T2
+        //
+        // annotated modules:
+        //
+
+        var ruleSet =  {
+          rules: [
+            {
+              select: {
+                module: "T1"
+              },
+              apply: {
+                propCommon: "T1",
+                propT1: "T1"
+              }
+            },
+            {
+              select: {
+                module: "T3"
+              },
+              apply: {
+                propCommon: "T3",
+                propT3: "T3"
+              }
+            },
+            {
+              select: {
+                module: "T4"
+              },
+              apply: {
+                propCommon: "T4",
+                propT4: "T4"
+              }
+            },
+            {
+              select: {
+                module: "I1"
+              },
+              apply: {
+                propCommon: "I1",
+                propI1: "I1"
+              }
+            }
+          ]
+        };
+
+        var annotationsRuleSet =  {
+          rules: [
+            // A1 annotation applied to:
+            // - T1, T3 (and T1 > T2 > T3)
+            // - T4
+            // - I1
+            // A2 annotation applied to:
+            // - T2 (and T1 > T2 > T3)
+            {
+              select: {
+                module: "T1",
+                annotation: "A1"
+              },
+              apply: {
+                annotPropCommon: "A1@T1",
+                annotPropT1A1: true
+              }
+            },
+            {
+              select: {
+                module: "T2",
+                annotation: "A2"
+              },
+              apply: {
+                annotPropCommon: "A2@T2",
+                annotPropT2A2: true
+              }
+            },
+            {
+              select: {
+                module: "T3",
+                annotation: "A1"
+              },
+              apply: {
+                annotPropCommon: "A1@T3",
+                annotPropT3A1: true
+              }
+            },
+            {
+              select: {
+                module: "T4",
+                annotation: "A1"
+              },
+              apply: {
+                annotPropCommon: "A1@T4",
+                annotPropT4A1: true
+              }
+            },
+            {
+              select: {
+                module: "I1",
+                annotation: "A1"
+              },
+              apply: {
+                annotPropCommon: "A1@I1",
+                annotPropI1A1: true
+              }
+            }
+          ]
+        };
+
+        // Type Modules
+        var moduleT1 = {id: "T1", kind: "type", ancestor: null};
+        var moduleT2 = {id: "B", kind: "type", ancestor: moduleT1};
+        var moduleT3 = {id: "T3", kind: "type", ancestor: moduleT2};
+        var moduleT4 = {id: "T4", kind: "type", ancestor: null};
+
+        // Instance Modules
+        var moduleI1 = {id: "I1", kind: "instance", type: moduleT4};
+
+        // No need to define Annotation Modules
+
+        var modules = {
+          "T1": moduleT1,
+          "T2": moduleT2,
+          "T3": moduleT3,
+          "T4": moduleT4,
+          "I1": moduleI1
+        };
+
+        var configurationService;
+
+        beforeEach(function() {
+          core = createCoreMock();
+
+          core.moduleMetaService.get.and.callFake(function(id) {
+            return modules[id] || null;
+          });
+
+          ConfigurationService = configServiceFactory(core);
+
+          configurationService = new ConfigurationService();
+          configurationService.add(ruleSet);
+          configurationService.add(annotationsRuleSet);
+        });
+
+        describe("module resolution", function() {
+
+          describe("when keyArgs.inherit: true", function() {
+
+            it("should return the local configuration of a root type module, having descendants", function() {
+
+              return configurationService.selectAsync("T1", null, {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "T1",
+                  propT1: "T1"
+                });
+              });
+            });
+
+            it("should return the local configuration of a root type module, having no descendants", function() {
+
+              return configurationService.selectAsync("T4", null, {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "T4",
+                  propT4: "T4"
+                });
+              });
+            });
+
+            it("should return the local configuration of an instance module, ignoring that of its type module", function() {
+
+              return configurationService.selectAsync("I1", null, {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "I1",
+                  propI1: "I1"
+                });
+              });
+            });
+
+            it("should inherit the configuration of a type module's ancestors, even if it has no own/local configuration", function() {
+
+              return configurationService.selectAsync("T2", null, {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "T1",
+                  propT1: "T1"
+                });
+              });
+            });
+
+            it("should inherit and merge the configuration of a type module and that of its ancestors", function() {
+
+              return configurationService.selectAsync("T3", null, {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "T3",
+                  propT1: "T1",
+                  // propT2: "T2" // T2 has no own config
+                  propT3: "T3"
+                });
+              });
+            });
+          });
+
+          describe("when keyArgs.inherit: false", function() {
+            it("should return the configuration of a type module, ignoring that of its ancestors", function() {
+
+              return configurationService.selectAsync("T3", null, {inherit: false}).then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "T3",
+                  propT3: "T3"
+                });
+              });
+            });
+          });
+
+          describe("when keyArgs.inherit: unspecified (default value)", function() {
+            it("should return the configuration of a type module, ignoring that of its ancestors", function() {
+
+              return configurationService.selectAsync("T3").then(function(result) {
+                expect(result).toEqual({
+                  propCommon: "T3",
+                  propT3: "T3"
+                });
+              });
+            });
+          });
+        });
+
+        describe("module and annotation resolution", function() {
+
+          describe("when keyArgs.inherit: true", function() {
+
+            it("should return the local configuration of a root type module annotation, having descendants", function() {
+
+              return configurationService.selectAsync("T1", "A1", {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@T1",
+                  annotPropT1A1: true
+                });
+              });
+            });
+
+            it("should return the local configuration of a root type module annotation, having no descendants", function() {
+
+              return configurationService.selectAsync("T4", "A1", {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@T4",
+                  annotPropT4A1: true
+                });
+              });
+            });
+
+            it("should return the local configuration of an instance module annotation, ignoring that of its type module", function() {
+
+              return configurationService.selectAsync("I1", "A1", {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@I1",
+                  annotPropI1A1: true
+                });
+              });
+            });
+
+            it("should return the local configuration of a type module annotation, when its ascendants have no configuration", function() {
+
+              return configurationService.selectAsync("T2", "A2", {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A2@T2",
+                  annotPropT2A2: true
+                });
+              });
+            });
+
+            it("should inherit the annotation configuration of a type module's ancestors, " +
+               "even if it has no own/local annotation configuration", function() {
+
+              return configurationService.selectAsync("T2", "A1", {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@T1",
+                  annotPropT1A1: true
+                });
+              });
+            });
+
+            it("should inherit and merge the configuration of a type module annotation and that of its ancestors", function() {
+
+              return configurationService.selectAsync("T3", "A1", {inherit: true}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@T3",
+                  annotPropT1A1: true,
+                  // annotPropT2A1: true, // T2 has no own annotation config
+                  annotPropT3A1: true
+                });
+              });
+            });
+          });
+
+          describe("when keyArgs.inherit: false", function() {
+
+            it("should return the configuration of a type module annotation, ignoring that of its ancestors", function() {
+
+              return configurationService.selectAsync("T3", "A1", {inherit: false}).then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@T3",
+                  annotPropT3A1: true
+                });
+              });
+            });
+          });
+
+          describe("when keyArgs.inherit: unspecified (default value)", function() {
+            it("should return the configuration of a type module annotation, ignoring that of its ancestors", function() {
+
+              return configurationService.selectAsync("T3", "A1").then(function(result) {
+                expect(result).toEqual({
+                  annotPropCommon: "A1@T3",
+                  annotPropT3A1: true
+                });
+              });
+            });
+          });
+        });
+      });
+
       describe("dependencies and factories", function() {
 
         it("should resolve all dependencies", function() {
@@ -1500,7 +1828,7 @@ define([
           });
         });
 
-        it("should get the external configuration when there is no internal configuraiton", function() {
+        it("should get the external configuration when there is no internal configuration", function() {
 
           return configurationService.selectAsync("test/OnlyExternalConfig").then(function(result) {
             expect(result.testId).toEqual("External");
