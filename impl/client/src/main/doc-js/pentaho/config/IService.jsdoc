@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2022 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,10 +97,19 @@
  * Selects, asynchronously, the configuration of a module, or module annotation,
  * given their identifiers.
  *
+ * If this is a type module and `keyArgs.inherit` is `true`,
+ * then the resulting configuration is obtained by merging the configurations obtained
+ * from ancestor type modules and the local configuration.
+ * The local configuration overrides that inherited from ancestor modules.
+ * Configurations are merged using {@link pentaho.util.spec.merge}.
+ *
  * @name selectAsync
  * @memberOf pentaho.config.IService#
  * @param {string} moduleId - The identifier of the module.
  * @param {?string} [annotationId] - The identifier of the module annotation.
+ * @param {object} [keyArgs] - The keyword arguments object.
+ * @param {boolean} [keyArgs.inherit=false] - Indicates that if this is a type module,
+ * configurations inherited from ancestor modules should be included.
  * @return {Promise.<?object>} A promise for the configuration, if any, or a promise for `null`, otherwise.
  */
 
