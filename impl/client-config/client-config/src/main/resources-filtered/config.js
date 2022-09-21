@@ -28,13 +28,13 @@ define(function() {
    * Links to the documentation of the options being configured are provided.
    *
    * For help on configuration, please check the following help topics:
-   * 1. [General information on configuration](https://help.pentaho.com/Documentation/9.3/Developer_center/Configuration_API)
-   * 2. [Configuring a visualization](https://help.pentaho.com/Documentation/9.3/Developer_center/Configuring_a_visualization)
+   * 1. [General information on configuration](https://help.pentaho.com/Documentation/9.4/Developer_center/Configuration_API)
+   * 2. [Configuring a visualization](https://help.pentaho.com/Documentation/9.4/Developer_center/Configuring_a_visualization)
    *
    * If you need to know the identifiers of well-known modules, check the following help topics:
-   * 1. [Ids of Well-Known Applications](https://help.pentaho.com/Documentation/9.3/Developer_center/Configuration_API#Known_values_of_Pentaho_platform_environment_variables)
-   * 2. [Ids of Stock Visualization Models and Views](https://help.pentaho.com/Documentation/9.3/Developer_center/Stock_visualizations_identifiers)
-   * 3. [Ids of Stock Color Palettes](https://help.pentaho.com/Documentation/9.3/Developer_center/Stock_color_palettes_identifiers)
+   * 1. [Ids of Well-Known Applications](https://help.pentaho.com/Documentation/9.4/Developer_center/Configuration_API#Known_values_of_Pentaho_platform_environment_variables)
+   * 2. [Ids of Stock Visualization Models and Views](https://help.pentaho.com/Documentation/9.4/Developer_center/Stock_visualizations_identifiers)
+   * 3. [Ids of Stock Color Palettes](https://help.pentaho.com/Documentation/9.4/Developer_center/Stock_color_palettes_identifiers)
    *
    * Almost all stock visualizations are based on the CCC charting library.
    * To experiment with CCC options and styles you can use the [CCC playground](https://webdetails.github.io/ccc).
@@ -55,7 +55,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -80,7 +80,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -104,7 +104,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#label
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#label
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -129,7 +129,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -192,8 +192,8 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette#colors
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette#colors
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -217,7 +217,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -248,7 +248,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalLight
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalLight
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -282,8 +282,8 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
-       * @see https://help.pentaho.com/Documentation/9.3/Developer_center/Platform_JavaScript_APIs/platform/pentaho.module.spec.IInstanceMeta#ranking
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
+       * @see https://help.pentaho.com/Documentation/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.module.spec.IInstanceMeta#ranking
        *
        * @type {pentaho.config.spec.IRule}
        */
