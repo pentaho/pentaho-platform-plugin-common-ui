@@ -228,13 +228,14 @@
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
-  // region Type API and Visualization Models Packages and Themes
+  // region Viz. API
 
   // This file is always in the non-compressed location.
   requirePaths["pentaho/visual/config"] = baseUncompressedPath + "/pentaho/visual/config";
 
   requireModules["pentaho/visual/config"] = {type: "pentaho/config/spec/IRuleSet"};
 
+  // region Models
   requireModules["pentaho/visual/models/Abstract"] = {base: "pentaho/visual/Model"};
   requireModules["pentaho/visual/models/CartesianAbstract"] = {base: "pentaho/visual/models/Abstract"};
 
@@ -348,7 +349,37 @@
   };
   // endregion
 
-  // Color Palettes
+  // region CCC Views
+  requireModules["pentaho/ccc/visual/Abstract"] = {base: null};
+  requireModules["pentaho/ccc/visual/CartesianAbstract"] = {base: "pentaho/ccc/visual/Abstract"};
+  requireModules["pentaho/ccc/visual/CategoricalContinuousAbstract"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
+
+  requireModules["pentaho/ccc/visual/BarAbstract"] = {base: "pentaho/ccc/visual/CategoricalContinuousAbstract"};
+  requireModules["pentaho/ccc/visual/Bar"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/ccc/visual/BarHorizontal"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/ccc/visual/BarStacked"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/ccc/visual/BarStackedHorizontal"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/ccc/visual/BarLine"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/ccc/visual/BarNormalizedAbstract"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/ccc/visual/BarNormalized"] = {base: "pentaho/ccc/visual/BarNormalizedAbstract"};
+  requireModules["pentaho/ccc/visual/BarNormalizedHorizontal"] = {base: "pentaho/ccc/visual/BarNormalizedAbstract"};
+
+  requireModules["pentaho/ccc/visual/Sunburst"] = {base: "pentaho/ccc/visual/Abstract"};
+  requireModules["pentaho/ccc/visual/Pie"] = {base: "pentaho/ccc/visual/Abstract"};
+  requireModules["pentaho/ccc/visual/Donut"] = {base: "pentaho/ccc/visual/Pie"};
+
+  requireModules["pentaho/ccc/visual/MetricPointAbstract"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
+  requireModules["pentaho/ccc/visual/Scatter"] = {base: "pentaho/ccc/visual/MetricPointAbstract"};
+  requireModules["pentaho/ccc/visual/Bubble"] = {base: "pentaho/ccc/visual/MetricPointAbstract"};
+
+  requireModules["pentaho/ccc/visual/PointAbstract"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
+  requireModules["pentaho/ccc/visual/Line"] = {base: "pentaho/ccc/visual/PointAbstract"};
+  requireModules["pentaho/ccc/visual/AreaStacked"] = {base: "pentaho/ccc/visual/PointAbstract"};
+
+  requireModules["pentaho/ccc/visual/HeatGrid"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
+  // endregion
+
+  // region Color Palettes
   requireModules["pentaho/visual/color/Palette"] = {base: "complex"};
 
   requireModules["pentaho/visual/color/palettes/nominalPrimary"] = {type: "pentaho/visual/color/Palette", ranking: -10};
@@ -378,6 +409,9 @@
   requireModules["pentaho/visual/color/palettes/divergentRyg5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
   requireModules["pentaho/visual/color/palettes/divergentRyb3"] = {type: "pentaho/visual/color/Palette", ranking: -10};
   requireModules["pentaho/visual/color/palettes/divergentRyb5"] = {type: "pentaho/visual/color/Palette", ranking: -10};
+  // endregion
+
+  // endregion
 
   // Copied by hand from /target/requireCfg.bundles.js
   if(useBundle) {
