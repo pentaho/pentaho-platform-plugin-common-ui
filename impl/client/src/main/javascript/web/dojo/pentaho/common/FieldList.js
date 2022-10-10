@@ -626,7 +626,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       if (groupHeader != nodeGroupHeader) {
         groupHeader = nodeGroupHeader;
         showGroup = false;
-        if (groupHeader) {
+        if (groupHeader && node.id) {
           domClass.add(groupHeader, "hidden");
           domClass.remove(groupHeader, "categoryNodeFirst");
           domClass.remove(groupHeader, "categoryNodeNotFirst");
