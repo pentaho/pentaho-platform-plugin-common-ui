@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2020 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2022 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,12 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
     _searchResponseCallback: null,
 
     /**
+     * Is supposed to be used only during the focused edition of the content of the prompt
+     * contains the value before editing
+     * is not up-to-date when the input box is empty, because the source callback is not called in this scenario
+     */
+    prevSelValue: undefined,
+    /**
      * Creates a static autocomplete box element.
      */
     update : function() {
@@ -98,7 +104,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       if(input.length === 0) {
         // Initialize autocomplete.
         this._createAndInitializeInputAutocompleteElement(ph, initialValue);
-      } else if(initialValue !== this.prevSelValue && initialValue !== undefined) {
+      } else if(initialValue !== this.getValue() && initialValue !== undefined) {
         //Update current value
         input.val(initialValue);
       }
