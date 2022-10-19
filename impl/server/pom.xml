@@ -17,7 +17,7 @@
     <commons-vfs2.version>2.2</commons-vfs2.version>
     <jmock-junit4.version>2.5.1</jmock-junit4.version>
     <pentaho-connections.version>9.5.0.0-SNAPSHOT</pentaho-connections.version>
-    <commons-beanutils.version>1.9.3</commons-beanutils.version>
+    <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <pentaho-reporting.version>9.5.0.0-SNAPSHOT</pentaho-reporting.version>
     <pentaho-metadata.version>9.5.0.0-SNAPSHOT</pentaho-metadata.version>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
