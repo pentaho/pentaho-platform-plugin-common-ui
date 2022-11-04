@@ -23,8 +23,8 @@ while still side-by-side with the _previous_ Visualization API version.
 The Analyzer application supports visualizations of both formats,
 allowing you to convert any custom visualizations of the previous format at your own pace.
 
-All [stock visualizations](https://help.pentaho.com/Documentation/8.3/Products/Visualizations_for_Analyzer), 
-with the exception of the [Geo Map](https://help.pentaho.com/Documentation/8.3/Products/Visualizations_for_Analyzer#Geo_map_visualization), 
+All [stock visualizations](https://help.pentaho.com/Documentation/9.4/Products/Visualizations_for_Analyzer), 
+with the exception of the [Geo Map](https://help.pentaho.com/Documentation/9.4/Products/Visualizations_for_Analyzer#Geo_map_visualization), 
 are available in the new format.
 
 Fresh Pentaho installations are configured to use the new format stock visualizations, 
