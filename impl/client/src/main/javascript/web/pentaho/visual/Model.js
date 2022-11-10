@@ -26,6 +26,7 @@ define([
   "./action/Select",
   "./action/SelectExecution",
   "./action/Execute",
+  "./action/Message",
   "pentaho/util/text",
   "pentaho/util/error",
   "pentaho/debug",
@@ -34,7 +35,7 @@ define([
   "pentaho/i18n!model",
   "./role/Property" // Pre-loaded with Model
 ], function(module, AbstractModel, KeyTypes, ActionTargetMixin, Transaction, UpdateAction, UpdateExecution,
-            Interaction, InteractionExecution, SelectAction, SelectExecution, ExecuteAction,
+            Interaction, InteractionExecution, SelectAction, SelectExecution, ExecuteAction, MessageAction,
             textUtil, errorUtil, debugMgr, DebugLevels, logger, bundle) {
 
   "use strict";
@@ -596,6 +597,21 @@ define([
      */
     execute: function(actionOrSpec) {
       var action = actionOrSpec instanceof ExecuteAction ? actionOrSpec : new ExecuteAction(actionOrSpec);
+      return this.act(action);
+    },
+
+    /**
+     * Performs a _message_ action, given its specification.
+     *
+     * @param {pentaho.visual.action.Message|pentaho.visual.action.spec.IMessage} [actionOrSpec] - The _message_ action
+     * or its specification.
+     *
+     * @return {pentaho.action.Execution} The action execution.
+     *
+     * @see pentaho.visual.action.IMessage
+     */
+    message: function (actionOrSpec) {
+      var action = actionOrSpec instanceof MessageAction ? actionOrSpec : new MessageAction(actionOrSpec);
       return this.act(action);
     },
 
