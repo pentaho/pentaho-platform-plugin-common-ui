@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1251,7 +1251,7 @@ define([
   var GemUI = declare([_WidgetBase, _TemplatedMixin, Evented, StatefulUI], {
 
     className: "gem",
-    templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
+    templateString: "<div id='${id}' class='${className} focus-visible dojoDndItem' tabindex='0' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
 
     constructor: function(options) {
 
@@ -1328,7 +1328,7 @@ define([
 
     className: "propPanel_combobox propPanel_control",
     options: null,
-    templateString: "<div class='${className}' id='${id}'></div>",
+    templateString: "<div class='focus-visible ${className}' id='${id}'></div>",
 
     constructor: function(options) {
       this.name  = this.model.id;
