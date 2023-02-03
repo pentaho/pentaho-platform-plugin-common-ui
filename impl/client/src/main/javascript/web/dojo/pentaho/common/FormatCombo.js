@@ -63,7 +63,7 @@ define( [ "dojo/_base/declare",
         lang.mixin( this, args );
 
         // add a pentaho css class to the base class
-        this.baseClass = "pentahoFormatCombo " + this.baseClass;
+        this.baseClass = "pentahoFormatCombo focus-container " + this.baseClass;
 
         if ( args && args.formats ) {
           formatStore = new Memory( { data: args.formats } );
