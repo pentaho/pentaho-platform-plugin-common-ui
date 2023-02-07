@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1251,7 +1251,7 @@ define([
   var GemUI = declare([_WidgetBase, _TemplatedMixin, Evented, StatefulUI], {
 
     className: "gem",
-    templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
+    templateString: "<div id='${id}' class='${className} dojoDndItem' tabindex='0' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
 
     constructor: function(options) {
 
@@ -1288,6 +1288,7 @@ define([
 
       this.own(
         on(this.domNode, "contextmenu", lang.hitch(this, "onContextMenu")),
+        on(this.domNode, "keypress", lang.hitch(this, "onContextMenu")),
         on(this.menuHandle, "mouseover",  function(e) {
           if(!ManagerClass.manager().source) {
             domClass.add(e.target, "over");
