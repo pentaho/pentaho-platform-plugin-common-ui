@@ -17,9 +17,7 @@
 
 package org.pentaho.common.ui.metadata.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import flexjson.JSONDeserializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -53,10 +51,12 @@ import org.pentaho.metadata.repository.IMetadataDomainRepository;
 import org.pentaho.platform.engine.core.system.PentahoBase;
 import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
 import org.pentaho.platform.engine.core.system.PentahoSystem;
+import org.pentaho.platform.engine.security.PentahoJsonValidator;
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
 
-import flexjson.JSONDeserializer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class provides utility functions used by the MetadataService
@@ -395,7 +395,8 @@ public class MetadataServiceUtil2 extends PentahoBase {
       ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-        return new JSONDeserializer<Query>().deserialize( json );
+        PentahoJsonValidator.validateJson( json, Query.class );
+        return new JSONDeserializer<Query>().deserialize( json, Query.class );
       } finally {
         Thread.currentThread().setContextClassLoader( oldLoader );
       }
