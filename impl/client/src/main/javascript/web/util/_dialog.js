@@ -97,6 +97,12 @@ if (pho.util == null) {
     setTimeout(handler, 0);
   }
 
+  function delayFocus($elem) {
+    delay(function() {
+      $elem.trigger("focus");
+    });
+  }
+
   // region Open Dialog Contexts
   var openDialogContexts = [];
 
@@ -235,19 +241,16 @@ if (pho.util == null) {
      * @return {DialogContext} The dialog context.
      */
     setRestoreFocus: function(restoreFocus) {
-      if(restoreFocus == null) {
-        restoreFocus = true;
-      }
-
-      if(!restoreFocus) {
+      if(restoreFocus === false) {
         this._restoreFocusMode = RestoreFocusModes.off;
         this._$restoreFocus = null;
-      } else if(restoreFocus instanceof Object) {
-        this._restoreFocusMode = RestoreFocusModes.fixed;
-        this._$restoreFocus = restoreFocus;
-      } else {
+      } else if(restoreFocus == null || restoreFocus === true) {
         this._restoreFocusMode = RestoreFocusModes.auto;
         this._$restoreFocus = null;
+      } else {
+        // An Element. Can be from another frame, so cannot reliably use instanceof.
+        this._restoreFocusMode = RestoreFocusModes.fixed;
+        this._$restoreFocus = $(restoreFocus);
       }
 
       return this;
@@ -271,7 +274,7 @@ if (pho.util == null) {
       openDialogContexts.push(this);
 
       if(this._restoreFocusMode === RestoreFocusModes.auto) {
-        var activeElement = document.activeElement;
+        var activeElement = this._getActiveElement();
         this._$restoreFocus = activeElement && $(activeElement);
       }
 
@@ -349,10 +352,10 @@ if (pho.util == null) {
     _doRestoreFocus: function(nextIndex) {
       if(this._$restoreFocus != null) {
         // Focus still within the dialog?
-        var activeElement = document.activeElement;
+        var activeElement = this._getActiveElement();
         var isActiveEf = activeElement == null || this._contains(activeElement);
         if(isActiveEf) {
-          this._$restoreFocus.trigger("focus");
+          delayFocus(this._$restoreFocus);
         } else if(nextIndex < openDialogContexts.length) {
           // Focus was already "stolen". It's best to let it be.
           // E.g. when a dialog A opens another dialog B, B's autofocus may run before A is closed.
@@ -381,6 +384,21 @@ if (pho.util == null) {
       }
     },
 
+    _getActiveElement: function() {
+      var activeElement = document.activeElement;
+      while(activeElement !== null && activeElement.tagName.toLowerCase() === "iframe") {
+        try {
+          activeElement = activeElement.contentDocument.activeElement;
+        } catch(ex) {
+          // Cross-site security.
+          // Just keep the iframe as the active element.
+          break;
+        }
+      }
+
+      return activeElement;
+    },
+
     _contains: function(elem) {
       var dialog = this.getElement();
       return elem === dialog || $.contains(dialog, elem);
@@ -402,16 +420,12 @@ if (pho.util == null) {
         // Tab forward. At last element or at dialog.
         // Focus first element.
         if(isTargetDialog || targetElem === $last[0]) {
-          delay(function() {
-            $first.trigger("focus");
-          });
+          delayFocus($first);
           event.preventDefault();
         }
       } else if(isTargetDialog || targetElem === $first[0]) {
         // Tab backward. At first element or at dialog.
-        delay(function() {
-          $last.trigger("focus");
-        });
+        delayFocus($last);
         event.preventDefault();
       }
     },
