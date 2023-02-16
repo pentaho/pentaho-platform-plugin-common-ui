@@ -71,7 +71,7 @@ define(function () {
     }
 
     function toggleButtonState() {
-      let isAriaPressed = elem.getAttribute("aria-pressed") === "true";
+      var isAriaPressed = elem.getAttribute("aria-pressed") === "true";
       elem.setAttribute("aria-pressed", String(!isAriaPressed));
     }
   }
