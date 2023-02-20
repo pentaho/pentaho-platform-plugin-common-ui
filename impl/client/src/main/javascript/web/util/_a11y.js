@@ -42,6 +42,14 @@ define(function () {
     elem.addEventListener('keydown', actionButtonKeyDownHandler);
     elem.addEventListener('keyup', actionButtonKeyUpHandler);
 
+    dispose.remove = dispose;
+    return dispose;
+
+    function dispose() {
+      elem.removeEventListener('keydown', actionButtonKeyDownHandler);
+      elem.removeEventListener('keyup', actionButtonKeyUpHandler);
+    }
+
     function actionButtonKeyDownHandler(event) {
       // The action button is activated by space on the keyup event, but the
       // default action for space is already triggered on keydown. It needs to be
@@ -79,11 +87,11 @@ define(function () {
   return {
     keyCodes: keyCodes,
     makeAccessibleActionButton: function (elem) {
-      makeAccessibleActionButton(elem, false);
+      return makeAccessibleActionButton(elem, false);
     },
     makeAccessibleToggleButton: function (elem, initialState) {
       elem.setAttribute("aria-pressed", initialState);
-      makeAccessibleActionButton(elem, true)
+      return makeAccessibleActionButton(elem, true)
     }
   };
 });
