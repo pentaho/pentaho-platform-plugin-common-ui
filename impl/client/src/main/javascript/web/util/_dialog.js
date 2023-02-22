@@ -93,16 +93,6 @@ if (pho.util == null) {
     auto: 3
   };
 
-  function delay(handler) {
-    setTimeout(handler, 0);
-  }
-
-  function delayFocus($elem) {
-    delay(function() {
-      $elem.trigger("focus");
-    });
-  }
-
   // region Open Dialog Contexts
   var openDialogContexts = [];
 
@@ -355,8 +345,10 @@ if (pho.util == null) {
         var activeElement = this._getActiveElement();
         var isActiveEf = activeElement == null || this._contains(activeElement);
         if(isActiveEf) {
-          delayFocus(this._$restoreFocus);
+          this._$restoreFocus.trigger("focus");
         } else if(nextIndex < openDialogContexts.length) {
+          console.log("active element null or not contained in dialog and was not top-level dialog");
+
           // Focus was already "stolen". It's best to let it be.
           // E.g. when a dialog A opens another dialog B, B's autofocus may run before A is closed.
 
@@ -420,12 +412,12 @@ if (pho.util == null) {
         // Tab forward. At last element or at dialog.
         // Focus first element.
         if(isTargetDialog || targetElem === $last[0]) {
-          delayFocus($first);
+          $first.trigger("focus");
           event.preventDefault();
         }
       } else if(isTargetDialog || targetElem === $first[0]) {
         // Tab backward. At first element or at dialog.
-        delayFocus($last);
+        $last.trigger("focus");
         event.preventDefault();
       }
     },
