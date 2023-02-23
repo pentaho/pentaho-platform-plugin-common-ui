@@ -439,6 +439,8 @@ if (pho.util == null) {
   // endregion
 
   pho.util._dialog = {
+    jQuery: jQueryLocal,
+
     /**
      * Creates a dialog context for a given dialog element.
      *
