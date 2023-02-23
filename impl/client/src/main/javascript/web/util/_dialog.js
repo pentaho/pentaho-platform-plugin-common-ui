@@ -28,6 +28,10 @@ if (pho.util == null) {
 (function() {
   "use strict";
 
+  // Guard against later replacement of the global jQuery by another instance
+  // which would not have the below registered pseudo-selectors.
+  var jQueryLocal = $;
+
   // region Extends jQuery with tabbable and focusable.
   // Adapted from https://github.com/jquery/jquery-ui/blob/1.13.2/ui/focusable.js and ./tabbable.js
   function isFocusable(elem, hasTabindex) {
@@ -39,7 +43,7 @@ if (pho.util == null) {
         return false;
       }
 
-      var $img = $("img[usemap='#" + mapName + "']");
+      var $img = jQueryLocal("img[usemap='#" + mapName + "']");
       return $img.length > 0 && $img.is(":visible");
     }
 
@@ -52,7 +56,7 @@ if (pho.util == null) {
         // However, controls within the fieldset's legend do not get disabled.
         // Since controls generally aren't placed inside legends, we skip
         // this portion of the check.
-        var $fieldset = $(elem)
+        var $fieldset = jQueryLocal(elem)
           .closest("fieldset")[0];
         if($fieldset) {
           focusableIfVisible = !$fieldset.disabled;
@@ -64,16 +68,16 @@ if (pho.util == null) {
       focusableIfVisible = hasTabindex;
     }
 
-    var $elem = $(elem);
+    var $elem = jQueryLocal(elem);
     return focusableIfVisible && $elem.is(":visible") && $elem.css("visibility") === "visible";
   }
 
-  $.extend($.expr.pseudos, {
+  jQueryLocal.extend(jQueryLocal.expr.pseudos, {
     "pen-focusable": function(element) {
-      return isFocusable(element, $.attr(element, "tabindex") != null);
+      return isFocusable(element, jQueryLocal.attr(element, "tabindex") != null);
     },
     "pen-tabbable": function(element) {
-      var tabIndex = $.attr(element, "tabindex");
+      var tabIndex = jQueryLocal.attr(element, "tabindex");
       var hasTabindex = tabIndex != null;
       return (!hasTabindex || tabIndex >= 0) && isFocusable(element, hasTabindex);
     }
@@ -119,7 +123,7 @@ if (pho.util == null) {
    * @param {Element} dialog - The dialog element.
    */
   function DialogContext(dialog) {
-    this._$dialog = $(dialog);
+    this._$dialog = jQueryLocal(dialog);
     this.setContent(null);
     this.setButtons(null);
   }
@@ -127,12 +131,12 @@ if (pho.util == null) {
   function querySection(section, selector) {
     if(Array.isArray(section)) {
       // Filter given elements.
-      return $(section).filter(selector);
+      return jQueryLocal(section).filter(selector);
     }
 
     // The section's root element or a jQuery of it.
     // Filter descendants.
-    return $(section).find(selector);
+    return jQueryLocal(section).find(selector);
   }
 
   Object.assign(DialogContext.prototype, /** @lends pho.util.DialogContext# */{
@@ -240,7 +244,7 @@ if (pho.util == null) {
       } else {
         // An Element. Can be from another frame, so cannot reliably use instanceof.
         this._restoreFocusMode = RestoreFocusModes.fixed;
-        this._$restoreFocus = $(restoreFocus);
+        this._$restoreFocus = jQueryLocal(restoreFocus);
       }
 
       return this;
@@ -265,7 +269,7 @@ if (pho.util == null) {
 
       if(this._restoreFocusMode === RestoreFocusModes.auto) {
         var activeElement = this._getActiveElement();
-        this._$restoreFocus = activeElement && $(activeElement);
+        this._$restoreFocus = activeElement && jQueryLocal(activeElement);
       }
 
       if(this._doesTrapFocus) {
@@ -393,7 +397,7 @@ if (pho.util == null) {
 
     _contains: function(elem) {
       var dialog = this.getElement();
-      return elem === dialog || $.contains(dialog, elem);
+      return elem === dialog || jQueryLocal.contains(dialog, elem);
     },
 
     _onTrapFocusKeyDown: function(event) {
