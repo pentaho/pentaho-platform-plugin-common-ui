@@ -22,7 +22,6 @@
     <pentaho-metadata.version>9.5.0.0-SNAPSHOT</pentaho-metadata.version>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
-    <hsqldb.version>2.3.2</hsqldb.version>
     <commons-xul.version>9.5.0.0-SNAPSHOT</commons-xul.version>
     <mockito-all.version>1.8.4</mockito-all.version>
     <commons-database.version>9.5.0.0-SNAPSHOT</commons-database.version>
