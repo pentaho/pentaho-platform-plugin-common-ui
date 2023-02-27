@@ -28,68 +28,15 @@ if (pho.util == null) {
 (function() {
   "use strict";
 
-  // Guard against later replacement of the global jQuery by another instance
-  // which would not have the below registered pseudo-selectors.
-  var jQueryLocal = $;
-
-  // region Extends jQuery with tabbable and focusable.
-  // Adapted from https://github.com/jquery/jquery-ui/blob/1.13.2/ui/focusable.js and ./tabbable.js
-  function isFocusable(elem, hasTabindex) {
-    var nodeName = elem.nodeName.toLowerCase();
-    if(nodeName === "area") {
-      var map = elem.parentNode;
-      var mapName = map.name;
-      if(!elem.href || !mapName || map.nodeName.toLowerCase() !== "map") {
-        return false;
-      }
-
-      var $img = jQueryLocal("img[usemap='#" + mapName + "']");
-      return $img.length > 0 && $img.is(":visible");
-    }
-
-    var focusableIfVisible;
-    if(/^(input|select|textarea|button|object)$/.test(nodeName)) {
-      focusableIfVisible = !elem.disabled;
-      if(focusableIfVisible) {
-
-        // Form controls within a disabled fieldset are disabled.
-        // However, controls within the fieldset's legend do not get disabled.
-        // Since controls generally aren't placed inside legends, we skip
-        // this portion of the check.
-        var $fieldset = jQueryLocal(elem)
-          .closest("fieldset")[0];
-        if($fieldset) {
-          focusableIfVisible = !$fieldset.disabled;
-        }
-      }
-    } else if(nodeName === "a") {
-      focusableIfVisible = elem.href || hasTabindex;
-    } else {
-      focusableIfVisible = hasTabindex;
-    }
-
-    var $elem = jQueryLocal(elem);
-    return focusableIfVisible && $elem.is(":visible") && $elem.css("visibility") === "visible";
-  }
-
-  jQueryLocal.extend(jQueryLocal.expr.pseudos, {
-    "pen-focusable": function(element) {
-      return isFocusable(element, jQueryLocal.attr(element, "tabindex") != null);
-    },
-    "pen-tabbable": function(element) {
-      var tabIndex = jQueryLocal.attr(element, "tabindex");
-      var hasTabindex = tabIndex != null;
-      return (!hasTabindex || tabIndex >= 0) && isFocusable(element, hasTabindex);
-    }
-  });
-  // endregion
+  /** @type {jQuery} */
+  var jQueryLocal = pho.util._focus.jQuery;
 
   var KeyCodes = {
     tab: 9
   };
   var Selectors = {
     autoFocus: "[autofocus]",
-    tabbable: ":pen-tabbable"
+    tabbable: pho.util._focus.Selectors.tabbable
   };
   var RestoreFocusModes = {
     off: 1,
@@ -439,8 +386,6 @@ if (pho.util == null) {
   // endregion
 
   pho.util._dialog = {
-    jQuery: jQueryLocal,
-
     /**
      * Creates a dialog context for a given dialog element.
      *
