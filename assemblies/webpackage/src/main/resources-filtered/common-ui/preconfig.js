@@ -89,6 +89,7 @@ if(!useDebug) {
     "dojo/store/Memory",
     "dijit/_HasDropDown",
     "dijit/_CssStateMixin",
+    "dijit/_PaletteMixin",
     "dojo/selector/_loader",
     "dojo/i18n",
     "dojo/request/default",
