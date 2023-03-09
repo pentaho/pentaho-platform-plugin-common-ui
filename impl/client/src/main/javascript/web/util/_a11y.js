@@ -42,13 +42,10 @@ define(function () {
     elem.addEventListener('keydown', actionButtonKeyDownHandler);
     elem.addEventListener('keyup', actionButtonKeyUpHandler);
 
-    dispose.remove = dispose;
-    return dispose;
-
-    function dispose() {
+    return createDisposable(function dispose() {
       elem.removeEventListener('keydown', actionButtonKeyDownHandler);
       elem.removeEventListener('keyup', actionButtonKeyUpHandler);
-    }
+    });
 
     function actionButtonKeyDownHandler(event) {
       // The action button is activated by space on the keyup event, but the
@@ -84,12 +81,34 @@ define(function () {
     }
   }
 
+  function createDisposable(dispose) {
+    dispose.remove = dispose;
+
+    return dispose;
+  }
+
+  function createNullDisposable() {
+    return createDisposable(function nullDispose() {
+      // NOOP
+    });
+  }
+
   return {
     keyCodes: keyCodes,
+
     makeAccessibleActionButton: function (elem) {
+      if (elem == null) {
+        return createNullDisposable();
+      }
+
       return makeAccessibleActionButton(elem, false);
     },
+
     makeAccessibleToggleButton: function (elem, initialState) {
+      if (elem == null) {
+        return createNullDisposable();
+      }
+
       elem.setAttribute("aria-pressed", initialState);
       return makeAccessibleActionButton(elem, true)
     }
