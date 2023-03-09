@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ if(!useDebug) {
     "dijit/_HasDropDown",
     "dijit/_CssStateMixin",
     "dijit/_PaletteMixin",
+    "dijit/Dialog",
     "dojo/selector/_loader",
     "dojo/i18n",
     "dojo/request/default",
