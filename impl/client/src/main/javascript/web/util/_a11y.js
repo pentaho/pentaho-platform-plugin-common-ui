@@ -12,10 +12,10 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2023 Hitachi Vantara..  All rights reserved.
+ * Copyright (c) 2002-2023 Hitachi Vantara. All rights reserved.
  */
 
-define(function () {
+define(["./_focus"], function(focusUtil) {
 
   var keyCodes = {
     backSpace: 8,
@@ -39,6 +39,7 @@ define(function () {
     elem.role = "button";
     elem.tabIndex = 0;
 
+    elem.addEventListener('mousedown', actionButtonMouseDownHandler);
     elem.addEventListener('keydown', actionButtonKeyDownHandler);
     elem.addEventListener('keyup', actionButtonKeyUpHandler);
 
@@ -46,6 +47,14 @@ define(function () {
       elem.removeEventListener('keydown', actionButtonKeyDownHandler);
       elem.removeEventListener('keyup', actionButtonKeyUpHandler);
     });
+
+    function actionButtonMouseDownHandler(event) {
+      // Mouse-down'ing on a button-like element should focus it.
+      // This already happens for certain HTML elements by default, but not all.
+      if(!event.defaultPrevented && focusUtil.isTabbable(elem, {focusable: true})) {
+        elem.focus();
+      }
+    }
 
     function actionButtonKeyDownHandler(event) {
       // The action button is activated by space on the keyup event, but the

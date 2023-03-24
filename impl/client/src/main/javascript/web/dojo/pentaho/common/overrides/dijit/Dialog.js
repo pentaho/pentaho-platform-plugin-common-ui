@@ -102,6 +102,12 @@ define([
     //      Restores the focus back to element that opened popupmenu.
     dialogOpener: null,
 
+    // ElementRefresher: function(Element) : Element
+    // Pentaho - Added to support WCAG focus maintenance.
+    // Allows "refreshing" the element to use for "refocus" to a corresponding one which is attached
+    // to the document. Required to deal with UI elements which are discarded and rebuilt.
+    elementRefresher: null,
+
     _setDraggableAttr: function(/* Boolean*/ val) {
       // Avoid _WidgetBase behavior of copying draggable attribute to this.domNode,
       // as that prevents text select on modern browsers (#14452)
@@ -320,6 +326,20 @@ define([
     // Pentaho setter for dialogOpener
     setDialogOpener: function(opener) {
       this.dialogOpener = opener;
+    },
+
+    // Pentaho setter for element refresher
+    setElementRefresher: function(refresher) {
+      this.elementRefresher = refresher;
+    },
+
+    // Pentaho: refreshes an element
+    _refreshElement: function(elem) {
+      if(elem != null && this.elementRefresher != null) {
+        return this.elementRefresher.call(null, elem);
+      }
+
+      return elem;
     },
 
     show: function() {
@@ -585,14 +605,14 @@ define([
         }
 
         // Adjust focus.
-        // TODO: regardless of setting of dialog.refocus, if the exeucte() method set focus somewhere,
+        // TODO: regardless of setting of dialog.refocus, if the execute() method set focus somewhere,
         // don't shift focus back to button.  Note that execute() runs at the start of the fade-out but
         // this code runs later, at the end of the fade-out.  Menu has code like this.
         if(dialog.refocus) {
           var focus;
           // Pentaho - BACKLOG-36893 hack
           if(dialog.dialogOpener) {
-            focus = dialog.dialogOpener;
+            focus = dialog._refreshElement(dialog.dialogOpener);
             dialog.dialogOpener = null;
             // End of BACKLOG-36893 hack
           } else {
@@ -600,7 +620,11 @@ define([
             // that dialog didn't have a focused field, set focus to first focusable item.
             // This situation could happen if two dialogs appeared at nearly the same time,
             // since a dialog doesn't set it's focus until the fade-in is finished.
-            focus = pd.focus;
+
+            // Pentaho - BACKLOG-36893
+            focus = dialog._refreshElement(pd.focus);
+            // End of BACKLOG-36893
+
             if(pd.dialog && (!focus || !dom.isDescendant(focus, pd.dialog.domNode))) {
               pd.dialog._getFocusItems(pd.dialog.domNode);
               focus = pd.dialog._firstFocusItem;
