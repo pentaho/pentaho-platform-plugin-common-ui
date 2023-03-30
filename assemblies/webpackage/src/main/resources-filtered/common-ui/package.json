@@ -59,6 +59,8 @@
     "dojo/store/Memory": "/dojo/pentaho/common/overrides/dojo/store/Memory",
     "dijit/_HasDropDown": "/dojo/pentaho/common/overrides/dijit/_HasDropDown",
     "dijit/_CssStateMixin": "/dojo/pentaho/common/overrides/dijit/_CssStateMixin",
+    "dijit/_PaletteMixin": "/dojo/pentaho/common/overrides/dijit/_PaletteMixin",
+    "dijit/Dialog": "/dojo/pentaho/common/overrides/dijit/Dialog",
     "dojo/selector/_loader": "/dojo/pentaho/common/overrides/dojo/selector/_loader",
     "dojo/i18n": "/dojo/pentaho/common/overrides/dojo/i18n",
     "dojo/request/default": "/dojo/pentaho/common/overrides/dojo/request/default",
