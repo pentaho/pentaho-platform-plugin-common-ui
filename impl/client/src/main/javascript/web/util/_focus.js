@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-/* globals pho */
-
 /*
  * Portions of this file are based on jQuery UI, v1.13.2
  */
 
-var pho = pho || {};
-if (pho.util == null) {
-  pho.util = {};
-}
-
-(function() {
+/* Need module name as this file is loaded first as a static resource by common-ui. */
+define("common-ui/util/_focus", [
+  "../jquery-clean"
+], function($) {
   "use strict";
-
-  // Guard against later replacement of the global jQuery by another instance
-  // which would not have the below registered pseudo-selectors.
-  var jQueryLocal = $;
 
   // region Extends jQuery with tabbable and focusable.
   // Adapted from https://github.com/jquery/jquery-ui/blob/1.13.2/ui/focusable.js and ./tabbable.js
@@ -43,7 +35,7 @@ if (pho.util == null) {
         return false;
       }
 
-      var $img = jQueryLocal("img[usemap='#" + mapName + "']");
+      var $img = $("img[usemap='#" + mapName + "']");
       return $img.length > 0 && $img.is(":visible");
     }
 
@@ -56,7 +48,7 @@ if (pho.util == null) {
         // However, controls within the fieldset's legend do not get disabled.
         // Since controls generally aren't placed inside legends, we skip
         // this portion of the check.
-        var $fieldset = jQueryLocal(elem).closest("fieldset")[0];
+        var $fieldset = $(elem).closest("fieldset")[0];
         if($fieldset) {
           focusableIfVisible = !$fieldset.disabled;
         }
@@ -67,16 +59,16 @@ if (pho.util == null) {
       focusableIfVisible = hasTabindex;
     }
 
-    var $elem = jQueryLocal(elem);
+    var $elem = $(elem);
     return focusableIfVisible && $elem.is(":visible") && $elem.css("visibility") === "visible";
   }
 
-  jQueryLocal.extend(jQueryLocal.expr.pseudos, {
+  $.extend($.expr.pseudos, {
     "pen-focusable": function(element) {
-      return isFocusable(element, jQueryLocal.attr(element, "tabindex") != null);
+      return isFocusable(element, $.attr(element, "tabindex") != null);
     },
     "pen-tabbable": function(element) {
-      var tabIndex = jQueryLocal.attr(element, "tabindex");
+      var tabIndex = $.attr(element, "tabindex");
       var hasTabindex = tabIndex != null;
       return (!hasTabindex || tabIndex >= 0) && isFocusable(element, hasTabindex);
     }
@@ -120,15 +112,17 @@ if (pho.util == null) {
   /**
    * Contains utilities for dealing with focus.
    * @namespace
+   * @name common-ui.util._focus
+   * @amd common-ui/util/_focus
    * @private
    */
-  pho.util._focus = {
+  return {
     /**
      * Gets a jQuery instance which is ensured to have the custom pseudo-selectors,
      * `:pen-tabbable` and `:pen-focusable`, registered.
-     * @type {jQuery}
+     * @type {$}
      */
-    jQuery: jQueryLocal,
+    jQuery: $,
 
     Selectors: Selectors,
 
@@ -143,7 +137,7 @@ if (pho.util == null) {
      */
     tabbables: function(root) {
       return expandSelection(root || document.body, function(elem) {
-        return jQueryLocal(Selectors.tabbable, elem);
+        return $(Selectors.tabbable, elem);
       });
     },
 
@@ -189,8 +183,14 @@ if (pho.util == null) {
       return tabbables[index - 1];
     }
   };
-})();
+});
 
-define("common-ui/util/_focus", function() {
-  return pho.util._focus;
+// Create global reference for non-amd users.
+var pho = pho || {};
+if (pho.util == null) {
+  pho.util = {};
+}
+
+require(["common-ui/util/_focus"], function(focusUtil) {
+  pho.util._focus = focusUtil;
 });
