@@ -46,20 +46,25 @@ define([
   "dojo/dom-geometry",
   "dojo/aspect",
   "pentaho/common/Messages",
-  "pentaho/common/propertiesPanel/Configuration"
+  "pentaho/common/propertiesPanel/Configuration",
+  "common-ui/util/_focus"
 ], function(declare, ItemFileReadStore,
             registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
             BorderContainer, HorizontalSlider, TextBox, ComboBox,
             Select, CheckBox, TitlePane,
             on, query, array, lang, html, construct, string, domClass,
             Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
-            Messages, Configuration) {
+            Messages, Configuration, focusUtil) {
 
   /* eslint-disable dot-notation, new-cap */
 
   var nextId = 0;
   function newId(prefix) {
     return prefix + (++nextId);
+  }
+
+  function updateDomUIKey(widget) {
+    focusUtil.setUIKey(widget.uiKeyNode || widget.domNode, widget.uiKey);
   }
 
   var Panel = declare("pentaho.common.propertiesPanel.Panel", [ContentPane, Evented], {
@@ -205,6 +210,11 @@ define([
       aspect.after(group._wipeOut, "onEnd", lang.hitch(this, "resize"));
       aspect.after(group._wipeIn,  "onEnd", lang.hitch(this, "resize"));
 
+      group.uiKey = "pen-prop-panel-group-" + groupId;
+      group.uiKeyNode = group.focusNode;
+
+      updateDomUIKey(group);
+
       this.domNode.appendChild(group.domNode);
 
       return (this.groups[groupId] = group);
@@ -326,12 +336,18 @@ define([
       }));
     },
 
+
     setConfiguration: function(configJson) {
       this._setConfiguration(new Configuration(configJson));
     },
 
     _setConfiguration: function(config) {
       if(this.propUIs && this.propUIs.length) this._destroyChildrenDeferred();
+
+      var hasFocus = focusUtil.containsFocus(this.domNode);
+      var focusState = hasFocus
+          ? focusUtil.captureState(document.activeElement, {root: this.domNode})
+          : null;
 
       if (this.groups) {
         this.previousGroupsOpenState = {};
@@ -357,6 +373,15 @@ define([
 
       this.configuration = config;
       this.postCreate();
+
+      if(hasFocus) {
+        var restoreFocusElem = focusState.closest()
+            || focusUtil.firstTabbable(this.domNode)
+            || focusUtil.previousTabbable(this.domNode);
+        if(restoreFocusElem != null) {
+          restoreFocusElem.focus();
+        }
+      }
     },
 
     _destroyChildrenDeferred: function() {
@@ -388,6 +413,7 @@ define([
     constructor: function(options) {
       this.model     = options.model;
       this.propPanel = options.propPanel;
+      this.uiKey     = "pen-stateful-ui-" + this.model.id;
 
       this._watchHandle = this.model.watch(lang.hitch(this, function(propName, prevVal, newVal) {
         switch(propName) {
@@ -399,6 +425,16 @@ define([
       }));
     },
 
+    postCreate: function() {
+      this.inherited(arguments);
+
+      this._updateDomUIKey();
+    },
+
+    _updateDomUIKey: function() {
+      updateDomUIKey(this);
+    },
+
     onUIEvent: function(type, args) {
     },
 
@@ -406,7 +442,8 @@ define([
       this.inherited(arguments);
 
       this.model =
-      this.propPanel = null;
+      this.propPanel =
+      this.uiKeyNode = null;
 
       // Otherwise the old widgets get replaced by the new ones when reloading,
       // before being destroyed.
@@ -1259,6 +1296,7 @@ define([
 
       this.gemBar  = options.gemBar;
       this.dndType = options.dndType;
+      this.uiKey   = this.gemBar.uiKey + "-" + this.model.id;
     },
 
     detach: function() {
@@ -1287,6 +1325,7 @@ define([
       gemLabel.innerHTML = this.model.value;
 
       this.own(
+        on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
         on(this.domNode, "contextmenu", lang.hitch(this, "onContextMenu")),
         on(this.domNode, "keypress", lang.hitch(this, "onContextMenu")),
         on(this.menuHandle, "mouseover",  function(e) {
@@ -1320,6 +1359,12 @@ define([
     onContextMenu: function(e) {
       // console.log("inner onContextMenu");
       // event.stop(e);
+    },
+
+    onMouseDown: function(ev) {
+      if(!ev.defaultPrevented) {
+        this.domNode.focus();
+      }
     }
   });
 
@@ -1387,6 +1432,8 @@ define([
 
         this.domNode.appendChild(selectBox);
 
+        this.uiKeyNode = selectBox;
+
         this.own(on(selectBox, "onchange", function() {
           me.model.set('value', this.value);
           me.value = this.value;
@@ -1394,7 +1441,7 @@ define([
 
       } else {
 
-        // use the styled drop down
+        // use the styled drop-down
 
         domClass.add(this.domNode, this.className);
 
@@ -1406,6 +1453,8 @@ define([
           }
         });
         sel.placeAt(this.domNode);
+
+        this.uiKeyNode = sel.focusNode;
       }
 
       this.inherited(arguments);
@@ -1513,6 +1562,10 @@ define([
           }, id);
 
       this.checkbox.placeAt(this.domNode, "first");
+
+      this.uiKeyNode = this.checkbox.focusNode;
+
+      this.inherited(arguments);
     },
 
     destroy: function() {
@@ -1551,6 +1604,10 @@ define([
       var button = registry.byId(this.buttonId);
       this.own(
         on(button, "click", lang.hitch(this, "onClick")));
+
+      this.uiKeyNode = button.focusNode;
+
+      this.inherited(arguments);
     },
 
     onClick: function() {
