@@ -70,6 +70,7 @@ define(["./_focus"], function(focusUtil) {
     var startRangeIndex = 0;
     var keysSoFar = "";
     var clearKeysSoFarHandle = null;
+    var latestSelectedOption = null;
 
     elem.addEventListener("keydown", onKeyPress);
     elem.addEventListener("click", onClick);
@@ -87,10 +88,12 @@ define(["./_focus"], function(focusUtil) {
     }
 
     function clearSelectedOptions() {
-      getSelectedOptions().forEach(opt => {
-        opt.classList.remove("selected");
-        opt.removeAttribute("aria-selected");
-      });
+      var allOptions = getAllOptions();
+      for (var i = 0; i < allOptions.length; i++) {
+        allOptions[i].classList.remove("selected");
+        allOptions[i].removeAttribute("aria-selected");
+      }
+      latestSelectedOption = null;
     }
 
     function clearActiveOption() {
@@ -194,7 +197,11 @@ define(["./_focus"], function(focusUtil) {
           break;
         case keys.Space:
           evt.preventDefault();
-          toggleSelected(nextItem);
+          if (evt.shiftKey) {
+            selectOptions();
+          } else {
+            toggleSelected(nextItem);
+          }
           break;
         case keys.a:
         case keys.A:
@@ -222,6 +229,28 @@ define(["./_focus"], function(focusUtil) {
 
       if (activeDescendantId !== lastActiveId) {
         scrollActiveOptionIntoView();
+      }
+    }
+
+    /**
+     * Selects contiguous options from the most recently selected option to the focused option.
+     */
+    function selectOptions() {
+      var latestSelectedOptionIndex = getOptionIndex(latestSelectedOption);
+      if (latestSelectedOptionIndex < 0) {
+        return;
+      }
+
+      var allOptions = getAllOptions();
+      var start = latestSelectedOptionIndex <= startRangeIndex ? latestSelectedOptionIndex : startRangeIndex;
+      var end = latestSelectedOptionIndex <= startRangeIndex ? startRangeIndex : latestSelectedOptionIndex;
+      for (var index = start; index <= end; index++) {
+        allOptions[index].setAttribute("aria-selected", true);
+        allOptions[index].classList.add("selected");
+
+        if (index == end) {
+          latestSelectedOption = allOptions[index];
+        }
       }
     }
 
@@ -259,6 +288,10 @@ define(["./_focus"], function(focusUtil) {
           allOptions[index].classList.add("selected");
         } else {
           allOptions[index].classList.remove("selected");
+        }
+
+        if (index == endIndex) {
+          latestSelectedOption = allOptions[index];
         }
       }
     }
@@ -359,6 +392,7 @@ define(["./_focus"], function(focusUtil) {
       } else {
         element.setAttribute("aria-selected", "true");
         element.classList.add("selected");
+        latestSelectedOption = element;
       }
     }
 
