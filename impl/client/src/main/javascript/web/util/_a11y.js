@@ -77,6 +77,7 @@ define(["./_focus"], function(focusUtil) {
 
     return {
       destroy: destroy,
+      removeOption: removeOption,
       clearSelectedOptions: clearSelectedOptions,
       clearActiveOption: clearActiveOption,
       getSelectedOptions: getSelectedOptions
@@ -85,6 +86,14 @@ define(["./_focus"], function(focusUtil) {
     function destroy() {
       elem.removeEventListener("keydown", onKeyPress);
       elem.removeEventListener("click", onClick);
+    }
+
+    function removeOption(option) {
+      if (activeDescendantId == option.id) {
+        clearActiveOption();
+      }
+      latestSelectedOption = null;
+      option.remove();
     }
 
     function clearSelectedOptions() {
