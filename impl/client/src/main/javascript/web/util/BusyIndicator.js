@@ -63,7 +63,7 @@ define("common-ui/util/BusyIndicator", ["common-ui/util/Glasspane", "common-ui/u
 
             // only create the DOM element if it's not already there
             this.$busyIndicator = $(
-                "<div class='busy-indicator-container waitPopup'>" +
+                "<div class='busy-indicator-container waitPopup' role='status'>" +
                 "  <div class='busy-indicator-container-wrapper'>" +
                 "    <div class='pentaho-busy-indicator-spinner'></div>" +
                 "    <div class='pentaho-busy-indicator-msg-contianer'>" +

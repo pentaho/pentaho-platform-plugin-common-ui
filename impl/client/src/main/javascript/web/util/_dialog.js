@@ -20,23 +20,19 @@
  * Portions of this file are based on jQuery UI, v1.13.2
  */
 
-var pho = pho || {};
-if (pho.util == null) {
-  pho.util = {};
-}
-
-(function() {
+/* Need module name as this file is loaded first as a static resource by common-ui. */
+define("common-ui/util/_dialog", [
+  "./_focus",
+  "../jquery-clean"
+], function(focusUtil, $) {
   "use strict";
-
-  /** @type {jQuery} */
-  var jQueryLocal = pho.util._focus.jQuery;
 
   var KeyCodes = {
     tab: 9
   };
   var Selectors = {
     autoFocus: "[autofocus]",
-    tabbable: pho.util._focus.Selectors.tabbable
+    tabbable: focusUtil.Selectors.tabbable
   };
   var RestoreFocusModes = {
     off: 1,
@@ -70,7 +66,7 @@ if (pho.util == null) {
    * @param {Element} dialog - The dialog element.
    */
   function DialogContext(dialog) {
-    this._$dialog = jQueryLocal(dialog);
+    this._$dialog = $(dialog);
     this.setContent(null);
     this.setButtons(null);
   }
@@ -78,12 +74,12 @@ if (pho.util == null) {
   function querySection(section, selector) {
     if(Array.isArray(section)) {
       // Filter given elements.
-      return jQueryLocal(section).filter(selector);
+      return $(section).filter(selector);
     }
 
     // The section's root element or a jQuery of it.
     // Filter descendants.
-    return jQueryLocal(section).find(selector);
+    return $(section).find(selector);
   }
 
   Object.assign(DialogContext.prototype, /** @lends pho.util.DialogContext# */{
@@ -191,7 +187,7 @@ if (pho.util == null) {
       } else {
         // An Element. Can be from another frame, so cannot reliably use instanceof.
         this._restoreFocusMode = RestoreFocusModes.fixed;
-        this._$restoreFocus = jQueryLocal(restoreFocus);
+        this._$restoreFocus = $(restoreFocus);
       }
 
       return this;
@@ -216,7 +212,7 @@ if (pho.util == null) {
 
       if(this._restoreFocusMode === RestoreFocusModes.auto) {
         var activeElement = this._getActiveElement();
-        this._$restoreFocus = activeElement && jQueryLocal(activeElement);
+        this._$restoreFocus = activeElement && $(activeElement);
       }
 
       if(this._doesTrapFocus) {
@@ -344,7 +340,7 @@ if (pho.util == null) {
 
     _contains: function(elem) {
       var dialog = this.getElement();
-      return elem === dialog || jQueryLocal.contains(dialog, elem);
+      return elem === dialog || $.contains(dialog, elem);
     },
 
     _onTrapFocusKeyDown: function(event) {
@@ -385,7 +381,7 @@ if (pho.util == null) {
   });
   // endregion
 
-  pho.util._dialog = {
+  return {
     /**
      * Creates a dialog context for a given dialog element.
      *
@@ -404,8 +400,14 @@ if (pho.util == null) {
      */
     getOpen: getOpenDialogContext
   };
-})();
+});
 
-define("common-ui/util/_dialog", function() {
-  return pho.util._dialog;
+// Create global reference for non-amd users.
+var pho = pho || {};
+if (pho.util == null) {
+  pho.util = {};
+}
+
+require(["common-ui/util/_dialog"], function(dialogUtil) {
+  pho.util._dialog = dialogUtil;
 });
