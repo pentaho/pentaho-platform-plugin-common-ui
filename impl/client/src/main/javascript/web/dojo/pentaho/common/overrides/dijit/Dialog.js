@@ -680,13 +680,17 @@ define([
     // Note: if no dialogs, ds.length==1 but ds[ds.length-1].dialog is null
     var topDialog = ds[ds.length - 1].dialog;
 
+    function isGwtModalDialogNode(node) {
+      return domClass.contains(node, "pentaho-gwt") && domClass.contains(node, "pentaho-dialog") && domClass.contains(node, "modal");
+    }
+
     // If a node was focused, and there's a Dialog currently showing, and not in the process of fading out...
     // Ignore focus events on other document though because it's likely an Editor inside of the Dialog.
     if(node && topDialog && !topDialog._fadeOutDeferred && node.ownerDocument == topDialog.ownerDocument) {
       // If the node that was focused is inside the dialog or in a popup, even a context menu that isn't
       // technically a descendant of the the dialog, don't do anything.
       do {
-        if(node == topDialog.domNode || domClass.contains(node, "dijitPopup")) {
+        if(node == topDialog.domNode || domClass.contains(node, "dijitPopup") || isGwtModalDialogNode(node)) {
           return;
         }
       } while(node = node.parentNode);
