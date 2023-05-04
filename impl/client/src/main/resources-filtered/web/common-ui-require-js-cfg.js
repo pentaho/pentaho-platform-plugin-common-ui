@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,6 +198,8 @@
   requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
   requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
+  requirePaths["dijit/_PaletteMixin"] = dojoOverrides + "dijit/_PaletteMixin";
+  requirePaths["dijit/Dialog"] = dojoOverrides + "dijit/Dialog";
   requirePaths["dojo/selector/_loader"] = dojoOverrides + "dojo/selector/_loader";
   requirePaths["dojo/i18n"] = dojoOverrides + "dojo/i18n";
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
