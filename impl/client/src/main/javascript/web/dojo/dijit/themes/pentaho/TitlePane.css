@@ -1,10 +1,14 @@
 
 .tundra .pentaho-titled-toolbar .dijitArrowNode {
+  --icon-height: 12;
+  --icon-width: 12;
+
+  height: calc(1px * var(--icon-height));
+  width: calc(1px * var(--icon-width));
+
   background-image: url('images/TitlePanel-opened.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  height: 12px;
-  width: 12px;
 }
 .dj_ie6 .tundra .pentaho-titled-toolbar .dijitArrowNode {
   background-image: url('images/spriteArrows.gif');
