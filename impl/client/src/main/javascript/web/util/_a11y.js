@@ -546,6 +546,14 @@ define(["./_focus"], function(focusUtil) {
 
       elem.setAttribute("aria-pressed", initialState);
       return makeAccessibleActionButton(elem, true)
+    },
+
+    setTabindex: function (elem) {
+      elem.setAttribute("tabindex", "0");
+    },
+
+    removeTabindex: function(elem) {
+      elem.setAttribute("tabindex", "-1");
     }
   };
 });
