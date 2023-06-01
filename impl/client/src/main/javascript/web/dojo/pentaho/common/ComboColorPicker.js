@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2021 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin",'pentaho/common/button','pentaho/common/Dialog',
         "pentaho/common/CustomColorPicker",
-        "pentaho/common/TabSet", "dojo/dom-style", "dojo/on", "dojo/_base/lang", "dojo/dom-class", 'dojo/text!pentaho/common/ComboColorPicker.html'],
-  function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Button, Dialog, CustomColorPicker, TabSet, style, on, lang, domClass, templateStr){
+        "pentaho/common/TabSet", "dojo/dom-style", "dojo/on", "dojo/_base/lang", "dojo/dom-class", 'dojo/text!pentaho/common/ComboColorPicker.html', 'common-ui/util/_a11y'],
+  function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Button, Dialog, CustomColorPicker, TabSet, style, on, lang, domClass, templateStr, a11yUtil){
     return declare("pentaho.common.ComboColorPicker",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
           hasTitleBar: false,
@@ -154,6 +154,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               on(this.palette, "change", lang.hitch(this, '_colorChange' ));
               on(this.colorPicker, "change", lang.hitch(this, '_colorChange' ));
               on(this.closeBtn, "click", lang.hitch(this, 'closeRequest' ));
+              a11yUtil.makeAccessibleActionButton(this.closeBtn);
          },
 
           rgb: function(r,g,b) {
