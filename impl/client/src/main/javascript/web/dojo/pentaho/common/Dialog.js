@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             _createButtonPanel: function() {
               this.buttonPanel = construct.create("TABLE");
               style.set(this.buttonPanel, "width", "100%");
-              construct.place(this.buttonPanel, this.popup.domNode);
+              construct.place(this.buttonPanel, this.popup.containerNode);
               domClass.add(this.buttonPanel, 'button-panel');
             },
 
