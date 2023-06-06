@@ -32,7 +32,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
                 // we already have tabs
                 return;
             }
-                
+
+            var _this = this;
             this.tabs = tabs;
             var html = "";
             domClass.add(this.tabSetDiv, 'pentaho-tabBar');
@@ -41,21 +42,21 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
                 var div = construct.create('div', {}, this.tabSetDiv);
                 div.setAttribute("role", "tab");
                 div.setAttribute( 'tabId', this.tabs[idx].id);
-                div.addEventListener("keydown", (event) => {
+                div.addEventListener("keydown", function (event) {
                     var target = event.currentTarget;
                     switch (event.key) {
                         case "ArrowLeft":
                             if (target.previousElementSibling) {
-                                this.setSelectedTab(target.previousElementSibling.getAttribute('tabId'));
+                                _this.setSelectedTab(target.previousElementSibling.getAttribute('tabId'));
                             } else {
-                                this.setSelectedTab(target.parentElement.lastElementChild.getAttribute('tabId'));
+                                _this.setSelectedTab(target.parentElement.lastElementChild.getAttribute('tabId'));
                             }
                             break;
                         case "ArrowRight":
                             if (target.nextElementSibling) {
-                                this.setSelectedTab(target.nextElementSibling.getAttribute('tabId'));
+                                _this.setSelectedTab(target.nextElementSibling.getAttribute('tabId'));
                             } else {
-                                this.setSelectedTab(target.parentElement.firstElementChild.getAttribute('tabId'));
+                                _this.setSelectedTab(target.parentElement.firstElementChild.getAttribute('tabId'));
                             }
                             break;
                     }
