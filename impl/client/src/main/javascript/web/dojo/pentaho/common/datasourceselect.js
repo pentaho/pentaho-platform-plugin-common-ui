@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   'pentaho/common/ListBox',
   'pentaho/common/Dialog',
   'pentaho/common/MessageBox', "dojo/_base/lang", 'dojo/text!pentaho/common/datasourceselect.html',
-  'dojo/Stateful', 'dojo/has', 'dojo/_base/sniff'],
-  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has) {
+  'dojo/Stateful', 'dojo/has', "common-ui/util/_a11y", 'dojo/_base/sniff'],
+  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has, a11yUtil) {
     return declare("pentaho.common.datasourceselect", [Stateful, Dialog, _TemplatedMixin, _WidgetsInTemplateMixin],
 
       {
@@ -35,37 +35,19 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         buttons: ['Ok_txt', 'Cancel_txt'],
         scrollPosition: 0,
 
-        /* dynamic injection of the wizard does not work currently
-         includeDatasourceWizard: function() {
-         if(this.datasourceWizardIncluded) {
-         return;
-         }
-         var docHead = document.getElementsByTagName("head")[0];
-         var tag = document.createElement("link");
-         tag.setAttribute("rel", "stylesheet");
-         tag.setAttribute("type", "text/css");
-         tag.setAttribute("href", this.datasourceEditorPath+"datasourceEditorDialog.css");
-         docHead.appendChild(tag);
-
-         var tag = document.createElement("script");
-         tag.setAttribute("type", "text/javascript");
-         tag.setAttribute("src", this.datasourceEditorPath+"DatasourceEditor.nocache.js");
-         docHead.appendChild(tag);
-
-         },
-         */
         setModelList: function (list) {
           this.models = list;
+          var htmlSelect = this.modelList;
 
-          this.modelList.clearOptions();
+          while (htmlSelect.options.length) htmlSelect.remove(0);
+
           for (var idx = 0; idx < list.length; idx++) {
             var opt = new Option(list[idx].name, list[idx].id);
-            this.modelList.addOption(opt);
+            htmlSelect.add(opt);
           }
-          if (list.length > 0) {
-            this.modelList.set('value', list[0].id);
-            this.datasourceSelected();
-          }
+
+          htmlSelect.selectedIndex = 0;
+          this.datasourceSelected();
         },
 
         onModelDblClick: function (x) {
@@ -78,9 +60,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         },
 
         setSelectedIndex: function (idx) {
-          this.modelList.set('value', this.models[idx]);
           this.modelList.selectedIndex = idx;
-//            this.modelList.focus();
           this.datasourceSelected();
         },
 
@@ -95,9 +75,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         },
 
         datasourceSelected: function () {
-          var id = this.modelList.get('value');
+          var id = this.getSelectedModel().id;
           var model = this.getModel(id);
-          var enable = model.modelId == 'MODEL_1' && this.canDataSourceAdmin;
+          var enable = model.modelId === 'MODEL_1' && this.canDataSourceAdmin;
           this.enableIconButton(this.editdatasourceimg, enable, this.editDatasource);
           this.enableIconButton(this.deletedatasourceimg, enable, this.deleteDatasource);
           this.enableIconButton(this.adddatasourceimg, this.canDataSourceAdmin, this.addDatasource);
@@ -128,37 +108,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
         postCreate: function () {
           this.inherited(arguments);
-          this.modelList.onChange = lang.hitch(this, this.datasourceSelected);
-          on(this.adddatasourceimg.buttonImg, "click", lang.hitch( this,  this.addDatasource));
-          on(this.editdatasourceimg.buttonImg, "click", lang.hitch( this,  this.editDatasource));
-          on(this.deletedatasourceimg.buttonImg, "click", lang.hitch( this,  this.deleteDatasource));
-          on(this.modelList.menuNode, "dblclick", lang.hitch( this,  this.onModelDblClick)); //[PIR-439]
-
-          // workaround to make scrollbar somewhat usable in IE8
-          if(has("ie") == 8){
-
-            // remember scroll position
-            on(this.modelList.menuOuterNode, "scroll", lang.hitch(this, this.retainScrollPosition));
-
-            // apply scroll position whenever possible
-            on(this, "focus", lang.hitch(this, this.applyScrollPosition));
-            on(this, "blur", lang.hitch(this, this.applyScrollPosition));
-            on(this, "mouseover", lang.hitch(this, this.applyScrollPosition));
-            on(this, "mouseout", lang.hitch(this, this.applyScrollPosition));
-          }
-
-        },
-
-        retainScrollPosition: function () {
-          this.scrollPosition = this.modelList.menuOuterNode.scrollTop;
-        },
-
-        applyScrollPosition: function () {
-          window.setTimeout(lang.hitch( this, function(){
-            if(this.modelList.menuOuterNode.scrollTop === 0){
-              this.modelList.menuOuterNode.scrollTop = this.scrollPosition;
-            }
-          }), 0);
+          this.own(
+            on(this.modelList, "click, keypress", lang.hitch(this, this.datasourceSelected)),
+            on(this.adddatasourceimg.buttonImg, "click", lang.hitch( this,  this.addDatasource)),
+            on(this.editdatasourceimg.buttonImg, "click", lang.hitch( this,  this.editDatasource)),
+            on(this.deletedatasourceimg.buttonImg, "click", lang.hitch( this,  this.deleteDatasource)),
+            on(this.modelList, "dblclick", lang.hitch( this,  this.onModelDblClick)), //[PIR-439]
+            a11yUtil.makeAccessibleActionButton(this.adddatasourceimg.buttonImg),
+            a11yUtil.makeAccessibleActionButton(this.editdatasourceimg.buttonImg),
+            a11yUtil.makeAccessibleActionButton(this.deletedatasourceimg.buttonImg)
+          );
         },
 
         addDatasource: function () {
@@ -196,7 +155,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               // nothing is selected
               return false;
             }
-            var id = this.modelList.get('value');
+
+            var id = this.getSelectedModel().id;
             // find the model
             var callbacks = {
               onError: function (val) {
@@ -212,7 +172,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             callbacks.onFinish = lang.hitch(this, this.datasourceEditCallback);
 
-            var model = this.getModel(this.modelList.get('value'));
+            var model = this.getModel(id);
             window.parent.pho.openEditDatasourceEditor(model.domainId, model.modelId, callbacks);
           }
         },
