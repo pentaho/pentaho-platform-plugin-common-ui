@@ -147,12 +147,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             keyup: function(evt) {
               event.stop(evt);
-              if(evt.keyCode == keys.ENTER) {
-                if(this.execute) {
-                  this.execute();
-                }
-              }
-              if(evt.keyCode == keys.ESCAPE) {
+              if(evt.keyCode === keys.ESCAPE) {
                 if(this.onCancel) {
                   this.onCancel();
                 }
