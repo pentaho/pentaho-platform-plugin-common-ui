@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
  * @property {boolean} executeAtStart True if this component should be executed on the first update of the Dashboard
  * object were it is, False otherwise
  */
-define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils' ], 
-  function($, BaseComponent, Utils) {
+define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils', 'common-ui/util/_a11y', 'dojo/dom' ],
+  function($, BaseComponent, Utils, a11yUtil, dom) {
 
   return BaseComponent.extend({
     components : undefined, // array of components
@@ -126,6 +126,9 @@ define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboar
 
       var $htmlObject = $('#' + this.htmlObject);
       $htmlObject.html(html);
+
+      a11yUtil.makeAccessibleActionButton(dom.byId('edit-parameter'));
+      a11yUtil.makeAccessibleActionButton(dom.byId('remove-parameter'));
 
       if (this.cssClass) {
         $htmlObject.addClass(this.cssClass);
