@@ -15,8 +15,8 @@
  *
  */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/dom", "dojo/query", "dojo/dom-construct", "dojo/dom-style", "dijit/Dialog", "pentaho/common/button", "pentaho/common/SmallImageButton", "pentaho/common/Messages", "dojo/dom-class",
-  "dojo/_base/lang", "dojo/_base/event", "dojo/keys"],
-    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys){
+  "dojo/_base/lang", "dojo/_base/event", "dojo/keys", "common-ui/util/_focus"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil){
       return declare("pentaho.common.Dialog",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
             popup : null,
@@ -249,6 +249,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.popup = new Dialog();
 //                this.popup.attr("content", this.domNode);
               }
+              this.popup.setElementRefresher(function(elem) {
+                return focusUtil.refreshElement(elem);
+              });
               this.inherited(arguments);
             },
 
