@@ -32,6 +32,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             closeIcon: undefined,
             _onCancelCallback: undefined,
 
+            // ElementRefresher: function(Element) : Element
+            // Supports WCAG focus maintenance.
+            // Allows "refreshing" the element to use for "refocus" to a corresponding one which is attached
+            // to the document. Required to deal with UI elements which are discarded and rebuilt.
+            elementRefresher: function(elem) {
+              return focusUtil.refreshElement(elem);
+            },
+
+            setElementRefresher: function(refresher) {
+              if (refresher != null) {
+                this.elementRefresher = refresher;
+              } else {
+                delete this.elementRefresher;
+              }
+            },
+
             setLocalizationLookupFunction: function(f) {
               this.getLocaleString = f;
               this._localize();
@@ -67,7 +83,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             // * set variables for the template
             postMixInProperties: function() {
-
               this.inherited(arguments);
             },
 
@@ -196,6 +211,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
               this._createButtons();
 
+              this.popup.setElementRefresher(this.elementRefresher);
               this.popup.show();
               this.shown = true;
             },
@@ -249,6 +265,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.popup = new Dialog();
 //                this.popup.attr("content", this.domNode);
               }
+
               this.popup.setElementRefresher(function(elem) {
                 return focusUtil.refreshElement(elem);
               });
