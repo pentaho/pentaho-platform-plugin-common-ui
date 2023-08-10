@@ -96,6 +96,8 @@
     "name": "pentaho/environment"
   }, {
     "name": "pentaho/theme"
+  }, {
+    "name": "common-ui/util/_alertDialog"
   });
 
   requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isVirtual: true};
