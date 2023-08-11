@@ -96,6 +96,8 @@
     "name": "pentaho/environment"
   }, {
     "name": "pentaho/theme"
+  }, {
+    "name": "common-ui/util/_alertDialog"
   });
 
   requireModules["pentaho/config/spec/IRuleSet"] = {base: null, isVirtual: true};
@@ -195,6 +197,7 @@
   requirePaths["dojox/rpc"] = dojoOverrides + "dojox/rpc";
   requirePaths["dojo/_base/kernel"] = dojoOverrides + "dojo/_base/kernel";
   requirePaths["dojo/_base/config"] = dojoOverrides + "dojo/_base/config";
+  requirePaths["dojo/store/JsonRest"] = dojoOverrides + "dojo/store/JsonRest";
   requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
   requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
