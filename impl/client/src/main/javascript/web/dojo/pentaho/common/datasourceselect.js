@@ -200,7 +200,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             this.msgBox.callbacks = [
               lang.hitch(this, this.deleteDatasource2),
               lang.hitch(this, function () {
-                this.msgBox.hide()
+                this.msgBox.hide();
               })
             ];
 
@@ -210,7 +210,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
 
         deleteDatasource2: function () {
-
+          this.msgBox.popup.setDialogOpener(this.adddatasourceimg.buttonImg);
           this.msgBox.hide();
 
           var callbacks = {
