@@ -175,11 +175,13 @@ define([
                         self._scheduleOpen(this, iframe, {x: evt.pageX, y: evt.pageY});
                     }),
                     on(cn, delegatedEvent("keydown"), function(evt){
-                        // Pentaho : Added 'ENTER' and 'SPACE' keys to be used to open context menus.
-                        if((evt.shiftKey && evt.keyCode === keys.F10) || evt.keyCode === keys.ENTER || evt.keyCode === keys.SPACE){
+                        // Pentaho : 'ENTER' and 'SPACE' keys to be used to open context menus.
+                        if(evt.keyCode === keys.ENTER || evt.keyCode === keys.SPACE){
+                            var component = evt.target;
+                            var rect = domGeometry.position(component);
                             evt.stopPropagation();
                             evt.preventDefault();
-                            self._scheduleOpen(this, iframe);   // no coords - open near target node
+                            self._scheduleOpen(this, iframe,{x : rect.x + rect.w, y : rect.y + rect.h} );
                         }
                     })
                 ];
