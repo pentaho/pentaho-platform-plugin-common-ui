@@ -39,31 +39,47 @@ define("common-ui/util/_focus", [
       return $img.length > 0 && $img.is(":visible");
     }
 
-    var focusableIfVisible;
     if(/^(input|select|textarea|button|object)$/.test(nodeName)) {
-      focusableIfVisible = !elem.disabled;
-      if(focusableIfVisible) {
-
-        // Form controls within a disabled fieldset are disabled.
-        // However, controls within the fieldset's legend do not get disabled.
-        // Since controls generally aren't placed inside legends, we skip
-        // this portion of the check.
-        var $fieldset = $(elem).closest("fieldset")[0];
-        if($fieldset) {
-          focusableIfVisible = !$fieldset.disabled;
-        }
+      if(isDisabled(elem)) {
+        return false;
       }
     } else if(nodeName === "a") {
-      focusableIfVisible = elem.href || hasTabindex;
-    } else {
-      focusableIfVisible = hasTabindex;
+      if(!elem.href && !hasTabindex) {
+        return false;
+      }
+    } else if(!hasTabindex) {
+      return false;
     }
 
+    return isVisible(elem);
+  }
+
+  function isDisabled(elem) {
+    if(elem.disabled) {
+      return false;
+    }
+
+    // Form controls within a disabled fieldset are disabled.
+    // However, controls within the fieldset's legend do not get disabled.
+    // Since controls generally aren't placed inside legends, we skip
+    // this portion of the check.
+    var $fieldset = $(elem).closest("fieldset")[0];
+    if($fieldset && $fieldset.disabled) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function isVisible(elem) {
     var $elem = $(elem);
-    return focusableIfVisible && $elem.is(":visible") && $elem.css("visibility") === "visible";
+    return $elem.is(":visible") && $elem.css("visibility") === "visible";
   }
 
   $.extend($.expr.pseudos, {
+    "pen-focusable-candidate": function(element) {
+      return isFocusable(element, true);
+    },
     "pen-focusable": function(element) {
       return isFocusable(element, $.attr(element, "tabindex") != null);
     },
@@ -77,7 +93,8 @@ define("common-ui/util/_focus", [
 
   var Selectors = {
     tabbable: ":pen-tabbable",
-    focusable: ":pen-focusable"
+    focusable: ":pen-focusable",
+    candidate: ":pen-focusable-candidate"
   };
 
   var suspendFocusRingCount = 0;
@@ -122,8 +139,71 @@ define("common-ui/util/_focus", [
     return null;
   }
 
+  /**
+   * @return {function(Element) : JQueryResult} A jQuery-like selector function.
+   */
+  function getSelectorFunFromArgs(keyArgs, searchDescendants) {
+    var preSelector = optionalArg(keyArgs, "selector");
+    var selector = getSelectorFromFocusableArg(keyArgs);
+    var postFilter = optionalArg(keyArgs, "filter");
+
+    var selectorFun = searchDescendants ? null : $;
+
+    if (preSelector != null) {
+      selectorFun = composeJQuery(selectorFun, preSelector);
+    }
+
+    selectorFun = composeJQuery(selectorFun, selector);
+
+    // assert selectorFun != null;
+
+    if (postFilter != null) {
+      selectorFun = composeJQuery(selectorFun, processJQueryFilterArg(postFilter));
+    }
+
+    return selectorFun;
+  }
+
+  /**
+   * @param {function(Element) : JQueryResult} previousFun - A jQuery-like function.
+   * @param {string|function} nextArg - When `previousFun` is `null`, a selector string.
+   *   Otherwise, it is a value suitable for `jQuery.filter(.)`: a selector string or a predicate function.
+   * @return {function(Element) : JQueryResult} A new function which incorporates the given additional filter.
+   */
+  function composeJQuery(previousFun, nextArg) {
+    // The first function must establish the initial jQuery set by using find to select descendant elements.
+    if (previousFun == null) {
+      return function composeJQueryRoot(elem) {
+        return $(elem).find(nextArg);
+      };
+    }
+
+    // Subsequent functions successively filter the elements initially selected.
+    return function composeJQueryFilter(elem) {
+      return previousFun(elem).filter(nextArg);
+    };
+  }
+
+  function processJQueryFilterArg(filterArg) {
+    return function(index, elem) {
+      return filterArg.call(this, elem);
+    };
+  }
+
   function getSelectorFromFocusableArg(keyArgs) {
-    return optionalArg(keyArgs, "focusable", false) ? Selectors.focusable : Selectors.tabbable;
+    var focusableMode = optionalArg(keyArgs, "focusable", false);
+    if (focusableMode === true) {
+      focusableMode = "focusable";
+    } else if(focusableMode === false) {
+      focusableMode = "tabbable";
+    }
+
+    var selector = Selectors[focusableMode];
+    if(selector == null) {
+      throw new Error("Invalid `focusable` value '" + focusableMode + "'.");
+    }
+
+    return selector;
   }
 
   /**
@@ -165,13 +245,29 @@ define("common-ui/util/_focus", [
      * Gets a value that indicates whether an element can receive focus.
      * @param {?Element} [elem] - The element.
      * @param {?Object} [keyArgs] - The keyword arguments object.
-     * @param {boolean} [keyArgs.focusable=false] - Indicates that the result includes not only keyboard-focusability
-     *   but also the ability to focus using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @return {boolean} The value `true` if the element is defined and is focusable in the requested sense;
      *   `false`, otherwise.
      */
     isTabbable: function(elem, keyArgs) {
-      return elem != null && $(elem).filter(getSelectorFromFocusableArg(keyArgs)).length > 0;
+      if(elem == null ) {
+        return false;
+      }
+
+      var selectorFun = getSelectorFunFromArgs(keyArgs, false);
+      return selectorFun(elem).length > 0;
     },
 
     /**
@@ -182,8 +278,19 @@ define("common-ui/util/_focus", [
      *
      * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
      * @param {?Object} [keyArgs] - The keyword arguments object.
-     * @param {boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
-     *   including those which can only be focused using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @param {boolean} [keyArgs.self=false] - Indicates that the root element should also be considered,
      *   at first position.
      * @return {Element[]} An array of focusable elements.
@@ -193,7 +300,7 @@ define("common-ui/util/_focus", [
         root = document.body;
       }
 
-      var selectorFun = $.bind(null, getSelectorFromFocusableArg(keyArgs));
+      var selectorFun = getSelectorFunFromArgs(keyArgs, true);
 
       var selection = expandSelection(root, selectorFun);
 
@@ -212,8 +319,19 @@ define("common-ui/util/_focus", [
      *
      * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
      * @param {?Object} [keyArgs] - The keyword arguments object.
-     * @param {boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
-     *   including those which can only be focused using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @param {boolean} [keyArgs.self=false] - Indicates that the root element should also be considered,
      *   at first position.
      * @return {?Element} The first focusable element, if any; `null`, otherwise.
@@ -230,8 +348,19 @@ define("common-ui/util/_focus", [
      *
      * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
      * @param {?Object} [keyArgs] - The keyword arguments object.
-     * @param {boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
-     *   including those which can only be focused using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @param {boolean} [keyArgs.self=false] - Indicates that the root element should also be considered,
      *   at first position.
      * @return {?Element} The last focusable element, if any; `null`, otherwise.
@@ -250,8 +379,19 @@ define("common-ui/util/_focus", [
      * @param {?Object} [keyArgs] - The keyword arguments object.
      * @param {?Element} [keyArgs.root] - The root element establishes the scope under which focusable elements are
      *   considered. Defaults to the body of this frame's document.
-     * @param {?boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
-     *   including those which can only be focused using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @return {?Element} The next focusable element, if any; `null`, otherwise.
      */
     nextTabbable: function(elem, keyArgs) {
@@ -278,8 +418,19 @@ define("common-ui/util/_focus", [
      * @param {?Object} [keyArgs] - The keyword arguments object.
      * @param {?Element} [keyArgs.root] - The root element establishes the scope under which focusable elements are
      *   considered. Defaults to the body of this frame's document.
-     * @param {?boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
-     *   including those which can only be focused using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @return {?Element} The previous focusable element, if any; `null`, otherwise.
      */
     previousTabbable: function(elem, keyArgs) {
@@ -304,12 +455,37 @@ define("common-ui/util/_focus", [
      *
      * @param {Element} elem - The initial element.
      * @param {?Object} [keyArgs] - The keyword arguments object.
-     * @param {?boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
-     *   including those which can only be focused using the mouse or code.
+     * @param {string} [keyArgs.selector] - A base selector string which selects the candidate elements for focusable
+     *  inspection. The selected elements are further restricted according to the `keyArgs.focusable` and
+     *  `keyArgs.filter` arguments. When unspecified, all descendant elements are candidates.
+     * @param {string|boolean} [keyArgs.focusable=false] - The focusable type. Identifies the type of focusability
+     *  required by elements. All elements must be enabled and visible.
+     *
+     *  Depending on the specified focusable type value, elements are required to be:
+     *  - `"focusable"` or `true`- click-focusable
+     *  - `"tabbable"` or `false` - sequentially-focusable
+     *  - `"candidate"` - focusable, albeit possibly requiring a `tabindex` attribute to be set later; useful
+     *                    for implementing the "roving tab index" interaction pattern.
+     * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering of
+     *  candidate elements. Can be used, for example, in cases of custom enabled or visible conditions.
      * @return {?Element} The closest focusable element, if any; `null`, otherwise.
      */
     closestTabbable: function(elem, keyArgs) {
-      return $(elem).closest(getSelectorFromFocusableArg(keyArgs))[0] || null;
+
+      var selectorFun = getSelectorFunFromArgs(keyArgs, false);
+
+      // Based on jQuery.closest().
+      var curr = elem;
+      while(curr != null) {
+        // Skip document fragments (11).
+        if(selectorFun(curr).length > 0) {
+          return curr;
+        }
+
+        curr = curr.parentNode;
+      }
+
+      return null;
     },
     // endregion tabbable
 
