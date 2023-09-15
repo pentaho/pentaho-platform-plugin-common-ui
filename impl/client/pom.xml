@@ -19,7 +19,7 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js</js.project.list>
+    <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular,angular-animate,angular-i18n,uirouter__core,uirouter__angularjs</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
 
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
@@ -60,6 +60,26 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>angular</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>angular-animate</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>angular-i18n</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>uirouter__core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>uirouter__angularjs</artifactId>
     </dependency>
   </dependencies>
 

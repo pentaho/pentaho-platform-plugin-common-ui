@@ -233,6 +233,61 @@
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
+  // region Angular
+  requirePaths["common-ui/angularjs"] = basePath + "/angularjs/angular";
+  requireShim["common-ui/angularjs"] = {
+    deps: ["common-ui/jquery"],
+    exports: "angular",
+    init: function() {
+      // Load i18n for angular.
+      var baseMid = "common-ui/angularjs-i18n/angular-locale_"; // mid = module id
+      var locale = (typeof SESSION_LOCALE !== "undefined") ? SESSION_LOCALE : "en";
+
+      locale = locale.replace("_", "-").toLowerCase();
+
+      require([baseMid + locale], function() {}, function() {
+        // Couldn't find the locale specified, fall back.
+        var prev = locale;
+
+        // Strip off the country designation, try to get just the language.
+        locale = (locale.length > 2) ? locale.substring(0, 2) : "en";
+
+        if(typeof console !== "undefined" && console.warn)
+          console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
+
+        require([baseMid + locale], function() {}, function() {
+          // Can't find the language at all, go get english.
+          if(typeof console !== "undefined" && console.warn)
+            console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
+
+          require([baseMid + "en"], function() {});
+        });
+      });
+    }
+  };
+
+  requirePaths["common-ui/angularjs-i18n"] = basePath + "/angularjs/i18n";
+
+  requirePaths["common-ui/angularjs-animate"] = basePath + "/angularjs/angular-animate";
+  requireShim["common-ui/angularjs-animate"] = ["common-ui/angularjs"];
+
+  requirePaths["common-ui/uirouter"] = basePath + "/angularjs/uirouter";
+  requirePackages.push({
+    "name": "common-ui/uirouter/core",
+    "location": basePath + "/angularjs/uirouter/core/_bundles",
+    "main": "ui-router-core.min"
+  });
+  requirePackages.push({
+    "name": "common-ui/uirouter/angularjs",
+    "location": basePath + "/angularjs/uirouter/angularjs/release",
+    "main": "ui-router-angularjs.min"
+  });
+  requireMap["common-ui/uirouter"] = {
+    "angular": "common-ui/angularjs",
+    "@uirouter": "common-ui/uirouter"
+  };
+  // endregion
+
   // region Viz. API
 
   // This file is always in the non-compressed location.
