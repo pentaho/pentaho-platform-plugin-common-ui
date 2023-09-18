@@ -539,6 +539,7 @@ pentaho.pda.Column.ELEMENT_TYPES.ATTRIBUTE = "ATTRIBUTE";
 pentaho.pda.Column.ELEMENT_TYPES.KEY = "KEY";
 pentaho.pda.Column.ELEMENT_TYPES.QUERY = "QUERY";
 pentaho.pda.Column.ELEMENT_TYPES.UNKNOWN = "UNKNOWN";
+pentaho.pda.Column.ELEMENT_TYPES.CAT_CALC_FIELD = "CAT_CALC_FIELD";
 
 // values are from java.sql.Types
 pentaho.pda.Column.JAVA_SQL_TYPES = new Object();
