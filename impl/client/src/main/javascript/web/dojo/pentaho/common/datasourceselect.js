@@ -18,8 +18,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   'pentaho/common/ListBox',
   'pentaho/common/Dialog',
   'pentaho/common/MessageBox', "dojo/_base/lang", 'dojo/text!pentaho/common/datasourceselect.html',
-  'dojo/Stateful', 'dojo/has', "common-ui/util/_a11y", 'dojo/_base/sniff'],
-  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has, a11yUtil) {
+  'dojo/Stateful', 'dojo/has', "common-ui/util/_a11y", "common-ui/util/_focus", 'dojo/dom', 'dojo/_base/sniff'],
+  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has, a11yUtil, focusUtil, dom) {
     return declare("pentaho.common.datasourceselect", [Stateful, Dialog, _TemplatedMixin, _WidgetsInTemplateMixin],
 
       {
@@ -110,14 +110,27 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           this.inherited(arguments);
           this.own(
             on(this.modelList, "click, keypress", lang.hitch(this, this.datasourceSelected)),
-            on(this.adddatasourceimg.buttonImg, "click", lang.hitch( this,  this.addDatasource)),
-            on(this.editdatasourceimg.buttonImg, "click", lang.hitch( this,  this.editDatasource)),
-            on(this.deletedatasourceimg.buttonImg, "click", lang.hitch( this,  this.deleteDatasource)),
-            on(this.modelList, "dblclick", lang.hitch( this,  this.onModelDblClick)), //[PIR-439]
+            on(this.adddatasourceimg.buttonImg, "click", lang.hitch(this, this.addDatasource)),
+            on(this.editdatasourceimg.buttonImg, "click", lang.hitch(this, this.editDatasource)),
+            on(this.deletedatasourceimg.buttonImg, "click", lang.hitch(this, this.deleteDatasource)),
+            on(this.modelList, "dblclick", lang.hitch(this, this.onModelDblClick)), //[PIR-439]
             a11yUtil.makeAccessibleActionButton(this.adddatasourceimg.buttonImg),
             a11yUtil.makeAccessibleActionButton(this.editdatasourceimg.buttonImg),
-            a11yUtil.makeAccessibleActionButton(this.deletedatasourceimg.buttonImg)
-          );
+            a11yUtil.makeAccessibleActionButton(this.deletedatasourceimg.buttonImg),
+            a11yUtil.makeAccessibleToolbar(dom.byId("toolbar"), {itemFilter: this.isEnabled}));
+        },
+
+        isEnabled: function (item) {
+          return !isDisabled(item);
+
+          function isDisabled(item) {
+            if ((item.ariaDisabled !== "true")) {
+              return Array.from(item.classList).some(function (className) {
+                return className.toLowerCase().includes("disabled");
+              });
+            }
+            return true;
+          }
         },
 
         addDatasource: function () {
