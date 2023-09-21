@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,6 +158,26 @@ define(['common-ui/jquery-clean'], function ($) {
               if(newParameter.timezoneHint !== undefined){
                 group.parameters[index].timezoneHint = newParameter.timezoneHint;
               }
+              return;
+            }
+          }, this );
+        }
+      },
+
+      /**
+       * Updates attriubtes of parameter with new one taken from passed parameter object
+       * @param newParameter - parameter object with new attribute values
+       */
+      updateParameterAttribute: function (newParameter) {
+        if (newParameter && newParameter.name && newParameter.attributes) {
+          this.mapParameters(function (oldParam, group) {
+            if (newParameter.name === oldParam.name) {
+              var index = group.parameters.indexOf(oldParam);
+              $.each(newParameter.attributes, function(key, val) {
+                if ( group.parameters[index].attributes[key] !== undefined ) {
+                  group.parameters[index].attributes[key] = val;
+                }
+              });
               return;
             }
           }, this );
