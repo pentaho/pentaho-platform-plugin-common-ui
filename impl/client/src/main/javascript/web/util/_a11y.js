@@ -538,10 +538,11 @@ define("common-ui/util/_a11y", ["./_focus"], function (focusUtil) {
      */
     function onKeyPress(evt) {
       var currentItem = evt.target;
+      var useTabs = useTabsForNavigation(currentItem);
 
       switch (evt.key) {
         case keys.ArrowRight:
-          if (currentItem == null) {
+          if (currentItem == null || useTabs) {
             return;
           }
 
@@ -549,7 +550,7 @@ define("common-ui/util/_a11y", ["./_focus"], function (focusUtil) {
           break;
 
         case keys.ArrowLeft:
-          if (currentItem == null) {
+          if (currentItem == null || useTabs) {
             return;
           }
 
@@ -562,6 +563,19 @@ define("common-ui/util/_a11y", ["./_focus"], function (focusUtil) {
 
         case keys.End:
           setFocusItem(getLast());
+          break;
+
+        case keys.Tab:
+          if (currentItem == null || !useTabs) {
+            return;
+          }
+
+          if (evt.shiftKey) {
+            setFocusItem(getPrevious(currentItem));
+          } else {
+            setFocusItem(getNext(currentItem));
+          }
+
           break;
 
         default:
@@ -642,6 +656,10 @@ define("common-ui/util/_a11y", ["./_focus"], function (focusUtil) {
         focusable: "candidate",
         filter: itemFilter
       });
+    }
+
+    function useTabsForNavigation(elem) {
+      return (elem && (elem.dataset.penToolbarNavUseTabs === "true"));
     }
 
     function isFocusableItem(item) {

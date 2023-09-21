@@ -6,27 +6,32 @@
         </td>
     </tr>
     <tr>
-        <td colspan="3">
-            <table style="padding:0px; margin:0px; width:100%">
-                <tr>
-                    <td style="width:100%">
-                        <span data-dojo-attach-point="datasourcelistlbl" class="label">Data Sources:</span>
-                    </td>
-                    <td>
-                        <div data-dojo-attach-point="editdatasourceimg" data-dojo-type="pentaho.common.SmallImageButton" title="Edit the selected datasource" baseClass="pentaho-editbutton">
-                        </div>
-                    </td>
-                    <td>
-                        <div data-dojo-attach-point="adddatasourceimg" data-dojo-type="pentaho.common.SmallImageButton" title="Add a datasource" baseClass="pentaho-addbutton">
-                        </div>
-                    </td>
-                    <td>
-                        <div data-dojo-attach-point="deletedatasourceimg" data-dojo-type="pentaho.common.SmallImageButton" title="Delete the selected datasource" baseClass="pentaho-deletebutton">
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </td>
+      <td colspan="3">
+        <div id="toolbar">
+          <table style="padding:0px; margin:0px; width:100%">
+            <tr>
+              <td style="width:100%">
+                <span data-dojo-attach-point="datasourcelistlbl" class="label">Data Sources:</span>
+              </td>
+              <td>
+                <div baseClass="toolbar-button pentaho-editbutton" data-dojo-attach-point="editdatasourceimg"
+                     data-dojo-type="pentaho.common.SmallImageButton" title="Edit the selected datasource">
+                </div>
+              </td>
+              <td>
+                <div baseClass="toolbar-button pentaho-addbutton" data-dojo-attach-point="adddatasourceimg"
+                     data-dojo-type="pentaho.common.SmallImageButton" title="Add a datasource">
+                </div>
+              </td>
+              <td>
+                <div baseClass="toolbar-button pentaho-deletebutton" data-dojo-attach-point="deletedatasourceimg"
+                     data-dojo-type="pentaho.common.SmallImageButton" title="Delete the selected datasource">
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
     </tr>
     <tr>
         <td colspan="3">
