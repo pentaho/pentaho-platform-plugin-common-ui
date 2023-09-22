@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -236,7 +236,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     dialogContainer.style.width = "100%";
     dialogContainer.style.height = "100%";
     dialogContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    dialogContainer.style.zIndex = "9999";
+    dialogContainer.style.zIndex = "900";
 
     var dialogContentContainer = document.createElement("div");
     dialogContentContainer.id="cal-field-container";
