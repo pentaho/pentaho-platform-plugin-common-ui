@@ -238,7 +238,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     dialogContainer.style.width = "100%";
     dialogContainer.style.height = "100%";
     dialogContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    dialogContainer.style.zIndex = "9999";
+    dialogContainer.style.zIndex = "900";
 
     var dialogContentContainer = document.createElement("div");
     dialogContentContainer.id="cal-field-container";
