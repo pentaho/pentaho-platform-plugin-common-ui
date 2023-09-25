@@ -40,7 +40,7 @@ define("common-ui/util/_focus", [
     }
 
     if(/^(input|select|textarea|button|object)$/.test(nodeName)) {
-      if(isDisabled(elem)) {
+      if(!isEnabled(elem)) {
         return false;
       }
     } else if(nodeName === "a") {
@@ -54,7 +54,7 @@ define("common-ui/util/_focus", [
     return isVisible(elem);
   }
 
-  function isDisabled(elem) {
+  function isEnabled(elem) {
     if(elem.disabled) {
       return false;
     }

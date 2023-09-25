@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,11 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
 
             postCreate: function () {
               this.inherited(arguments);
+
+              var keyNavCodes = this.rowLimitRestrictions._keyNavCodes;
+              delete keyNavCodes[keys.LEFT_ARROW];
+              delete keyNavCodes[keys.RIGHT_ARROW];
+
               on(this.rowLimitRestrictions, 'change', lang.hitch(this, '_onSelect'));
               on(this.rowsNumberInput, 'keydown, focusout', lang.hitch(this, '_onRowLimitSubmit'));
               on(this.rowsNumberInput, 'mousedown', function(e){
