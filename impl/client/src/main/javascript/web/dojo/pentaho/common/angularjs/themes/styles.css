@@ -1,3 +1,22 @@
+.pentaho-angularjs-host-dialog.pentaho-angularjs-host-dialog {
+  /* Reiterate (.responsive).pentaho-dialog rule which was being overridden by dijit.css */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.pentaho-angularjs-host-dialog > * > .dijitDialogPaneContent {
+  /* Dijit sets these upon viewport resize */
+  width: unset !important;
+  height: unset !important;
+  overflow: unset !important;
+}
+
+
+.pentaho-angularjs-host-dialog > * > .dijitDialogPaneContent,
+.pentaho-angularjs-host-dialog .ui-view,
 .pentaho-angularjs-host-dialog .ui-view > * {
+  display: flex;
+  flex-direction: column;
   flex: auto;
+  min-height: 0;
 }
