@@ -254,6 +254,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     dialogContainer.appendChild(dialogContentContainer);
     
     document.body.appendChild(dialogContainer);
+    dialogContentContainer.querySelector("#MA_name").focus();
   },
   
   configureFor: function(datasource, searchContainer) {
@@ -365,12 +366,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
             {
               "id": "catId-add-button",
               "class": "pentaho-addbutton icon-zoomable",
+              "tabindex": "-1",
+              "collapsed": "true",
+              "expanded":"false",
               "onclick": function() {
                 this.openCalcField();
               }.bind(this)
-
             }, categoryDiv);
-
       }
       this.textSelectionDisabler(categoryNameSpan);
       this.connectHandles.push(on(categoryNameSpan,  'dblclick', lang.hitch( this,  this.expandCollapseCategory)));
@@ -844,6 +846,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(nextHeader)) {
       return this._findNextHeader(nextHeader);
     }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(nextHeader.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
 
     return nextHeader;
   },
@@ -867,7 +872,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(prevHeader)) {
       return this._findPrevHeader(prevHeader);
     }
-
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(prevHeader.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
     return prevHeader;
   },
 
@@ -889,6 +896,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(nextField)) {
       return this._findNextField(nextField);
     }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
 
     return nextField;
   },
@@ -911,16 +921,23 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(prevField)) {
       return this._findPrevField(prevField);
     }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
 
     return prevField;
   },
 
   _onKeydownHeader: function (e) {
-    var code = e.keyCode || e.which;
-    var header = e.target;
-    var categoryId = dojo.attr(header, "id");
-    var children;
-    var expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
+      var code = e.keyCode || e.which;
+      var header = e.target;
+      var categoryId = dojo.attr(header, "id");
+      var children;
+      var expanded = false;
+      if (header.firstElementChild !== null){
+        expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
+      }
+
 
     if (code === keys.DOWN_ARROW) {
       e.preventDefault();
@@ -952,7 +969,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       if (!this._isFirstHeader(header)) {
         e.preventDefault();
         var previousHeader = this._findPrevHeader(header);
-        expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          if (previousHeader.firstElementChild !== null){
+              expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          }
         var lastChild;
 
         if (expanded) {
@@ -1029,6 +1048,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           node.setAttribute('tabindex', '-1');
           nextHeader.focus();
         }
+      } else {
+          var nextHeader = this._findNextHeader(groupHeader);
+          if (nextHeader) {
+              nextHeader.setAttribute('tabindex', '0');
+              node.setAttribute('tabindex', '-1');
+              nextHeader.focus();
+           }
       }
     }
   },
@@ -1075,7 +1101,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           coords = domGeometry.position(node, true);
           coords.x += coords.w;
           coords.y += coords.h;
-          this.fieldContextMenu._scheduleOpen(node, null, coords);
+          if (this.isCalcField(node.classList[0])) {
+              this.calcFieldContextMenu._scheduleOpen(node, null, coords);
+          } else {
+              this.fieldContextMenu._scheduleOpen(node, null, coords);
+          }
           break;
         case keys.UP_ARROW:
           event.preventDefault();
