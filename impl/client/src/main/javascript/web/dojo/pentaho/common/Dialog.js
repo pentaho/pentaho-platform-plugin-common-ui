@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/dom", "dojo/query", "dojo/dom-construct", "dojo/dom-style", "dijit/Dialog", "pentaho/common/button", "pentaho/common/SmallImageButton", "pentaho/common/Messages", "dojo/dom-class",
-  "dojo/_base/lang", "dojo/_base/event", "dojo/keys"],
-    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys){
+  "dojo/_base/lang", "dojo/_base/event", "dojo/keys", "common-ui/util/_focus"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil){
       return declare("pentaho.common.Dialog",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
             popup : null,
@@ -31,6 +31,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             hasCloseIcon: false,
             closeIcon: undefined,
             _onCancelCallback: undefined,
+
+            // ElementRefresher: function(Element) : Element
+            // Supports WCAG focus maintenance.
+            // Allows "refreshing" the element to use for "refocus" to a corresponding one which is attached
+            // to the document. Required to deal with UI elements which are discarded and rebuilt.
+            elementRefresher: function(elem) {
+              return focusUtil.refreshElement(elem);
+            },
+
+            setElementRefresher: function(refresher) {
+              if (refresher != null) {
+                this.elementRefresher = refresher;
+              } else {
+                delete this.elementRefresher;
+              }
+            },
 
             setLocalizationLookupFunction: function(f) {
               this.getLocaleString = f;
@@ -67,14 +83,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             // * set variables for the template
             postMixInProperties: function() {
-
               this.inherited(arguments);
             },
 
             _createButtonPanel: function() {
               this.buttonPanel = construct.create("TABLE");
               style.set(this.buttonPanel, "width", "100%");
-              construct.place(this.buttonPanel, this.popup.domNode);
+              construct.place(this.buttonPanel, this.popup.containerNode);
               domClass.add(this.buttonPanel, 'button-panel');
             },
 
@@ -147,12 +162,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             keyup: function(evt) {
               event.stop(evt);
-              if(evt.keyCode == keys.ENTER) {
-                if(this.execute) {
-                  this.execute();
-                }
-              }
-              if(evt.keyCode == keys.ESCAPE) {
+              if(evt.keyCode === keys.ESCAPE) {
                 if(this.onCancel) {
                   this.onCancel();
                 }
@@ -201,6 +211,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
               this._createButtons();
 
+              this.popup.setElementRefresher(this.elementRefresher);
               this.popup.show();
               this.shown = true;
             },
@@ -254,6 +265,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.popup = new Dialog();
 //                this.popup.attr("content", this.domNode);
               }
+
+              this.popup.setElementRefresher(function(elem) {
+                return focusUtil.refreshElement(elem);
+              });
               this.inherited(arguments);
             },
 

@@ -15,8 +15,8 @@
 *
 */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
-"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp"],
-    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp){
+"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp", "dojo/keys", "dojo/dom-geometry"],
+    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp, keys, domGeometry){
       return declare("pentaho.common.FieldList",
     [_WidgetBase, _Templated],
 {
@@ -33,6 +33,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   fieldListNodes: [],
   localeStringFind: "Find:",
   localeStringClearSearch: "Clear Search",
+  fieldCategories: [],
 
   sanitizeIdAndClassNames: function(name) {
     if(name != null){
@@ -170,7 +171,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   },
 
   registerExpandCollapseCategoryCallback: function(f) {
-	this.expandCollapseCategoryCallback = f;
+    this.expandCollapseCategoryCallback = f;
   },
 
   _localize: function() {
@@ -222,6 +223,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.categoryClassMap = {};
     this.usedCategoryIds = {};
     this.fieldListNodes = [];
+    this.fieldCategories = [];
   },
 
   openCalcField: function(){
@@ -325,6 +327,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       }
       var catId = this.getCategoryClassName(category.id);
       addedCategories.push(category.id);
+      this.fieldCategories.push(catId);
       // create div for category
       var categoryDiv = construct.create("div",
         {
@@ -332,10 +335,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         }, this.containerNode);
       if (isFirstCategory) {
         domClass.add(categoryDiv, "categoryNodeFirst");
+        categoryDiv.setAttribute("tabindex", "0");
         isFirstCategory = false;
       } else {
         domClass.add(categoryDiv, "categoryNodeNotFirst");
       }
+      this.connectHandles.push(on(categoryDiv,  'keydown', lang.hitch( this,  this._onKeydownHeader)));
+
       // create +- expand/collapse indicator
       var categoryIndicator = construct.create("div",
         {
@@ -479,6 +485,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       this.connectHandles.push(on(div,  'click', lang.hitch( this,  function(event) {
         this.onFieldClick(event);
       })));
+      this.connectHandles.push(on(div,  'keydown', lang.hitch( this, this._onKeyDownFieldListTree)));
     }
     return {node: div, data: item, type: ["treenode-leaf-label"]};
   },
@@ -574,7 +581,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
   expandCollapseCategory: function (eventElement) {
     var categoryId = dojo.attr(eventElement.target, "categoryId");
-    var node = dom.byId(categoryId + "-fields");
     var indicatorNode = dom.byId(categoryId + "-indicator");
     var collapsed = dojo.attr(indicatorNode, "collapsed") != "true";
     if (collapsed) {
@@ -633,6 +639,37 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       this.dndObj.anchor = node;
       this.dndObj._addItemClass(node, "Anchor");
       this.dndObj.selection[id] = 1;
+    }
+  },
+
+  _isFieldSelected: function(elem) {
+    return elem.classList.contains('pentaho-listitem-selected');
+  },
+
+  _toggleSelection: function(node){
+    if(this._isFieldSelected(node)) {
+      this.dndObj._removeItemClass(node, "Anchor");
+      delete this.dndObj.selection[node.getAttribute("id")];
+    } else {
+      this._updateMultiSelectionForContextMenu(node.getAttribute("fieldId"));
+    }
+  },
+
+  _updateMultiSelectionForContextMenu: function(fieldId) {
+    var selected = false;
+    this.dndObj.forInSelectedItems(function(item, id) {
+      if (item.data.fieldId === fieldId) {
+        selected = true;
+      }
+    });
+
+    var id = "field-" + fieldId;
+    var node = dom.byId(id);
+
+    if (!selected) {
+      this.dndObj.anchor = node;
+      this.dndObj._addItemClass(node, "Anchor");
+      this.dndObj.selection[id] = this.dndObj.getSelectedNodes().length + 1;
     }
   },
 
@@ -743,6 +780,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           showGroup = true;
           if (isFirstCategory) {
             domClass.add(groupHeader, "categoryNodeFirst");
+            groupHeader.setAttribute("tabindex", "0");
             isFirstCategory = false;
           } else {
             domClass.add(groupHeader, "categoryNodeNotFirst");
@@ -781,7 +819,276 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         this.expandCollapseCategory({target: indicatorNode})
       }
     }
-  }
+  },
 
+  _isHiddenChild: function (elem) {
+    return elem.classList.contains("hidden");
+  },
+
+  _findNextHeader: function (elem) {
+    var currentCatId = dojo.attr(elem, "id");
+    var catArray = this.fieldCategories;
+    var L = catArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at last position.
+    var index = catArray.indexOf(currentCatId);
+    if (index < 0 || index === (L - 1)) {
+      return dom.byId(catArray[0]);
+    }
+
+    var nextHeader = dom.byId(catArray[index + 1]);
+    if (this._isHiddenChild(nextHeader)) {
+      return this._findNextHeader(nextHeader);
+    }
+
+    return nextHeader;
+  },
+
+  _findPrevHeader: function (elem) {
+    var currentCatId = dojo.attr(elem, "id");
+    var catArray = this.fieldCategories;
+    var L = catArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at first position.
+    var index = catArray.indexOf(currentCatId);
+    if (index <= 0) {
+      return dom.byId(catArray[L - 1]);
+    }
+
+    var prevHeader = dom.byId(catArray[index - 1]);
+    if (this._isHiddenChild(prevHeader)) {
+      return this._findPrevHeader(prevHeader);
+    }
+
+    return prevHeader;
+  },
+
+  _findNextField: function (elem) {
+    var fieldArray = Array.from(this.containerNode.children);
+    var L = fieldArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at last position.
+    var index = fieldArray.indexOf(elem);
+    if (index < 0 || index === (L - 1)) {
+      return fieldArray[0];
+    }
+
+    var nextField = fieldArray[index + 1];
+    if (this._isHiddenChild(nextField)) {
+      return this._findNextField(nextField);
+    }
+
+    return nextField;
+  },
+
+  _findPrevField: function (elem) {
+    var fieldArray = Array.from(this.containerNode.children);
+    var L = fieldArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at first position.
+    var index = fieldArray.indexOf(elem);
+    if (index <= 0) {
+      return fieldArray[L - 1];
+    }
+
+    var prevField = fieldArray[index - 1];
+    if (this._isHiddenChild(prevField)) {
+      return this._findPrevField(prevField);
+    }
+
+    return prevField;
+  },
+
+  _onKeydownHeader: function (e) {
+    var code = e.keyCode || e.which;
+    var header = e.target;
+    var categoryId = dojo.attr(header, "id");
+    var children;
+    var expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
+
+    if (code === keys.DOWN_ARROW) {
+      e.preventDefault();
+      var firstChild;
+      if (expanded) {
+        children = query("." + categoryId, this.containerNode);
+        for (var i = 0; i < children.length; i++) {
+          if (this._isHiddenChild(children[i])) {
+            continue;
+          }
+          firstChild = children[i];
+          break;
+        }
+      }
+      header.setAttribute('tabindex', '-1');
+      if (firstChild) {
+        // Move focus to first shown child under Nth Header
+        firstChild.setAttribute('tabindex', '0');
+        firstChild.focus();
+      } else {
+        var nextHeader = this._findNextHeader(header);
+        if (nextHeader) {
+          // Move from Nth header to (N+1) Header if Nth Header is closed
+          nextHeader.setAttribute('tabindex', '0');
+          nextHeader.focus();
+        }
+      }
+    } else if (code === keys.UP_ARROW) {
+      if (!this._isFirstHeader(header)) {
+        e.preventDefault();
+        var previousHeader = this._findPrevHeader(header);
+        expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+        var lastChild;
+
+        if (expanded) {
+          children = query("." + previousHeader.id, this.containerNode);
+          for (var j = children.length - 1; j > -1; j--) {
+            if (this._isHiddenChild(children[j])) {
+              continue;
+            }
+            lastChild = children[j];
+            break;
+          }
+        }
+        header.setAttribute('tabindex', '-1');
+        if (lastChild) {
+          // Move from Nth header to Last Sibling under (N-1) Header if (N-1) Header is open
+          lastChild.setAttribute('tabindex', '0');
+          lastChild.focus();
+        } else {
+          // Move from Nth header to (N-1) Header if (N-1) header is closed
+          previousHeader.setAttribute('tabindex', '0');
+          previousHeader.focus();
+        }
+      }
+    } else if (code === keys.LEFT_ARROW) {
+      if (expanded) {
+        this.expandCollapseCategory({ target: header.nextElementSibling });
+      }
+    } else if (code === keys.RIGHT_ARROW) {
+      if (!expanded) {
+        this.expandCollapseCategory({ target: header.nextElementSibling });
+      }
+    }
+  },
+
+  _isFirstHeader: function (elem) {
+    return elem.classList.contains("categoryNodeFirst");
+  },
+
+  _isLastField: function (elem) {
+    var fieldListNodesLength = this.fieldListNodes.length;
+    return elem.id === this.fieldListNodes[ fieldListNodesLength - 1].id;
+  },
+
+  _isField: function (elem) {
+    return elem.classList.contains("field");
+  },
+
+  _moveFocus: function (node, key) {
+    var groupHeader = dom.byId(dojo.attr(node, "categoryId"));
+    if (key === 'Up') {
+      var previousSibling = this._findPrevField(node);
+      var header = groupHeader;
+      if (previousSibling && this._isField(previousSibling)) {
+        previousSibling.setAttribute('tabindex', '0');
+        node.setAttribute('tabindex', '-1');
+        previousSibling.focus();
+      } else if (header) {
+        header.setAttribute('tabindex', '0');
+        node.setAttribute('tabindex', '-1');
+        header.focus();
+      }
+    } else if (key === 'Down') {
+      if (!this._isLastField(node)) {
+        var nextSibling = this._findNextField(node);
+        if (nextSibling && this._isField(nextSibling)) {
+          nextSibling.setAttribute('tabindex', '0');
+          node.setAttribute('tabindex', '-1');
+          nextSibling.focus();
+          return;
+        }
+        var nextHeader = this._findNextHeader(groupHeader);
+        if (nextHeader) {
+          nextHeader.setAttribute('tabindex', '0');
+          node.setAttribute('tabindex', '-1');
+          nextHeader.focus();
+        }
+      }
+    }
+  },
+
+  _onKeyDownFieldListTree: function (event) {
+    var node = event.target;
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if (event.shiftKey) {
+      switch (code) {
+        case keys.UP_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Up');
+          this._updateMultiSelectionForContextMenu(node.getAttribute("fieldId"));
+          break;
+        case keys.DOWN_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Down');
+          this._updateMultiSelectionForContextMenu(node.getAttribute("fieldId"));
+          break;
+        default:
+          return;
+      }
+    } else if (event.ctrlKey) {
+      switch (code) {
+        case keys.UP_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Up');
+          break;
+        case keys.DOWN_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Down');
+          break;
+        case keys.SPACE:
+          event.preventDefault();
+          this._toggleSelection(node);
+          break;
+        default:
+          return;
+      }
+    } else {
+      switch (code) {
+        case keys.ENTER:
+          this.updateSelectionForContextMenu(node.getAttribute("fieldId"));
+          coords = domGeometry.position(node, true);
+          coords.x += coords.w;
+          coords.y += coords.h;
+          this.fieldContextMenu._scheduleOpen(node, null, coords);
+          break;
+        case keys.UP_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Up');
+          break;
+        case keys.DOWN_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Down');
+          break;
+        default:
+          return;
+      }
+    }
+  },
 });
 });

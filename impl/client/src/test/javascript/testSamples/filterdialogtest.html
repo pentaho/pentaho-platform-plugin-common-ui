@@ -85,7 +85,6 @@
                 // configure the filter dialog
                 filterDialog = dijit.byId('filterDialog');
                 filterDialog.setLocalizationLookupFunction(pentaho.common.Messages.getString);
-                filterDialog.execute = okFunc;
                 filterDialog.onCancel = cancelFunc;
                 filterDialog.setSearchListLimit(200);
                 filterDialog.registerOnSuccessCallback(okFunc);
