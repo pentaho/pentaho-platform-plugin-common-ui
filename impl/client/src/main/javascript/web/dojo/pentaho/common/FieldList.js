@@ -44,7 +44,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
   },
 
+  isCalcField: function (category) {
+    return category === pentaho.pda.Column.ELEMENT_TYPES.CAT_CALC_FIELD;
+  },
+
   generateUniqueClassName: function(categoryId) {
+    if (this.isCalcField(categoryId)) {
+      return categoryId;
+    }
     var gen = function(){ return Math.round(Math.random() * 100000);};
     var className = "category" + gen();
     while(this.usedCategoryIds[className]){
@@ -54,8 +61,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     return "" + className;
   },
 
+  initializeCategoryClassMap: function() {
+    if (!this.initialized) {
+      this.categoryClassMap[pentaho.pda.Column.ELEMENT_TYPES.CAT_CALC_FIELD] = pentaho.pda.Column.ELEMENT_TYPES.CAT_CALC_FIELD;
+      this.initialized = true;
+    }
+  },
+
   getCategoryClassName: function(categoryId) {
     var className = this.categoryClassMap[categoryId];
+    this.initializeCategoryClassMap();
     if (!className) {
       className = this.generateUniqueClassName(categoryId);
       this.categoryClassMap[categoryId] = className;
@@ -77,6 +92,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         var y = evt.pageY;
         this.fieldContextMenu._scheduleOpen(evt.target, null, {x: x, y: y});
     },
+
+  calcFieldContextMenuCallback: function calcFieldContextMenuShow(evt) {
+        if( !this.calcFieldContextMenu ) {
+            return;
+        }
+        event.stop(evt);
+        var x = evt.pageX;
+        var y = evt.pageY;
+        this.calcFieldContextMenu._scheduleOpen(evt.target, null, {x: x, y: y});
+  },
 
   /**
    * Function to handle adding a field. Will receive the fieldId as the only parameter.
@@ -131,6 +156,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
   registerFieldContextMenuCallback: function(f) {
     this.fieldContextMenuCallback = f;
+  },
+
+  registerCalcFieldContextMenuCallback: function(f) {
+    this.calcFieldContextMenuCallback = f;
   },
 
   registerDoubleClickCallback: function(f) {
@@ -197,6 +226,36 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.fieldCategories = [];
   },
 
+  openCalcField: function(){
+    var dialogContainer = document.createElement("div");
+    dialogContainer.id="calfieldparent";
+    dialogContainer.style.display = "flex";
+    dialogContainer.style.justifyContent = "center";
+    dialogContainer.style.alignItems = "center";
+    dialogContainer.style.position = "fixed";
+    dialogContainer.style.top = "0";
+    dialogContainer.style.left = "0";
+    dialogContainer.style.width = "100%";
+    dialogContainer.style.height = "100%";
+    dialogContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    dialogContainer.style.zIndex = "900";
+
+    var dialogContentContainer = document.createElement("div");
+    dialogContentContainer.id="cal-field-container";
+    dialogContentContainer.style.backgroundColor = "#fff";
+    dialogContentContainer.style.padding = "20px";
+    dialogContentContainer.style.width = "40%"
+    dialogContentContainer.style.height = "70%"
+    dialogContentContainer.style.overflow = "auto";
+    dialogContentContainer.style.boxSizing = "border-box";
+
+    var hiddenDivContent = document.getElementById("standardDialog").innerHTML;
+    dialogContentContainer.innerHTML = hiddenDivContent;
+    dialogContainer.appendChild(dialogContentContainer);
+    
+    document.body.appendChild(dialogContainer);
+  },
+  
   configureFor: function(datasource, searchContainer) {
     this.unload();
 
@@ -246,6 +305,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     var addedCategories = [];
 
     var categories = this.getCategories(datasource);
+
+    var calc = new pentaho.pda.dataelement();
+    calc.id = pentaho.pda.Column.ELEMENT_TYPES.CAT_CALC_FIELD;
+    calc.elementType = pentaho.pda.Column.ELEMENT_TYPES.CATEGORY;
+    calc.dataType = pentaho.pda.Column.DATA_TYPES.NONE;
+    calc.name = "Calculated Fields";
+
+    categories.push(calc);
     
     var isFirstCategory = true;
 
@@ -254,7 +321,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         return;
       }
       var fields = this.getFields(datasource, category, this.filters);
-      if(fields.length == 0) {
+      if(fields.length == 0 && !(this.isCalcField(category.id))) {
         // there are no fields for this category with the current filters
         return;
       }
@@ -280,8 +347,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         {
           "id": catId + "-indicator",
           "class": "categoryIndicator treenode-open",
-          "categoryId": catId,
-          "collapsed": "false"
+          "collapsed": "false",
+          "categoryId": catId
         }, categoryDiv);
       this.connectHandles.push(on(categoryIndicator,  'click', lang.hitch( this,  this.expandCollapseCategory)));
 
@@ -293,6 +360,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           "innerHTML": category.name,
           "categoryId": catId
         }, categoryDiv);
+      if(this.isCalcField(category.id)){
+        var addCalButton = construct.create("button",
+            {
+              "id": "catId-add-button",
+              "class": "pentaho-addbutton icon-zoomable",
+              "onclick": function() {
+                this.openCalcField();
+              }.bind(this)
+
+            }, categoryDiv);
+
+      }
       this.textSelectionDisabler(categoryNameSpan);
       this.connectHandles.push(on(categoryNameSpan,  'dblclick', lang.hitch( this,  this.expandCollapseCategory)));
 
@@ -310,15 +389,28 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   addFields: function( fields, parent, parentId ) {
       var items = [];
       array.forEach(fields, function(field) {
-        var item = {
-            "categoryId": parentId,
-            "displayName": field.name,
-            "fieldId": field.id,
-            "dataType": field.dataType,
-            "type": ["treenode-leaf-label"],
-            "description": field.description
-          };
-        if(field.hiddenForUser != "true"){
+          if(this.isCalcField(parentId)){
+              var modifiedField = field.replace(/ /g, '');
+              var item = {
+                  "categoryId": parentId,
+                  "displayName": field,
+                  "fieldId": modifiedField+"-id",
+                  "dataType": modifiedField+"-dataType",
+                  "type": ["treenode-leaf-label"],
+                  "description": "CAL-FIELD-"+modifiedField.toUpperCase()
+              };
+          } else {
+              var item = {
+                  "categoryId": parentId,
+                  "displayName": field.name,
+                  "fieldId": field.id,
+                  "dataType": field.dataType,
+                  "type": ["treenode-leaf-label"],
+                  "description": field.description
+              };
+          }
+
+          if(this.isCalcField(parentId) || field.hiddenForUser != "true"){
           items.push(item);
           this.dndObj.setItem("field-" + item.fieldId, { "data": item, "type": "treenode-leaf-label", "fieldId": item.fieldId });
         }
@@ -371,7 +463,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       // Wire up interaction
       this.connectHandles.push(on(div,  "contextmenu", lang.hitch( this,  function(event) {
         this.updateSelectionForContextMenu(item.fieldId);
-        if(this.fieldContextMenuCallback) {
+        if (this.isCalcField(item.categoryId)) {
+          if (this.calcFieldContextMenuCallback) {
+            this.calcFieldContextMenuCallback(event);
+          }
+        } else if (this.fieldContextMenuCallback) {
             this.fieldContextMenuCallback(event);
         }
       })));
@@ -621,6 +717,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
   setContextMenu: function( fieldContextMenu ) {
     this.fieldContextMenu = fieldContextMenu;
+  },
+
+  setCalcFieldContextMenu: function(calcFieldContextMenu) {
+    this.calcFieldContextMenu = calcFieldContextMenu;
   },
   
   searchFields: function(key) {
