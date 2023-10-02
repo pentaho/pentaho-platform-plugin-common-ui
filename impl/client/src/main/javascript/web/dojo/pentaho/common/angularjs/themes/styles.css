@@ -4,6 +4,11 @@
   overflow-y: auto;
 }
 
+/* Hide the close button, by default. Override to enable for specific dialogs. */
+.pentaho-angularjs-host-dialog .dijitDialogCloseIcon {
+  display: none;
+}
+
 .pentaho-angularjs-host-dialog > * > .dijitDialogPaneContent {
   /* Dijit sets these upon viewport resize */
   width: unset !important;
