@@ -6,11 +6,15 @@ define([
   "common-ui/angularjs",
   "./hostDialogModule",
   "dojo/text!./HostDialog.html",
+  "../Overrides",
   "pentaho/shim/es6-promise",
   "css!./themes/styles.css"
 ], function(declare, Dialog, angularJs, hostDialogModule, templateHtml) {
 
   // "use strict";
+
+  // The pentaho/common/Overrides is needed so that the dialog's modal underlay/backdrop uses the Pentaho
+  // glasspane CSS class and associated color.
 
   /**
    * @name dijit.Dialog
