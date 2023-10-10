@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2019 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -225,33 +225,25 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   },
 
   openCalcField: function(){
-    var dialogContainer = document.createElement("div");
-    dialogContainer.id="calfieldparent";
-    dialogContainer.style.display = "flex";
-    dialogContainer.style.justifyContent = "center";
-    dialogContainer.style.alignItems = "center";
-    dialogContainer.style.position = "fixed";
-    dialogContainer.style.top = "0";
-    dialogContainer.style.left = "0";
-    dialogContainer.style.width = "100%";
-    dialogContainer.style.height = "100%";
-    dialogContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    dialogContainer.style.zIndex = "900";
-
-    var dialogContentContainer = document.createElement("div");
-    dialogContentContainer.id="cal-field-container";
-    dialogContentContainer.style.backgroundColor = "#fff";
-    dialogContentContainer.style.padding = "20px";
-    dialogContentContainer.style.width = "40%"
-    dialogContentContainer.style.height = "70%"
-    dialogContentContainer.style.overflow = "auto";
-    dialogContentContainer.style.boxSizing = "border-box";
-
-    var hiddenDivContent = document.getElementById("standardDialog").innerHTML;
-    dialogContentContainer.innerHTML = hiddenDivContent;
-    dialogContainer.appendChild(dialogContentContainer);
-    
-    document.body.appendChild(dialogContainer);
+    document.getElementById("MA_name").value = "";
+    document.getElementById("MA_content").value = "";
+    document.getElementById("cal-field-container").setAttribute("data-edit-mode", "false");
+    document.getElementById("dialogTitleText").innerHTML = "Create Calculated Field";
+    var availableFields = document.getElementById("availableFields");
+    if (availableFields != null) {
+      for (var index = availableFields.options.length-1; index >= 0; index--) {
+        availableFields.remove(index);
+      }
+    }
+    array.forEach(this.fieldListNodes, function (node) {
+      var option = document.createElement("option");
+      option.innerText = node.innerText;
+      option.value = node.getAttribute("fieldid");
+      availableFields.appendChild(option);
+    });
+    var calcFieldDlgClasses = document.getElementById("calfieldparent").classList;
+    calcFieldDlgClasses.remove("calculated-field-hide");
+    calcFieldDlgClasses.add("calculated-field");
   },
   
   configureFor: function(datasource, searchContainer) {
