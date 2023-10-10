@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,6 +127,23 @@ define([ 'common-ui/prompting/parameters/ParameterDefinition',  'common-ui/promp
         parameterDefinition.updateParameterValue(param);
         var newParam = parameterDefinition.getParameter("param-to-update");
         expect(newParam.timezoneHint).toBe("0400");
+      });
+
+      it("should update the previous parameter to have a new attribute value if the new parameter has one", function() {
+        testParam = Parameter();
+        testParam.name = "param-to-update";
+        testParam.attributes.hidden = false;
+        testParam.attributes.anotherAttribute = "red";
+        testParam.attributes.attributeNotUpdated = 42;
+
+        parameterDefinition.parameterGroups.push({'name': "test-parameterGroup", 'parameters': [ testParam ] });
+        var paramUpdate = {'name': "param-to-update", 'attributes': { anotherAttribute: "blue", yetAnotherAttribute: 7, hidden: true } };
+        parameterDefinition.updateParameterAttribute(paramUpdate);
+        var newParam = parameterDefinition.getParameter("param-to-update");
+        expect(newParam.attributes.hidden).toBe(true);
+        expect(newParam.attributes.anotherAttribute).toBe("blue");
+        expect(newParam.attributes.attributeNotUpdated).toBe(42);
+        expect(newParam.attributes.yetAnotherAttribute).toBe(undefined);
       });
     });
   });
