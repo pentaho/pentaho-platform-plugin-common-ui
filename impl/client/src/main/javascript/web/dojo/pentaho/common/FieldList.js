@@ -238,7 +238,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     array.forEach(this.fieldListNodes, function (node) {
       var option = document.createElement("option");
       option.innerText = node.innerText;
-      option.value = node.getAttribute("fieldid");
+      option.value = node.classList.contains("CAT_CALC_FIELD") ? node.innerText : node.getAttribute("fieldid");
       availableFields.appendChild(option);
     });
     var calcFieldDlgClasses = document.getElementById("calfieldparent").classList;
