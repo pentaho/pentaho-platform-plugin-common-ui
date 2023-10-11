@@ -31,6 +31,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             hasCloseIcon: false,
             closeIcon: undefined,
             _onCancelCallback: undefined,
+            responsive: false,
+            responsiveClasses: undefined,
 
             // ElementRefresher: function(Element) : Element
             // Supports WCAG focus maintenance.
@@ -174,6 +176,17 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.popup.set('title',this.title);
             },
 
+            setupResponsiveness: function () {
+              //add "responsive" class to the dialog, along with any additional responsiveClasses defined
+              domClass.add(this.popup.domNode, "responsive");
+              if (this.responsiveClasses) {
+                domClass.add(this.popup.domNode, this.responsiveClasses);
+              }
+
+              //move the titlebar to the dialog content to take advantage of the responsive CSS changes we've made in PAZ
+              construct.place(query('.dijitDialogTitleBar',this.popup.domNode)[0], query('.dijitDialogPaneContent',this.popup.domNode)[0], "first");
+            },
+
             show: function(){
               this.domNode.style.display='';
               this.popup.set('title',this.title);
@@ -212,6 +225,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this._createButtons();
 
               this.popup.setElementRefresher(this.elementRefresher);
+
+              if (this.responsive) {
+                this.setupResponsiveness();
+              }
+
               this.popup.show();
               this.shown = true;
             },
