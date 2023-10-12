@@ -5,13 +5,15 @@
 }
 
 .pc_pagePrev {
-	float: left;
+  float: left;
   background: transparent url(images/page_back.png) no-repeat;
   height: 18px;
   width: 18px;
   white-space: nowrap;
   padding: 0px 2px 0px 1px;
-  cursor: pointer;   
+  cursor: pointer;
+  margin: 3px;
+  --focus-ring-offset: 0;
 }
 
 .pc_pagePrevDisabled {
@@ -24,13 +26,15 @@
 }
 
 .pc_pageNext {
-	float: left;
+  float: left;
   background: transparent url(images/page_forward.png) no-repeat;
   height: 18px;
-	width: 18px;
-	white-space: nowrap;
-	padding: 0px 1px 0px 2px;
-	cursor: pointer;
+  width: 18px;
+  white-space: nowrap;
+  padding: 0px 1px 0px 2px;
+  cursor: pointer;
+  margin: 3px;
+  --focus-ring-offset: 0;
 }
 
 .pc_pageNextDisabled {
@@ -43,11 +47,11 @@
 }
 
 .pc_pageNumberInput {
-	float: left;
+  float: left;
   width: 2em;
 }
 
 .pc_pageTotal {
-	float: left;
-	padding: 1px 0px 0px 2px;
+  float: left;
+  padding: 1px 0px 0px 2px;
 }

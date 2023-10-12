@@ -31,184 +31,158 @@
  *
  */
 
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin",
-        "dijit/form/NumberTextBox", "dojo/dom-class", "dojo/keys", "common-ui/util/_a11y"],
-    function (declare, on, query, lang, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, NumberTextBox, domClass, keys, a11yUtil) {
-        return declare("pentaho.common.PageControl", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dijit/form/NumberTextBox", "dojo/dom-class", "dojo/keys", "common-ui/util/_a11y"], function (declare, on, query, lang, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, NumberTextBox, domClass, keys, a11yUtil) {
+  return declare("pentaho.common.PageControl", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
-            // Template for this widget
-            templateString: "<div class='pc_pageControlContainer' data-dojo-attach-point='containerNode'><div class='pc_pagePrev' data-dojo-attach-point='prevPageControl'></div><div class='pc_pageNext' data-dojo-attach-point='nextPageControl'></div><div data-dojo-attach-point='pageNumberInput' data-dojo-type='dijit.form.NumberTextBox' class='pc_pageNumberInput' constraints='{min:1}'></div><div class='pc_pageTotal contrast-color' data-dojo-attach-point='pageTotalSpan'>/ ##</div></div>",
+    // Template for this widget
+    templateString: "<div class='pc_pageControlContainer' data-dojo-attach-point='containerNode'><div class='pc_pagePrev' data-dojo-attach-point='prevPageControl' data-type='toolbar-button'></div><div class='pc_pageNext' data-dojo-attach-point='nextPageControl' data-type='toolbar-button'></div><div data-dojo-attach-point='pageNumberInput' data-dojo-type='dijit.form.NumberTextBox' data-type='toolbar-button' data-pen-toolbar-nav-use-tabs='true' class='pc_pageNumberInput' constraints='{min:1}'></div><div class='pc_pageTotal contrast-color' data-dojo-attach-point='pageTotalSpan'>/ ##</div></div>",
 
-            // Function for retrieving localized strings
-            getLocaleString: null,
+    // Function for retrieving localized strings
+    getLocaleString: null,
 
-            // Callback to set page number
-            changePageNumberCallback: null,
+    // Callback to set page number
+    changePageNumberCallback: null,
 
-            // Current page number
-            pageNumber: 1,
+    // Current page number
+    pageNumber: 1,
 
-            // Total pages in this report
-            pageTotal: 1,
+    // Total pages in this report
+    pageTotal: 1,
 
-            // Called once per instance
-            postCreate: function () {
-                this._resetPageNumber();
-                this.setPageCount(this.pageTotal);
-                this.own(
-                    on(this.pageNumberInput, "change", lang.hitch(this, this._changePageNumber)),
-                    on(this.pageNumberInput, "keyup", lang.hitch(this, this._pageNumberKeyUp)),
-                    on(this.prevPageControl, "click", lang.hitch(this, this._prevPage)),
-                    on(this.nextPageControl, "click", lang.hitch(this, this._nextPage)),
-                    on(this.pageTotalSpan, "mousedown", lang.hitch(this, this._pageTotalMouseDown)),
-                    a11yUtil.makeAccessibleActionButton(this.prevPageControl),
-                    a11yUtil.makeAccessibleActionButton(this.nextPageControl));
-            },
+    // Called once per instance
+    postCreate: function () {
+      this._resetPageNumber();
+      this.setPageCount(this.pageTotal);
+      this.own(on(this.pageNumberInput, "change", lang.hitch(this, this._changePageNumber)), on(this.pageNumberInput, "keyup", lang.hitch(this, this._pageNumberKeyUp)), on(this.prevPageControl, "click", lang.hitch(this, this._prevPage)), on(this.nextPageControl, "click", lang.hitch(this, this._nextPage)), on(this.pageTotalSpan, "mousedown", lang.hitch(this, this._pageTotalMouseDown)), a11yUtil.makeAccessibleActionButton(this.prevPageControl), a11yUtil.makeAccessibleActionButton(this.nextPageControl));
+    },
 
-            registerLocalizationLookup: function (f) {
-                this.getLocaleString = f;
-                this._localize();
-            },
+    registerLocalizationLookup: function (f) {
+      this.getLocaleString = f;
+      this._localize();
+    },
 
-            registerPageNumberChangeCallback: function (f) {
-                this.changePageNumberCallback = f;
-            },
+    registerPageNumberChangeCallback: function (f) {
+      this.changePageNumberCallback = f;
+    },
 
-            setPageNumber: function (pageNumber) {
-                if (pageNumber < 1 || pageNumber > this.pageTotal) {
-                    // TODO Alert user of invalid entry
-                    this._resetPageNumber();
-                    return;
-                }
-                try {
-                    this._updateInternalPageNumber(pageNumber);
-                } catch (err) {
-                    console.error("Unable to update page number: " + err);
-                    this._resetPageNumber();
-                }
-            },
+    setPageNumber: function (pageNumber) {
+      if (pageNumber < 1 || pageNumber > this.pageTotal) {
+        // TODO Alert user of invalid entry
+        this._resetPageNumber();
+        return;
+      }
+      try {
+        this._updateInternalPageNumber(pageNumber);
+      } catch (err) {
+        console.error("Unable to update page number: " + err);
+        this._resetPageNumber();
+      }
+    },
 
-            getPageNumber: function () {
-                return this.pageNumberInput.get("value");
-            },
+    getPageNumber: function () {
+      return this.pageNumberInput.get("value");
+    },
 
-            getPageTotal: function () {
-                return this.pageTotal;
-            },
+    getPageTotal: function () {
+      return this.pageTotal;
+    },
 
-            setPageCount: function (pageCount) {
-                if (typeof (pageCount) == 'number') {
-                    this.pageTotal = pageCount;
-                } else {
-                    this.pageTotal = 1; // Reset to default
-                }
-                this.pageTotalSpan.innerHTML = '/ ' + pageCount;
-                this._updatePageButtonState();
-            },
+    setPageCount: function (pageCount) {
+      if (typeof (pageCount) == 'number') {
+        this.pageTotal = pageCount;
+      } else {
+        this.pageTotal = 1; // Reset to default
+      }
+      this.pageTotalSpan.innerHTML = '/ ' + pageCount;
+      this._updatePageButtonState();
+    },
 
-            reset: function () {
-                this._updateInternalPageNumber(1);
-            },
+    reset: function () {
+      this._updateInternalPageNumber(1);
+    },
 
-            _localize: function () {
-                this.prevPageControl.setAttribute("title", this.getLocaleString("PageControlPreviousPage_title"));
-                this.nextPageControl.setAttribute("title", this.getLocaleString("PageControlNextPage_title"));
-            },
+    _localize: function () {
+      this.prevPageControl.setAttribute("title", this.getLocaleString("PageControlPreviousPage_title"));
+      this.nextPageControl.setAttribute("title", this.getLocaleString("PageControlNextPage_title"));
+    },
 
-            _updatePageButtonState: function () {
-                this.pagePrevDisabled = this.pageNumber === 1;
-                this.pageNextDisabled = this.pageTotal === this.pageNumber;
-                if (this.pagePrevDisabled) {
-                    domClass.add(this.prevPageControl, "pc_pagePrevDisabled");
-                    this.prevPageControl.setAttribute("tabindex", "-1");
-                } else {
-                    domClass.remove(this.prevPageControl, "pc_pagePrevDisabled");
-                    this.prevPageControl.setAttribute("tabindex", "0");
-                }
-                if (this.pageNextDisabled) {
-                    domClass.add(this.nextPageControl, "pc_pageNextDisabled");
-                    this.nextPageControl.setAttribute("tabindex", "-1");
-                } else {
-                    domClass.remove(this.nextPageControl, "pc_pageNextDisabled");
-                    this.nextPageControl.setAttribute("tabindex", "0");
-                }
-            },
+    _updatePageButtonState: function () {
+      this.pagePrevDisabled = this.pageNumber === 1;
+      this.pageNextDisabled = this.pageTotal === this.pageNumber;
+      if (this.pagePrevDisabled) {
+        domClass.add(this.prevPageControl, "pc_pagePrevDisabled");
+      } else {
+        domClass.remove(this.prevPageControl, "pc_pagePrevDisabled");
+      }
+      if (this.pageNextDisabled) {
+        domClass.add(this.nextPageControl, "pc_pageNextDisabled");
+      } else {
+        domClass.remove(this.nextPageControl, "pc_pageNextDisabled");
+      }
+    },
 
-            _changePageNumber: function () {
-                if (this.ignorePageNumberUpdate) {
-                    return;
-                }
-                if (!this.pageNumberInput.isValid()) {
-                    this._resetPageNumber();
-                    return;
-                }
-                this.setPageNumber(this.pageNumberInput.get("value"));
-            },
+    _changePageNumber: function () {
+      if (!this.pageNumberInput.isValid() || isNaN(this.pageNumberInput.get("value"))) {
+        this._resetPageNumber();
+        return;
+      }
+      this.setPageNumber(this.pageNumberInput.get("value"));
+    },
 
-            _updateInternalPageNumber: function (pageNumber) {
-                if (this.pageNumber === pageNumber) {
-                    return;
-                }
+    _updateInternalPageNumber: function (pageNumber) {
+      if (this.pageNumber === pageNumber) {
+        return;
+      }
 
-                this.ignorePageNumberUpdate = true;
-                try {
-                    if (this.changePageNumberCallback) {
-                        this.changePageNumberCallback(pageNumber);
-                    }
-                    this.pageNumber = pageNumber;
-                    this.pageNumberInput.set("value", this.pageNumber);
-                    this._updatePageButtonState();
-                } finally {
-                    this.ignorePageNumberUpdate = false;
-                }
-                this.pageNumber = pageNumber;
-                this.pageNumberInput.set("value", this.pageNumber);
-                this._updatePageButtonState();
-            },
+      if (this.changePageNumberCallback) {
+        this.changePageNumberCallback(pageNumber);
+      }
+      this._setPageNumberInput(pageNumber);
+    },
 
-            _pageNumberKeyUp: function (event) {
-                switch (event.keyCode) {
-                    case keys.ENTER:
-                        this._changePageNumber();
-                        break;
-                    case keys.ESCAPE:
-                        this._resetPageNumber();
-                        break;
-                    default:
-                        // We don't care about any other key
-                        break;
-                }
-            },
+    _setPageNumberInput: function (pageNumber) {
+      this.pageNumber = pageNumber;
+      this.pageNumberInput.set("value", this.pageNumber);
+      this._updatePageButtonState();
+    },
 
-            _resetPageNumber: function () {
-                this.ignorePageNumberUpdate = true;
-                try {
-                    this.pageNumberInput.set("value", this.pageNumber);
-                } finally {
-                    this.ignorePageNumberUpdate = false;
-                }
-                this._updatePageButtonState();
-            },
+    _pageNumberKeyUp: function (event) {
+      switch (event.keyCode) {
+        case keys.ENTER:
+          this._changePageNumber();
+          break;
+        case keys.ESCAPE:
+          this._resetPageNumber();
+          break;
+        default:
+          // We don't care about any other key
+          break;
+      }
+    },
 
-            // Change to the previous page
-            _prevPage: function () {
-                if (this.pagePrevDisabled) {
-                    return;
-                }
-                this.setPageNumber(this.pageNumber - 1);
-            },
+    _resetPageNumber: function () {
+      this.pageNumberInput.set("value", this.pageNumber);
+      this._updatePageButtonState();
+    },
 
-            // Change to the next page
-            _nextPage: function () {
-                if (this.pageNextDisabled) {
-                    return;
-                }
-                this.setPageNumber(this.pageNumber + 1);
-            },
+    // Change to the previous page
+    _prevPage: function () {
+      if (this.pagePrevDisabled) {
+        return;
+      }
+      this.setPageNumber(this.pageNumber - 1);
+    },
 
-            _pageTotalMouseDown: function (e) {
-                e.preventDefault();
-            }
-        });
+    // Change to the next page
+    _nextPage: function () {
+      if (this.pageNextDisabled) {
+        return;
+      }
+      this.setPageNumber(this.pageNumber + 1);
+    },
+
+    _pageTotalMouseDown: function (e) {
+      e.preventDefault();
     }
-);
+  });
+});

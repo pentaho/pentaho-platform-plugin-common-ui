@@ -15,8 +15,8 @@
 *
 */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
-"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp", "dojo/keys", "dojo/dom-geometry"],
-    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp, keys, domGeometry){
+"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp", "dojo/keys", "dojo/dom-geometry", "common-ui/util/_focus"],
+    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp, keys, domGeometry, focusUtil){
       return declare("pentaho.common.FieldList",
     [_WidgetBase, _Templated],
 {
@@ -252,10 +252,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     var hiddenDivContent = document.getElementById("standardDialog").innerHTML;
     dialogContentContainer.innerHTML = hiddenDivContent;
     dialogContainer.appendChild(dialogContentContainer);
-    
+
     document.body.appendChild(dialogContainer);
+    dialogContentContainer.querySelector("#MA_name").focus();
   },
-  
+
   configureFor: function(datasource, searchContainer) {
     this.unload();
 
@@ -284,7 +285,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.dndObj._addItemClass = this._addItemClass;
     this.dndObj._removeItemClass = this._removeItemClass;
 
-    // If configureFor is called with a searchContainer then search functionality will be added to 
+    // If configureFor is called with a searchContainer then search functionality will be added to
     // this instance of the fieldlist and the search input box will be appended to the searchContainer node
     if (searchContainer) {
       var searchBox = construct.create("div",
@@ -295,7 +296,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       this.connectHandles.push(on(dom.byId("searchField"),  'keyup', lang.hitch( this,  "searchFields")));
       this.connectHandles.push(on(dom.byId("clearSearchField"),  'click', lang.hitch( this,  "onClearSearch")));
     }
-    
+
     if(!this.categorize) {
       var fields = this.getFields(datasource, null, this.filters);
       this.addFields( fields, this.containerNode, '' );
@@ -313,7 +314,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     calc.name = "Calculated Fields";
 
     categories.push(calc);
-    
+
     var isFirstCategory = true;
 
     array.forEach(categories, function(category, idx) {
@@ -347,8 +348,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         {
           "id": catId + "-indicator",
           "class": "categoryIndicator treenode-open",
-          "categoryId": catId,
-          "collapsed": "false"
+          "collapsed": "false",
+          "categoryId": catId
         }, categoryDiv);
       this.connectHandles.push(on(categoryIndicator,  'click', lang.hitch( this,  this.expandCollapseCategory)));
 
@@ -365,12 +366,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
             {
               "id": "catId-add-button",
               "class": "pentaho-addbutton icon-zoomable",
+              "tabindex": "-1",
+              "collapsed": "true",
+              "expanded":"false",
               "onclick": function() {
                 this.openCalcField();
               }.bind(this)
-
             }, categoryDiv);
-
       }
       this.textSelectionDisabler(categoryNameSpan);
       this.connectHandles.push(on(categoryNameSpan,  'dblclick', lang.hitch( this,  this.expandCollapseCategory)));
@@ -722,13 +724,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   setCalcFieldContextMenu: function(calcFieldContextMenu) {
     this.calcFieldContextMenu = calcFieldContextMenu;
   },
-  
+
   searchFields: function(key) {
-  
+
     var isFirstCategory = true;
     var searchField = dom.byId("searchField");
     var clearSearchField = dom.byId("clearSearchField");
-    
+    var hasFocus = this._hasFocus();
+    var focusTargetState = this._captureFocusTargetState();
+
     // if only one field shown, press return to add it
     if (key && key.keyCode == 13) {
       if (this.fieldCount == 1 && this.dndObj && this.dndObj.anchor) {
@@ -739,10 +743,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       }
       return;
     }
-    
+
     // Reset the highlight on the last selected field if there was one
     this.clearSelection();
-  
+
     // do search
     var key = searchField.value;
     var len = this.fieldListNodes.length;
@@ -780,7 +784,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           showGroup = true;
           if (isFirstCategory) {
             domClass.add(groupHeader, "categoryNodeFirst");
-            groupHeader.setAttribute("tabindex", "0");
+            groupHeader.setAttribute("tabindex", "-1");
             isFirstCategory = false;
           } else {
             domClass.add(groupHeader, "categoryNodeNotFirst");
@@ -790,15 +794,86 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         domClass.add(node, "hidden");
       }
     }
-    
+
+    this._restoreFocusTarget(focusTargetState, hasFocus);
+
     // if there is only one node left, do sth special
     if (this.fieldCount === 1) {
       this.updateSelectionForContextMenu(dojo.attr(firstNode, "fieldId"));
-    } 
-    
+    }
+
     this.expandAllCategories();
   },
-  
+
+  _getCurrentFocusTarget: function () {
+    return this.containerNode.querySelector('[tabindex="0"]');
+  },
+
+  _captureFocusTargetState: function () {
+    var currentNode = this._getCurrentFocusTarget();
+    if (currentNode == null) {
+      return null;
+    }
+
+    return focusUtil.captureState(currentNode, {
+      root: this.containerNode,
+      focusable: true
+    });
+  },
+
+  _restoreFocusTarget: function (focusTargetState, setFocus) {
+    var newNode = focusTargetState && focusTargetState.closest();
+
+    newNode = this._setCurrentFocusTarget(newNode, setFocus);
+
+    // If it was not possible to focus any of the tree's target-able nodes,
+    // then focus the search field (or previous tabbable element before fieldList).
+    if (newNode == null && setFocus) {
+      document.querySelector("#searchField").focus();
+    }
+
+    return newNode;
+  },
+
+  _getDefaultFocusTarget: function () {
+    var keyArgs = {root: this.containerNode, focusable: true};
+
+    return focusUtil.firstTabbable(keyArgs.root, keyArgs);
+  },
+
+  _setCurrentFocusTarget: function (newNode, setFocus) {
+    var currentNode = this._getCurrentFocusTarget();
+
+    if (newNode == null) {
+      newNode = this._getDefaultFocusTarget();
+    }
+
+    // No targetable nodes?
+    if (newNode == null) {
+      // assert currentNode === null;
+      return null;
+    }
+
+    // Effectively changing the current focus target?
+    if (newNode !== currentNode) {
+      if (currentNode != null) {
+        currentNode.setAttribute("tabindex", "-1");
+      }
+
+      newNode.setAttribute("tabindex", "0");
+    }
+
+    if (setFocus) {
+      newNode.focus();
+    }
+
+    return newNode;
+  },
+
+  _hasFocus: function () {
+    return focusUtil.containsFocus(this.containerNode);
+  },
+
   onClearSearch : function() {
     var searchField = dom.byId("searchField");
     var clearSearchField = dom.byId("clearSearchField");
@@ -810,7 +885,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
     domClass.add(clearSearchField, "hidden");
   },
-  
+
   expandAllCategories : function() {
     for (var categoryId in this.usedCategoryIds) {
       var indicatorNode = dom.byId(categoryId + "-indicator");
@@ -844,6 +919,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(nextHeader)) {
       return this._findNextHeader(nextHeader);
     }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(nextHeader.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
 
     return nextHeader;
   },
@@ -867,7 +945,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(prevHeader)) {
       return this._findPrevHeader(prevHeader);
     }
-
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(prevHeader.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
     return prevHeader;
   },
 
@@ -889,6 +969,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(nextField)) {
       return this._findNextField(nextField);
     }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
 
     return nextField;
   },
@@ -911,16 +994,23 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (this._isHiddenChild(prevField)) {
       return this._findPrevField(prevField);
     }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
 
     return prevField;
   },
 
   _onKeydownHeader: function (e) {
-    var code = e.keyCode || e.which;
-    var header = e.target;
-    var categoryId = dojo.attr(header, "id");
-    var children;
-    var expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
+      var code = e.keyCode || e.which;
+      var header = e.target;
+      var categoryId = dojo.attr(header, "id");
+      var children;
+      var expanded = false;
+      if (header.firstElementChild !== null){
+        expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
+      }
+
 
     if (code === keys.DOWN_ARROW) {
       e.preventDefault();
@@ -952,7 +1042,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       if (!this._isFirstHeader(header)) {
         e.preventDefault();
         var previousHeader = this._findPrevHeader(header);
-        expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          if (previousHeader.firstElementChild !== null){
+              expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          }
         var lastChild;
 
         if (expanded) {
@@ -1029,6 +1121,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           node.setAttribute('tabindex', '-1');
           nextHeader.focus();
         }
+      } else {
+          var nextHeader = this._findNextHeader(groupHeader);
+          if (nextHeader) {
+              nextHeader.setAttribute('tabindex', '0');
+              node.setAttribute('tabindex', '-1');
+              nextHeader.focus();
+           }
       }
     }
   },
@@ -1075,7 +1174,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           coords = domGeometry.position(node, true);
           coords.x += coords.w;
           coords.y += coords.h;
-          this.fieldContextMenu._scheduleOpen(node, null, coords);
+          if (this.isCalcField(node.classList[0])) {
+              this.calcFieldContextMenu._scheduleOpen(node, null, coords);
+          } else {
+              this.fieldContextMenu._scheduleOpen(node, null, coords);
+          }
           break;
         case keys.UP_ARROW:
           event.preventDefault();

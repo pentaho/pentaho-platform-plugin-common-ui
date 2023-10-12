@@ -18,8 +18,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   'pentaho/common/ListBox',
   'pentaho/common/Dialog',
   'pentaho/common/MessageBox', "dojo/_base/lang", 'dojo/text!pentaho/common/datasourceselect.html',
-  'dojo/Stateful', 'dojo/has', "common-ui/util/_a11y", "common-ui/util/_focus", 'dojo/dom', 'dojo/_base/sniff'],
-  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has, a11yUtil, focusUtil, dom) {
+  'dojo/Stateful', 'dojo/has', "common-ui/util/_a11y", 'dojo/dom', 'dojo/_base/sniff'],
+  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, entities, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has, a11yUtil, dom) {
     return declare("pentaho.common.datasourceselect", [Stateful, Dialog, _TemplatedMixin, _WidgetsInTemplateMixin],
 
       {
@@ -124,7 +124,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           return !isDisabled(item);
 
           function isDisabled(item) {
-            if ((item.ariaDisabled !== "true")) {
+            if ((item.getAttribute("aria-disabled") !== "true")) {
               return Array.from(item.classList).some(function (className) {
                 return className.toLowerCase().includes("disabled");
               });
