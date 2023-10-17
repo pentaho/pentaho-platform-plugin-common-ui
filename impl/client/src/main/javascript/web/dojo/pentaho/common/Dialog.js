@@ -176,15 +176,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.popup.set('title',this.title);
             },
 
-            setupResponsiveness: function () {
-              //add "responsive" class to the dialog, along with any additional responsiveClasses defined
+            _setupResponsiveness: function () {
+              // Add "responsive" class to the dialog, along with any additional responsiveClasses defined
               domClass.add(this.popup.domNode, "responsive");
               if (this.responsiveClasses) {
                 domClass.add(this.popup.domNode, this.responsiveClasses);
               }
 
-              //move the titlebar to the dialog content to take advantage of the responsive CSS changes we've made in PAZ
-              construct.place(query('.dijitDialogTitleBar',this.popup.domNode)[0], query('.dijitDialogPaneContent',this.popup.domNode)[0], "first");
+              let intermediaryDiv = construct.create("div");
+              construct.place(query('.dijitDialogTitleBar', this.popup.domNode)[0], intermediaryDiv);
+              construct.place(query('.dijitDialogPaneContent', this.popup.domNode)[0], intermediaryDiv);
+              construct.place(query( this.buttonPanel, this.popup.domNode)[0], intermediaryDiv);
+              construct.place(intermediaryDiv, this.popup.domNode);
             },
 
             show: function(){
@@ -220,15 +223,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
               if(!this.shown) {
                 this._createButtonPanel();
+
+                if (this.responsive) {
+                  this._setupResponsiveness();
+                }
               }
 
               this._createButtons();
 
               this.popup.setElementRefresher(this.elementRefresher);
-
-              if (this.responsive) {
-                this.setupResponsiveness();
-              }
 
               this.popup.show();
               this.shown = true;
