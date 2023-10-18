@@ -244,6 +244,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     var calcFieldDlgClasses = document.getElementById("calfieldparent").classList;
     calcFieldDlgClasses.remove("calculated-field-hide");
     calcFieldDlgClasses.add("calculated-field");
+
+    view.populateCategoriesAndFunctions();
   },
   
   configureFor: function(datasource, searchContainer) {
