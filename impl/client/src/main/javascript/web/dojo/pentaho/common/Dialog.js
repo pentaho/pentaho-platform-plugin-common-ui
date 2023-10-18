@@ -183,7 +183,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 domClass.add(this.popup.domNode, this.responsiveClasses);
               }
 
-              let intermediaryDiv = construct.create("div");
+              var intermediaryDiv = construct.create("div");
               construct.place(query('.dijitDialogTitleBar', this.popup.domNode)[0], intermediaryDiv);
               construct.place(query('.dijitDialogPaneContent', this.popup.domNode)[0], intermediaryDiv);
               construct.place(query( this.buttonPanel, this.popup.domNode)[0], intermediaryDiv);
