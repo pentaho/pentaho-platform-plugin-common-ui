@@ -131,6 +131,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.popup.attr("content", this.domNode);
               }
               this.inherited(arguments);
+              domClass.add(this.popup.domNode,'pentaho-common-dialog');
 
               if(!this.hasTitleBar) {
                 domClass.add(query('.dijitDialogTitleBar',this.popup.domNode)[0],'hidden');
