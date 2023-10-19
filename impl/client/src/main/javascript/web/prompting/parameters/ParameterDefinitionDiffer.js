@@ -130,7 +130,9 @@ define([], function() {
           if (!param.attributes.hidden || param.attributes.hidden == 'false') { // Can be 'false' or undefined
             var index = group.parameters.indexOf(param);
             if (index > 0) {
-              param.after = group.parameters[index-1];
+              if ( !group.parameters[index-1].attributes.hidden || group.parameters[index-1].attributes.hidden == 'false' ) {
+                param.after = group.parameters[index-1];
+              }
             }
 
             var oldParam = oldParamDefn.getParameter(param.name);
