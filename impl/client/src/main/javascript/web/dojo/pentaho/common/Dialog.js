@@ -31,6 +31,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             hasCloseIcon: false,
             closeIcon: undefined,
             _onCancelCallback: undefined,
+            responsive: false,
+            responsiveClasses: undefined,
 
             // ElementRefresher: function(Element) : Element
             // Supports WCAG focus maintenance.
@@ -129,6 +131,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.popup.attr("content", this.domNode);
               }
               this.inherited(arguments);
+              domClass.add(this.popup.domNode,'pentaho-common-dialog');
 
               if(!this.hasTitleBar) {
                 domClass.add(query('.dijitDialogTitleBar',this.popup.domNode)[0],'hidden');
@@ -174,6 +177,20 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.popup.set('title',this.title);
             },
 
+            _setupResponsiveness: function () {
+              // Add "responsive" class to the dialog, along with any additional responsiveClasses defined
+              domClass.add(this.popup.domNode, "responsive");
+              if (this.responsiveClasses) {
+                domClass.add(this.popup.domNode, this.responsiveClasses);
+              }
+
+              var intermediaryDiv = construct.create("div");
+              construct.place(query('.dijitDialogTitleBar', this.popup.domNode)[0], intermediaryDiv);
+              construct.place(query('.dijitDialogPaneContent', this.popup.domNode)[0], intermediaryDiv);
+              construct.place(query( this.buttonPanel, this.popup.domNode)[0], intermediaryDiv);
+              construct.place(intermediaryDiv, this.popup.domNode);
+            },
+
             show: function(){
               this.domNode.style.display='';
               this.popup.set('title',this.title);
@@ -207,11 +224,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
               if(!this.shown) {
                 this._createButtonPanel();
+
+                if (this.responsive) {
+                  this._setupResponsiveness();
+                }
               }
 
               this._createButtons();
 
               this.popup.setElementRefresher(this.elementRefresher);
+
               this.popup.show();
               this.shown = true;
             },
