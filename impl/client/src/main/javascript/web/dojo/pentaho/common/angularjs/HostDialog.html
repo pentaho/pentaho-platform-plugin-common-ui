@@ -1,0 +1,19 @@
+<div class="dijitDialog responsive pentaho-dialog modal pentaho-angularjs-host-dialog" role="dialog" aria-modal="true" aria-labelledby="${id}_title">
+  <div>
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar Caption">
+      <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+      <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+			  <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+		  </span>
+    </div>
+    <!--
+    To follow the Pentaho Dialog HTML and CSS structure,
+    the `ui-view` element should contain:
+    <div class="dialog-content"></div>
+    <div class="button-panel"></div>
+    -->
+    <div data-dojo-attach-point="containerNode" class="dijitDialogPaneContent">
+      <div class="ui-view"></div>
+    </div>
+  </div>
+</div>
