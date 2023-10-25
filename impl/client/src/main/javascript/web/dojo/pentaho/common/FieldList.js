@@ -226,37 +226,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.fieldCategories = [];
   },
 
-  openCalcField: function(){
-    var dialogContainer = document.createElement("div");
-    dialogContainer.id="calfieldparent";
-    dialogContainer.style.display = "flex";
-    dialogContainer.style.justifyContent = "center";
-    dialogContainer.style.alignItems = "center";
-    dialogContainer.style.position = "fixed";
-    dialogContainer.style.top = "0";
-    dialogContainer.style.left = "0";
-    dialogContainer.style.width = "100%";
-    dialogContainer.style.height = "100%";
-    dialogContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    dialogContainer.style.zIndex = "900";
-
-    var dialogContentContainer = document.createElement("div");
-    dialogContentContainer.id="cal-field-container";
-    dialogContentContainer.style.backgroundColor = "#fff";
-    dialogContentContainer.style.padding = "20px";
-    dialogContentContainer.style.width = "40%"
-    dialogContentContainer.style.height = "70%"
-    dialogContentContainer.style.overflow = "auto";
-    dialogContentContainer.style.boxSizing = "border-box";
-
-    var hiddenDivContent = document.getElementById("standardDialog").innerHTML;
-    dialogContentContainer.innerHTML = hiddenDivContent;
-    dialogContainer.appendChild(dialogContentContainer);
-
-    document.body.appendChild(dialogContainer);
-    dialogContentContainer.querySelector("#MA_name").focus();
-  },
-
   configureFor: function(datasource, searchContainer) {
     this.unload();
 
@@ -368,10 +337,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               "class": "pentaho-addbutton icon-zoomable",
               "tabindex": "-1",
               "collapsed": "true",
-              "expanded":"false",
-              "onclick": function() {
-                this.openCalcField();
-              }.bind(this)
+              "expanded":"false"
             }, categoryDiv);
       }
       this.textSelectionDisabler(categoryNameSpan);
@@ -583,6 +549,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
   expandCollapseCategory: function (eventElement) {
     var categoryId = dojo.attr(eventElement.target, "categoryId");
+    var node = dom.byId(categoryId + "-fields");
     var indicatorNode = dom.byId(categoryId + "-indicator");
     var collapsed = dojo.attr(indicatorNode, "collapsed") != "true";
     if (collapsed) {
