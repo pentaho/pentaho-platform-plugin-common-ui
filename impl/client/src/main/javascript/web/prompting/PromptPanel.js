@@ -1137,6 +1137,13 @@ function(Base, Logger, DojoNumber, i18n, Utils, focusUtil, GUIDHelper, WidgetBui
             if(fieldComponent.after) {
               var insertAfter = groupPanel.components.indexOf(fieldComponent.after);
               insertAt = insertAfter + 1;
+            } else if ( fieldComponent.param && fieldComponent.param.after ) {
+              groupPanel.components.forEach( function( val, i, array ) {
+                if ( val.param.name == fieldComponent.param.after.name ) {
+                  var insertAfter = i;
+                  insertAt = insertAfter + 1;
+                }
+              } );
             }
             groupPanel.components.splice(insertAt, 0, fieldComponent);
           }
