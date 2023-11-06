@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ define([
   "./PointAbstract",
   "./Scatter",
   "./Sunburst",
+  "./Waterfall",
   "./mixins/Interpolated",
   "./mixins/MultiCharted",
   "./mixins/ScaleColorContinuous",
@@ -47,6 +48,7 @@ define([
   "./types/BackgroundFill",
   "./types/Color",
   "./types/ColorSet",
+  "./types/WaterDirection",
   "./types/DisplayUnits",
   "./types/EmptyCellMode",
   "./types/FontStyle",
