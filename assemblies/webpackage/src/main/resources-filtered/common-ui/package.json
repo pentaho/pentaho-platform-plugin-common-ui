@@ -379,14 +379,6 @@
           }
         }
       },
-      "pentaho/visual/models/Treemap": {
-        "base": "pentaho/visual/models/Abstract",
-        "annotations": {
-          "pentaho/visual/DefaultView": {
-            "module": "pentaho/ccc/visual/Treemap"
-          }
-        }
-      },
 
       "pentaho/visual/models/MetricPointAbstract": {
         "base": "pentaho/visual/models/CartesianAbstract"
