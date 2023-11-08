@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
+ * Copyright 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,20 @@
  */
 define([
   "pentaho/module!_",
-  "./BarAbstract"
-], function (module, BaseView) {
+  "pentaho/type/String",
+  "pentaho/type/mixins/Enum",
+  "pentaho/i18n!../i18n/model"
+], function (module, PentahoString, EnumMixin, bundle) {
 
-  return BaseView.extend(module.id, {
-    _cccClass: "WaterfallChart",
+  "use strict";
 
-    _configureOptions: function () {
-      this.base();
-
-      this.options.direction = this.model.WaterDirection;
-    },
-
-    _options: {
-      orientation: 'vertical'
-    },
+  return PentahoString.extend({
+    $type: {
+      id: module.id,
+      mixins: [EnumMixin],
+      domain: ["up", "down"]
+    }
   })
-  .implement(module.config);
+  .localize({$type: bundle.structured.WaterDirection})
+  .configure();
 });
