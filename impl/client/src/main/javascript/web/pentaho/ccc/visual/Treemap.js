@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,45 @@
  */
 define([
   "pentaho/module!_",
-  "./Abstract"
-], function(module, BaseView) {
+  "./Abstract",
+  "cdf/lib/CCC/def",
+], function (module, BaseView, def) {
 
   "use strict";
 
   return BaseView.extend(module.id, {
-    _cccClass: "TreemapChart"
-  })
-  .implement(module.config);
+    _cccClass: "TreemapChart",
+
+    _roleToCccRole: {
+      "rows": "category",
+      "multi": "multiChart",
+      "size": "size"
+    },
+
+    _discreteColorRole: "rows",
+
+    _configureOptions: function () {
+      this.base();
+
+      this.options.layoutMode = this.model.treemapLayoutMode;
+    },
+
+    _configureLabels: function (){
+      var model = this.model;
+      var options = this.options;
+
+      var valuesVisible = !!def.get(this._validExtensionOptions, "valuesVisible", options.valuesVisible);
+
+      options.valuesVisible = valuesVisible;
+
+      if (valuesVisible && model.labelsOption !== "none" && this.model.size.hasFields){
+        options.valuesMask = this._configureValuesMask();
+      }
+    },
+
+    _configureValuesMask: function () {
+      return "{category} ({size})";
+    }
+
+  }).implement(module.config);
 });

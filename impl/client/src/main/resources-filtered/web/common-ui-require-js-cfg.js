@@ -348,6 +348,12 @@
       "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/BarNormalizedHorizontal"}
     }
   };
+  requireModules["pentaho/visual/models/Waterfall"] = {
+    base: "pentaho/visual/models/BarAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Waterfall"}
+    }
+  };
 
   requireModules["pentaho/visual/models/Sunburst"] = {
     base: "pentaho/visual/models/Abstract",
@@ -437,6 +443,7 @@
   requireModules["pentaho/ccc/visual/AreaStacked"] = {base: "pentaho/ccc/visual/PointAbstract"};
 
   requireModules["pentaho/ccc/visual/HeatGrid"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
+  requireModules["pentaho/ccc/visual/Waterfall"] = {base: "pentaho/ccc/visual/BarAbstract"};
   // endregion
 
   // region Color Palettes
@@ -711,6 +718,8 @@
       "pentaho/visual/models/types/FontStyle",
       "pentaho/visual/models/types/Sides",
       "pentaho/visual/models/types/LabelsOption",
+      "pentaho/visual/models/types/WaterDirection",
+      "pentaho/visual/models/types/TreemapLayoutMode",
       "pentaho/visual/models/Abstract",
       "pentaho/visual/models/types/DisplayUnits",
       "pentaho/visual/models/CartesianAbstract",
@@ -747,11 +756,13 @@
       "pentaho/visual/models/Bubble",
       "pentaho/visual/models/Pie",
       "pentaho/visual/models/Donut",
+      "pentaho/visual/models/Treemap",
       "pentaho/visual/models/HeatGrid",
       "pentaho/visual/models/Line",
       "pentaho/visual/models/Scatter",
       "pentaho/visual/models/types/SliceOrder",
       "pentaho/visual/models/Sunburst",
+      "pentaho/visual/models/Waterfall",
       "pentaho/visual/models/all",
       "pentaho/visual/role/adaptation/Strategy",
       "pentaho/visual/role/adaptation/IdentityStrategy",

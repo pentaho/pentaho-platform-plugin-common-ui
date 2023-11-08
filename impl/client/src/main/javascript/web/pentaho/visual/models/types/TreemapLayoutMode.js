@@ -15,21 +15,20 @@
  */
 define([
   "pentaho/module!_",
-  "./BarAbstract"
-], function (module, BaseView) {
+  "pentaho/type/String",
+  "pentaho/type/mixins/Enum",
+  "pentaho/i18n!../i18n/model"
+], function (module, PentahoString, EnumMixin, bundle) {
 
-  return BaseView.extend(module.id, {
-    _cccClass: "WaterfallChart",
+  "use strict";
 
-    _configureOptions: function () {
-      this.base();
-
-      this.options.direction = this.model.WaterDirection;
-    },
-
-    _options: {
-      orientation: 'vertical'
-    },
+  return PentahoString.extend({
+    $type: {
+      id: module.id,
+      mixins: [EnumMixin],
+      domain: ["squarify", "slice-and-dice", "slice", "dice"]
+    }
   })
-  .implement(module.config);
+  .localize({$type: bundle.structured.TreemapLayoutMode})
+  .configure();
 });
