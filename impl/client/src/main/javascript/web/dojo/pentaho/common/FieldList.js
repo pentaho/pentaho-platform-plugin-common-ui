@@ -223,28 +223,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.usedCategoryIds = {};
     this.fieldListNodes = [];
   },
-
-  openCalcField: function(){
-    document.getElementById("MA_name").value = "";
-    document.getElementById("MA_content").value = "";
-    document.getElementById("cal-field-container").setAttribute("data-edit-mode", "false");
-    document.getElementById("dialogTitleText").innerHTML = "Create Calculated Field";
-    var availableFields = document.getElementById("availableFields");
-    if (availableFields != null) {
-      for (var index = availableFields.options.length-1; index >= 0; index--) {
-        availableFields.remove(index);
-      }
-    }
-    array.forEach(this.fieldListNodes, function (node) {
-      var option = document.createElement("option");
-      option.innerText = node.innerText;
-      option.value = node.classList.contains("CAT_CALC_FIELD") ? node.innerText : node.getAttribute("fieldid");
-      availableFields.appendChild(option);
-    });
-    var calcFieldDlgClasses = document.getElementById("calfieldparent").classList;
-    calcFieldDlgClasses.remove("calculated-field-hide");
-    calcFieldDlgClasses.add("calculated-field");
-  },
   
   configureFor: function(datasource, searchContainer) {
     this.unload();
@@ -350,11 +328,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         var addCalButton = construct.create("button",
             {
               "id": "catId-add-button",
-              "class": "pentaho-addbutton icon-zoomable",
-              "onclick": function() {
-                this.openCalcField();
-              }.bind(this)
-
+              "class": "pentaho-addbutton icon-zoomable"
             }, categoryDiv);
 
       }

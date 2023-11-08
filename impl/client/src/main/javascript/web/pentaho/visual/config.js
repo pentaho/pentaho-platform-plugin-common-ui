@@ -1,5 +1,5 @@
 /*!
- * Copyright 2016 - 2021 Hitachi Vantara. All rights reserved.
+ * Copyright 2016 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -822,6 +822,20 @@ define(function() {
             slice_strokeStyle: function() { return this.finished("white"); },
             slice_lineWidth: function() { return this.finished(2); },
             slice_fillStyle: fillStyle1
+          }
+        }
+      },
+
+      // Waterfall
+      {
+        priority: RULE_PRIO_VIZ_DEFAULT,
+        select: {
+          module: "pentaho/ccc/visual/Waterfall"
+        },
+        apply: {
+          extension: {
+            legendAreaVisible: true,
+            axisGrid: true,
           }
         }
       },
