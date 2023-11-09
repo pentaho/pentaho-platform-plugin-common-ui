@@ -109,12 +109,12 @@ define(function() {
 
       // region Model Rules
 
-      // line/barLine models
+      // LineAbstract models
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
           module: [
-            "pentaho/visual/models/Line",
+            "pentaho/visual/models/LineAbstract",
             "pentaho/visual/models/BarLine"
           ]
         },
@@ -562,7 +562,7 @@ define(function() {
         }
       },
 
-      // Line/Area
+      // Line/Area/Stacked-Line
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
