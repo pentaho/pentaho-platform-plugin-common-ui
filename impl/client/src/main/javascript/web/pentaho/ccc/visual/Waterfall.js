@@ -24,12 +24,12 @@ define([
     _configureOptions: function () {
       this.base();
 
-      this.options.direction = this.model.WaterDirection;
+      this.options.direction = this.model.waterDirection;
     },
 
     _options: {
       orientation: 'vertical'
-    },
+    }
   })
   .implement(module.config);
 });
