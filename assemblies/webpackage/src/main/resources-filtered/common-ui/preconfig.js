@@ -91,6 +91,7 @@ if(!useDebug) {
     "dijit/_CssStateMixin",
     "dijit/_PaletteMixin",
     "dijit/Dialog",
+    "dijit/Menu",
     "dojo/selector/_loader",
     "dojo/i18n",
     "dojo/request/default",

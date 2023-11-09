@@ -200,6 +200,7 @@
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
   requirePaths["dijit/_PaletteMixin"] = dojoOverrides + "dijit/_PaletteMixin";
   requirePaths["dijit/Dialog"] = dojoOverrides + "dijit/Dialog";
+  requirePaths["dijit/Menu"] = dojoOverrides + "dijit/Menu";
   requirePaths["dojo/selector/_loader"] = dojoOverrides + "dojo/selector/_loader";
   requirePaths["dojo/i18n"] = dojoOverrides + "dojo/i18n";
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";

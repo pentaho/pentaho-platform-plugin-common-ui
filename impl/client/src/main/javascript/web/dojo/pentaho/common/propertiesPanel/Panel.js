@@ -69,7 +69,7 @@ define([
 
   var Panel = declare("pentaho.common.propertiesPanel.Panel", [ContentPane, Evented], {
 
-    captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}</span><i class='captionIcon'></i></div>",
+    captionTemplate: "<div class='caption flex-row flex-center-v'><span class='caption-text flex-none'>${ui.caption:i18n}</span><i class='captionIcon icon-zoomable flex-none'></i></div>",
     seperatorTemplate: "<div class='propPanel-seperator'></div>",
     propUIs: null,
     groups:  null,
@@ -1288,7 +1288,7 @@ define([
   var GemUI = declare([_WidgetBase, _TemplatedMixin, Evented, StatefulUI], {
 
     className: "gem",
-    templateString: "<div id='${id}' class='${className} dojoDndItem' tabindex='0' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
+    templateString: "<div id='${id}' class='${className} dojoDndItem flex-row flex-center-v' tabindex='0' dndType='${dndType}'><div class='gem-label flex-auto' title='${model.value}'></div><div class='gemMenuHandle icon-zoomable'></div></div>",
 
     constructor: function(options) {
 
