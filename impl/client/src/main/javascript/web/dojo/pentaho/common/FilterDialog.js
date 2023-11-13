@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2018 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   "pentaho/common/Calendar",
   "pentaho/common/DateTextBox",
   'pentaho/common/Dialog',
+  "dojo/keys",
   'pentaho/common/MessageBox', "dojo/text!pentaho/common/FilterDialog.html", "pentaho/common/Messages", "dojo/date/stamp",
-"dijit/form/MultiSelect"],
-    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, construct, on, query, lang, domClass, array, Calendar, DateTextBox, Dialog, MessageBox, templateStr, Messages, stamp,
-             MultiSelect){
+"dijit/form/MultiSelect", "common-ui/util/_a11y"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, construct, on, query, lang, domClass, array, Calendar, DateTextBox, Dialog, keys, MessageBox, templateStr, Messages, stamp,
+             MultiSelect, a11yUtil){
       return declare("pentaho.common.FilterDialog",[Dialog,_TemplatedMixin, _WidgetsInTemplateMixin],
 {
   templateString: templateStr,
@@ -59,6 +60,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     this.picklistCombinationTypeExcludeOption.setAttribute("value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
     
     this.callbacks = [lang.hitch(this, this.save), lang.hitch(this, this.cancel)];
+
+    this.own(
+      a11yUtil.makeAccessibleActionButton(this.picklistRemoveAll),
+      a11yUtil.makeAccessibleActionButton(this.picklistAddAll),
+      a11yUtil.makeAccessibleActionButton(this.picklistRemoveSelected),
+      a11yUtil.makeAccessibleActionButton(this.picklistAddSelected),
+      a11yUtil.makeAccessibleActionButton(this.typePicklistCombinationTypeLinksIncludeLink),
+      a11yUtil.makeAccessibleActionButton(this.typePicklistCombinationTypeLinksExcludeLink)
+    );
 
     this.errorDialog.setButtons([this.getLocaleString('Ok_txt')]);
     this.errorDialog.callbacks = [lang.hitch(this, function() {

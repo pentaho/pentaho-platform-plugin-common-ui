@@ -35,7 +35,7 @@ define([
           fields: { isRequired: true }
         },
         {
-          name: "WaterDirection",
+          name: "waterDirection",
           valueType: WaterDirection,
           isRequired: false,
           defaultValue: "up"

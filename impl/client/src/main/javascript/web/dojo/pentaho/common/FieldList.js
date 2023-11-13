@@ -15,8 +15,8 @@
 *
 */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
-"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp"],
-    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp){
+"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp", "dojo/keys", "dojo/dom-geometry", "common-ui/util/_focus"],
+    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event, regexp, keys, domGeometry, focusUtil){
       return declare("pentaho.common.FieldList",
     [_WidgetBase, _Templated],
 {
@@ -33,6 +33,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   fieldListNodes: [],
   localeStringFind: "Find:",
   localeStringClearSearch: "Clear Search",
+  fieldCategories: [],
 
   sanitizeIdAndClassNames: function(name) {
     if(name != null){
@@ -170,7 +171,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   },
 
   registerExpandCollapseCategoryCallback: function(f) {
-	this.expandCollapseCategoryCallback = f;
+    this.expandCollapseCategoryCallback = f;
   },
 
   _localize: function() {
@@ -222,8 +223,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.categoryClassMap = {};
     this.usedCategoryIds = {};
     this.fieldListNodes = [];
+    this.fieldCategories = [];
   },
-  
+
   configureFor: function(datasource, searchContainer) {
     this.unload();
 
@@ -252,7 +254,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     this.dndObj._addItemClass = this._addItemClass;
     this.dndObj._removeItemClass = this._removeItemClass;
 
-    // If configureFor is called with a searchContainer then search functionality will be added to 
+    // If configureFor is called with a searchContainer then search functionality will be added to
     // this instance of the fieldlist and the search input box will be appended to the searchContainer node
     if (searchContainer) {
       var searchBox = construct.create("div",
@@ -263,7 +265,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       this.connectHandles.push(on(dom.byId("searchField"),  'keyup', lang.hitch( this,  "searchFields")));
       this.connectHandles.push(on(dom.byId("clearSearchField"),  'click', lang.hitch( this,  "onClearSearch")));
     }
-    
+
     if(!this.categorize) {
       var fields = this.getFields(datasource, null, this.filters);
       this.addFields( fields, this.containerNode, '' );
@@ -281,7 +283,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     calc.name = "Calculated Fields";
 
     categories.push(calc);
-    
+
     var isFirstCategory = true;
 
     array.forEach(categories, function(category, idx) {
@@ -295,6 +297,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       }
       var catId = this.getCategoryClassName(category.id);
       addedCategories.push(category.id);
+      this.fieldCategories.push(catId);
       // create div for category
       var categoryDiv = construct.create("div",
         {
@@ -302,10 +305,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         }, this.containerNode);
       if (isFirstCategory) {
         domClass.add(categoryDiv, "categoryNodeFirst");
+        categoryDiv.setAttribute("tabindex", "0");
         isFirstCategory = false;
       } else {
         domClass.add(categoryDiv, "categoryNodeNotFirst");
       }
+      this.connectHandles.push(on(categoryDiv,  'keydown', lang.hitch( this,  this._onKeydownHeader)));
+
       // create +- expand/collapse indicator
       var categoryIndicator = construct.create("div",
         {
@@ -328,9 +334,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         var addCalButton = construct.create("button",
             {
               "id": "catId-add-button",
-              "class": "pentaho-addbutton icon-zoomable"
+              "class": "pentaho-addbutton icon-zoomable",
+              "tabindex": "-1",
+              "collapsed": "true",
+              "expanded":"false"
             }, categoryDiv);
-
       }
       this.textSelectionDisabler(categoryNameSpan);
       this.connectHandles.push(on(categoryNameSpan,  'dblclick', lang.hitch( this,  this.expandCollapseCategory)));
@@ -445,6 +453,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       this.connectHandles.push(on(div,  'click', lang.hitch( this,  function(event) {
         this.onFieldClick(event);
       })));
+      this.connectHandles.push(on(div,  'keydown', lang.hitch( this, this._onKeyDownFieldListTree)));
     }
     return {node: div, data: item, type: ["treenode-leaf-label"]};
   },
@@ -602,6 +611,37 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
   },
 
+  _isFieldSelected: function(elem) {
+    return elem.classList.contains('pentaho-listitem-selected');
+  },
+
+  _toggleSelection: function(node){
+    if(this._isFieldSelected(node)) {
+      this.dndObj._removeItemClass(node, "Anchor");
+      delete this.dndObj.selection[node.getAttribute("id")];
+    } else {
+      this._updateMultiSelectionForContextMenu(node.getAttribute("fieldId"));
+    }
+  },
+
+  _updateMultiSelectionForContextMenu: function(fieldId) {
+    var selected = false;
+    this.dndObj.forInSelectedItems(function(item, id) {
+      if (item.data.fieldId === fieldId) {
+        selected = true;
+      }
+    });
+
+    var id = "field-" + fieldId;
+    var node = dom.byId(id);
+
+    if (!selected) {
+      this.dndObj.anchor = node;
+      this.dndObj._addItemClass(node, "Anchor");
+      this.dndObj.selection[id] = this.dndObj.getSelectedNodes().length + 1;
+    }
+  },
+
   getSelectedItems: function() {
     if (this.dndObj && this.enableDragDrop) {
       var items = [];
@@ -651,13 +691,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   setCalcFieldContextMenu: function(calcFieldContextMenu) {
     this.calcFieldContextMenu = calcFieldContextMenu;
   },
-  
+
   searchFields: function(key) {
-  
+
     var isFirstCategory = true;
     var searchField = dom.byId("searchField");
     var clearSearchField = dom.byId("clearSearchField");
-    
+    var hasFocus = this._hasFocus();
+    var focusTargetState = this._captureFocusTargetState();
+
     // if only one field shown, press return to add it
     if (key && key.keyCode == 13) {
       if (this.fieldCount == 1 && this.dndObj && this.dndObj.anchor) {
@@ -668,10 +710,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       }
       return;
     }
-    
+
     // Reset the highlight on the last selected field if there was one
     this.clearSelection();
-  
+
     // do search
     var key = searchField.value;
     var len = this.fieldListNodes.length;
@@ -709,6 +751,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           showGroup = true;
           if (isFirstCategory) {
             domClass.add(groupHeader, "categoryNodeFirst");
+            groupHeader.setAttribute("tabindex", "-1");
             isFirstCategory = false;
           } else {
             domClass.add(groupHeader, "categoryNodeNotFirst");
@@ -718,15 +761,86 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         domClass.add(node, "hidden");
       }
     }
-    
+
+    this._restoreFocusTarget(focusTargetState, hasFocus);
+
     // if there is only one node left, do sth special
     if (this.fieldCount === 1) {
       this.updateSelectionForContextMenu(dojo.attr(firstNode, "fieldId"));
-    } 
-    
+    }
+
     this.expandAllCategories();
   },
-  
+
+  _getCurrentFocusTarget: function () {
+    return this.containerNode.querySelector('[tabindex="0"]');
+  },
+
+  _captureFocusTargetState: function () {
+    var currentNode = this._getCurrentFocusTarget();
+    if (currentNode == null) {
+      return null;
+    }
+
+    return focusUtil.captureState(currentNode, {
+      root: this.containerNode,
+      focusable: true
+    });
+  },
+
+  _restoreFocusTarget: function (focusTargetState, setFocus) {
+    var newNode = focusTargetState && focusTargetState.closest();
+
+    newNode = this._setCurrentFocusTarget(newNode, setFocus);
+
+    // If it was not possible to focus any of the tree's target-able nodes,
+    // then focus the search field (or previous tabbable element before fieldList).
+    if (newNode == null && setFocus) {
+      document.querySelector("#searchField").focus();
+    }
+
+    return newNode;
+  },
+
+  _getDefaultFocusTarget: function () {
+    var keyArgs = {root: this.containerNode, focusable: true};
+
+    return focusUtil.firstTabbable(keyArgs.root, keyArgs);
+  },
+
+  _setCurrentFocusTarget: function (newNode, setFocus) {
+    var currentNode = this._getCurrentFocusTarget();
+
+    if (newNode == null) {
+      newNode = this._getDefaultFocusTarget();
+    }
+
+    // No targetable nodes?
+    if (newNode == null) {
+      // assert currentNode === null;
+      return null;
+    }
+
+    // Effectively changing the current focus target?
+    if (newNode !== currentNode) {
+      if (currentNode != null) {
+        currentNode.setAttribute("tabindex", "-1");
+      }
+
+      newNode.setAttribute("tabindex", "0");
+    }
+
+    if (setFocus) {
+      newNode.focus();
+    }
+
+    return newNode;
+  },
+
+  _hasFocus: function () {
+    return focusUtil.containsFocus(this.containerNode);
+  },
+
   onClearSearch : function() {
     var searchField = dom.byId("searchField");
     var clearSearchField = dom.byId("clearSearchField");
@@ -738,7 +852,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
     domClass.add(clearSearchField, "hidden");
   },
-  
+
   expandAllCategories : function() {
     for (var categoryId in this.usedCategoryIds) {
       var indicatorNode = dom.byId(categoryId + "-indicator");
@@ -747,7 +861,304 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         this.expandCollapseCategory({target: indicatorNode})
       }
     }
-  }
+  },
 
+  _isHiddenChild: function (elem) {
+    return elem.classList.contains("hidden");
+  },
+
+  _findNextHeader: function (elem) {
+    var currentCatId = dojo.attr(elem, "id");
+    var catArray = this.fieldCategories;
+    var L = catArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at last position.
+    var index = catArray.indexOf(currentCatId);
+    if (index < 0 || index === (L - 1)) {
+      return dom.byId(catArray[0]);
+    }
+
+    var nextHeader = dom.byId(catArray[index + 1]);
+    if (this._isHiddenChild(nextHeader)) {
+      return this._findNextHeader(nextHeader);
+    }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(nextHeader.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
+
+    return nextHeader;
+  },
+
+  _findPrevHeader: function (elem) {
+    var currentCatId = dojo.attr(elem, "id");
+    var catArray = this.fieldCategories;
+    var L = catArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at first position.
+    var index = catArray.indexOf(currentCatId);
+    if (index <= 0) {
+      return dom.byId(catArray[L - 1]);
+    }
+
+    var prevHeader = dom.byId(catArray[index - 1]);
+    if (this._isHiddenChild(prevHeader)) {
+      return this._findPrevHeader(prevHeader);
+    }
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(prevHeader.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
+    return prevHeader;
+  },
+
+  _findNextField: function (elem) {
+    var fieldArray = Array.from(this.containerNode.children);
+    var L = fieldArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at last position.
+    var index = fieldArray.indexOf(elem);
+    if (index < 0 || index === (L - 1)) {
+      return fieldArray[0];
+    }
+
+    var nextField = fieldArray[index + 1];
+    if (this._isHiddenChild(nextField)) {
+      return this._findNextField(nextField);
+    }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
+
+    return nextField;
+  },
+
+  _findPrevField: function (elem) {
+    var fieldArray = Array.from(this.containerNode.children);
+    var L = fieldArray.length;
+
+    if (L === 0) {
+      return null;
+    }
+
+    // Not found or found at first position.
+    var index = fieldArray.indexOf(elem);
+    if (index <= 0) {
+      return fieldArray[L - 1];
+    }
+
+    var prevField = fieldArray[index - 1];
+    if (this._isHiddenChild(prevField)) {
+      return this._findPrevField(prevField);
+    }
+      var calButton = dom.byId("catId-add-button");
+      var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
+      calButton.setAttribute("tabindex", tabIndexValue);
+
+    return prevField;
+  },
+
+  _onKeydownHeader: function (e) {
+      var code = e.keyCode || e.which;
+      var header = e.target;
+      var categoryId = dojo.attr(header, "id");
+      var children;
+      var expanded = false;
+      if (header.firstElementChild !== null){
+        expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
+      }
+
+
+    if (code === keys.DOWN_ARROW) {
+      e.preventDefault();
+      var firstChild;
+      if (expanded) {
+        children = query("." + categoryId, this.containerNode);
+        for (var i = 0; i < children.length; i++) {
+          if (this._isHiddenChild(children[i])) {
+            continue;
+          }
+          firstChild = children[i];
+          break;
+        }
+      }
+      header.setAttribute('tabindex', '-1');
+      if (firstChild) {
+        // Move focus to first shown child under Nth Header
+        firstChild.setAttribute('tabindex', '0');
+        firstChild.focus();
+      } else {
+        var nextHeader = this._findNextHeader(header);
+        if (nextHeader) {
+          // Move from Nth header to (N+1) Header if Nth Header is closed
+          nextHeader.setAttribute('tabindex', '0');
+          nextHeader.focus();
+        }
+      }
+    } else if (code === keys.UP_ARROW) {
+      if (!this._isFirstHeader(header)) {
+        e.preventDefault();
+        var previousHeader = this._findPrevHeader(header);
+          if (previousHeader.firstElementChild !== null){
+              expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          }
+        var lastChild;
+
+        if (expanded) {
+          children = query("." + previousHeader.id, this.containerNode);
+          for (var j = children.length - 1; j > -1; j--) {
+            if (this._isHiddenChild(children[j])) {
+              continue;
+            }
+            lastChild = children[j];
+            break;
+          }
+        }
+        header.setAttribute('tabindex', '-1');
+        if (lastChild) {
+          // Move from Nth header to Last Sibling under (N-1) Header if (N-1) Header is open
+          lastChild.setAttribute('tabindex', '0');
+          lastChild.focus();
+        } else {
+          // Move from Nth header to (N-1) Header if (N-1) header is closed
+          previousHeader.setAttribute('tabindex', '0');
+          previousHeader.focus();
+        }
+      }
+    } else if (code === keys.LEFT_ARROW) {
+      if (expanded) {
+        this.expandCollapseCategory({ target: header.nextElementSibling });
+      }
+    } else if (code === keys.RIGHT_ARROW) {
+      if (!expanded) {
+        this.expandCollapseCategory({ target: header.nextElementSibling });
+      }
+    }
+  },
+
+  _isFirstHeader: function (elem) {
+    return elem.classList.contains("categoryNodeFirst");
+  },
+
+  _isLastField: function (elem) {
+    var fieldListNodesLength = this.fieldListNodes.length;
+    return elem.id === this.fieldListNodes[ fieldListNodesLength - 1].id;
+  },
+
+  _isField: function (elem) {
+    return elem.classList.contains("field");
+  },
+
+  _moveFocus: function (node, key) {
+    var groupHeader = dom.byId(dojo.attr(node, "categoryId"));
+    if (key === 'Up') {
+      var previousSibling = this._findPrevField(node);
+      var header = groupHeader;
+      if (previousSibling && this._isField(previousSibling)) {
+        previousSibling.setAttribute('tabindex', '0');
+        node.setAttribute('tabindex', '-1');
+        previousSibling.focus();
+      } else if (header) {
+        header.setAttribute('tabindex', '0');
+        node.setAttribute('tabindex', '-1');
+        header.focus();
+      }
+    } else if (key === 'Down') {
+      if (!this._isLastField(node)) {
+        var nextSibling = this._findNextField(node);
+        if (nextSibling && this._isField(nextSibling)) {
+          nextSibling.setAttribute('tabindex', '0');
+          node.setAttribute('tabindex', '-1');
+          nextSibling.focus();
+          return;
+        }
+        var nextHeader = this._findNextHeader(groupHeader);
+        if (nextHeader) {
+          nextHeader.setAttribute('tabindex', '0');
+          node.setAttribute('tabindex', '-1');
+          nextHeader.focus();
+        }
+      } else {
+          var nextHeader = this._findNextHeader(groupHeader);
+          if (nextHeader) {
+              nextHeader.setAttribute('tabindex', '0');
+              node.setAttribute('tabindex', '-1');
+              nextHeader.focus();
+           }
+      }
+    }
+  },
+
+  _onKeyDownFieldListTree: function (event) {
+    var node = event.target;
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if (event.shiftKey) {
+      switch (code) {
+        case keys.UP_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Up');
+          this._updateMultiSelectionForContextMenu(node.getAttribute("fieldId"));
+          break;
+        case keys.DOWN_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Down');
+          this._updateMultiSelectionForContextMenu(node.getAttribute("fieldId"));
+          break;
+        default:
+          return;
+      }
+    } else if (event.ctrlKey) {
+      switch (code) {
+        case keys.UP_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Up');
+          break;
+        case keys.DOWN_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Down');
+          break;
+        case keys.SPACE:
+          event.preventDefault();
+          this._toggleSelection(node);
+          break;
+        default:
+          return;
+      }
+    } else {
+      switch (code) {
+        case keys.ENTER:
+          this.updateSelectionForContextMenu(node.getAttribute("fieldId"));
+          coords = domGeometry.position(node, true);
+          coords.x += coords.w;
+          coords.y += coords.h;
+          if (this.isCalcField(node.classList[0])) {
+              this.calcFieldContextMenu._scheduleOpen(node, null, coords);
+          } else {
+              this.fieldContextMenu._scheduleOpen(node, null, coords);
+          }
+          break;
+        case keys.UP_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Up');
+          break;
+        case keys.DOWN_ARROW:
+          event.preventDefault();
+          this._moveFocus(node, 'Down');
+          break;
+        default:
+          return;
+      }
+    }
+  },
 });
 });

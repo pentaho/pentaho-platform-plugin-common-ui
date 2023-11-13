@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 domClass.toggle(this.buttonImg, 'pentaho-imagebutton-disabled', this.disabled);
                 if (this.disabled) {
                   this.buttonImg.title = '';
+                  this.buttonImg.setAttribute("tabindex", "-1");
                 } else {
                   this.buttonImg.title = this.title;
+                  this.buttonImg.setAttribute("tabindex", "0");
                 }
               }
             },

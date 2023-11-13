@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", 'pentaho/common/button'
-  , 'pentaho/common/Dialog', "dojo/dom-class", "dojo/_base/lang", 'dojo/text!pentaho/common/TemplatePicker.html'],
-    function (declare, _WidgetBase, _Templated, on, query, button, Dialog, domClass, lang, templateStr) {
+  , 'pentaho/common/Dialog', "dojo/dom-class", "dojo/_base/lang", 'dojo/text!pentaho/common/TemplatePicker.html', "common-ui/util/_a11y"],
+    function (declare, _WidgetBase, _Templated, on, query, button, Dialog, domClass, lang, templateStr, a11yUtil) {
       return declare("pentaho.common.TemplatePicker",
           [Dialog],
           {
@@ -33,8 +33,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
             templateSelectedCallback: null,
 
             updatePageArrows: function () {
-              this.prevSetBtn.set('disabled', this.pageNo == 0);
-              this.nextSetBtn.set('disabled', (this.pageNo + 1) * 6 >= this.templates.length);
+              var isFirstPage = this.pageNo == 0;
+              var isLastPage = (this.pageNo + 1) * 6 >= this.templates.length;
+              this.prevSetBtn.set('disabled', isFirstPage);
+              this.nextSetBtn.set('disabled', isLastPage);
+              if (!this.prevSetBtn.get('disabled')) {
+                this.prevSetBtn.domNode.focus();
+              } else if (!this.nextSetBtn.get('disabled')) {
+                this.nextSetBtn.domNode.focus();
+              }
             },
 
             setTemplates: function (templates) {
@@ -68,18 +75,29 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               this.closeBtn.callback = lang.hitch(this, this.closeClick);
               this.prevSetBtn.callback = lang.hitch(this, this.prevPage);
               this.nextSetBtn.callback = lang.hitch(this, this.nextPage);
-              on(this.templateImg0, 'click', lang.hitch(this, 'imgClick'));
-              on(this.templateImg1, 'click', lang.hitch(this, 'imgClick'));
-              on(this.templateImg2, 'click', lang.hitch(this, 'imgClick'));
-              on(this.templateImg3, 'click', lang.hitch(this, 'imgClick'));
-              on(this.templateImg4, 'click', lang.hitch(this, 'imgClick'));
-              on(this.templateImg5, 'click', lang.hitch(this, 'imgClick'));
-              on(this.templateName0, 'click',lang.hitch( this, 'imgClick'));
-              on(this.templateName1, 'click',lang.hitch( this, 'imgClick'));
-              on(this.templateName2, 'click',lang.hitch( this, 'imgClick'));
-              on(this.templateName3, 'click',lang.hitch( this, 'imgClick'));
-              on(this.templateName4, 'click',lang.hitch( this, 'imgClick'));
-              on(this.templateName5, 'click',lang.hitch( this, 'imgClick'));
+              this.own(
+                on(this.templateImg0, 'click', lang.hitch(this, 'imgClick')),
+                on(this.templateImg1, 'click', lang.hitch(this, 'imgClick')),
+                on(this.templateImg2, 'click', lang.hitch(this, 'imgClick')),
+                on(this.templateImg3, 'click', lang.hitch(this, 'imgClick')),
+                on(this.templateImg4, 'click', lang.hitch(this, 'imgClick')),
+                on(this.templateImg5, 'click', lang.hitch(this, 'imgClick')),
+                on(this.templateName0, 'click',lang.hitch( this, 'imgClick')),
+                on(this.templateName1, 'click',lang.hitch( this, 'imgClick')),
+                on(this.templateName2, 'click',lang.hitch( this, 'imgClick')),
+                on(this.templateName3, 'click',lang.hitch( this, 'imgClick')),
+                on(this.templateName4, 'click',lang.hitch( this, 'imgClick')),
+                on(this.templateName5, 'click',lang.hitch( this, 'imgClick')),
+                a11yUtil.makeAccessibleActionButton(this.closeBtn.domNode),
+                a11yUtil.makeAccessibleActionButton(this.prevSetBtn.domNode),
+                a11yUtil.makeAccessibleActionButton(this.nextSetBtn.domNode),
+                a11yUtil.makeAccessibleActionButton(this.templateImg0),
+                a11yUtil.makeAccessibleActionButton(this.templateImg1),
+                a11yUtil.makeAccessibleActionButton(this.templateImg2),
+                a11yUtil.makeAccessibleActionButton(this.templateImg3),
+                a11yUtil.makeAccessibleActionButton(this.templateImg4),
+                a11yUtil.makeAccessibleActionButton(this.templateImg5)
+              );
             },
 
             imgClick: function (event) {

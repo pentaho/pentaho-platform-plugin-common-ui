@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -32,17 +32,40 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
                 // we already have tabs
                 return;
             }
-                
+
+            var _this = this;
             this.tabs = tabs;
             var html = "";
             domClass.add(this.tabSetDiv, 'pentaho-tabBar');
+            this.tabSetDiv.setAttribute("role", "tablist");
             for(var idx=0; idx<this.tabs.length; idx++) {
                 var div = construct.create('div', {}, this.tabSetDiv);
+                div.setAttribute("role", "tab");
                 div.setAttribute( 'tabId', this.tabs[idx].id);
+                div.addEventListener("keydown", function (event) {
+                    var target = event.currentTarget;
+                    switch (event.key) {
+                        case "ArrowLeft":
+                            if (target.previousElementSibling) {
+                                _this.setSelectedTab(target.previousElementSibling.getAttribute('tabId'));
+                            } else {
+                                _this.setSelectedTab(target.parentElement.lastElementChild.getAttribute('tabId'));
+                            }
+                            break;
+                        case "ArrowRight":
+                            if (target.nextElementSibling) {
+                                _this.setSelectedTab(target.nextElementSibling.getAttribute('tabId'));
+                            } else {
+                                _this.setSelectedTab(target.parentElement.firstElementChild.getAttribute('tabId'));
+                            }
+                            break;
+                    }
+                }, true);
                 this.tabs[idx].element = div;
                 domClass.add(div, 'pentaho-tabWidget');
-                if(idx == 0) {
+                if(idx === 0) {
                     domClass.add(div, 'pentaho-tabWidget-selected');
+                    div.setAttribute("tabindex", "0");
                 }
                 var span = construct.create('span', {}, div);
                 domClass.add(span, 'pentaho-tabWidgetLabel', div);
@@ -60,7 +83,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         setSelectedTab: function(tabId) {
             // find this tab
             for(var idx=0; idx<this.tabs.length; idx++) {
-                if(this.tabs[idx].id == tabId) {
+                if(this.tabs[idx].id === tabId) {
                     // set this tab using the index
                     this.setSeletedTabIdx(idx);
                 }
@@ -69,11 +92,17 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         
         setSeletedTabIdx: function(tabIdx) {
             var panelId = this.tabs[tabIdx].id;
-            for(var idx=0; idx<this.tabs.length; idx++) {
-                if(tabIdx == idx) {
-                    domClass.add(this.tabs[idx].element, 'pentaho-tabWidget-selected');
+            for (var idx = 0; idx < this.tabs.length; idx++) {
+                var currentTab = this.tabs[idx].element;
+                if (tabIdx === idx) {
+                    domClass.add(currentTab, 'pentaho-tabWidget-selected');
+                    currentTab.setAttribute("tabindex", "0");
+                    currentTab.setAttribute("aria-selected", "true");
+                    currentTab.focus();
                 } else {
-                    domClass.remove(this.tabs[idx].element, 'pentaho-tabWidget-selected');
+                    domClass.remove(currentTab, 'pentaho-tabWidget-selected');
+                    currentTab.setAttribute("tabindex", "-1");
+                    currentTab.setAttribute("aria-selected", "false");
                 }
             }
             if(this.tabs[tabIdx].beforeCallback) {
