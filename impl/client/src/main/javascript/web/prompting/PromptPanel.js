@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2021 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@
  * @property {Function} onStateChanged Callback called if defined after state variables have been changed on the prompt panel or parameter definition
  * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered.
  */
-define(["cdf/lib/Base", "cdf/Logger", "dojo/number", "dojo/i18n", "common-ui/util/util", "common-ui/util/GUIDHelper",
+define(["cdf/lib/Base", "cdf/Logger", "dojo/number", "dojo/i18n", "common-ui/util/util", "common-ui/util/_focus", "common-ui/util/GUIDHelper",
         "./WidgetBuilder", "cdf/Dashboard.Clean", "./parameters/ParameterDefinitionDiffer", "common-ui/jquery-clean",
         "common-ui/underscore", "./components/CompositeComponent"],
-function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _, CompositeComponent) {
+function(Base, Logger, DojoNumber, i18n, Utils, focusUtil, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _, CompositeComponent) {
 
   // Add specific prompting message bundle
   if(pentaho.common.Messages) {
@@ -510,7 +510,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
      *
      * @name PromptPanel#constructor
      * @method
-     * @param {String} destinationId The html id to place the prompt
+     * @param {String} destinationId The html id to place the prompt on
      * @param {ParameterDefinition} paramDefn The parameter definition assigned to the prompt
      * @param {Object} [options] Extra configuration options to be passed to the prompt renderer constructor.
      */
@@ -1013,10 +1013,33 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
           });
 
           this._focusedParam = focusedParam;
+
+          if(focusedParam == null && focusUtil.containsFocus(this._getDestinationElement())) {
+            // Focus is inside the prompt panel, but not within the structure of any component having `promptType` `"prompt"`.
+            // Assume some other decoration markup has interactive elements, and handle restoring focus to these
+            // using a generic procedure.
+            this._focusStateOfNonPromptComponents = focusUtil.captureState(document.activeElement, {
+              root: this._getDestinationElement(),
+              focusable: true
+            });
+          }
         }
 
         this.init(noAutoAutoSubmit);
       }
+    },
+
+    /**
+     * Gets the destination element of the prompt panel.
+     *
+     * The element with the identifier of {@link PromptPanel#destinationId}.
+     * @name PromptPanel#_getDestinationElement
+     * @method
+     * @return {Element} The destination element.
+     * @private
+     */
+    _getDestinationElement: function() {
+      return $("#" + this.destinationId)[0];
     },
 
     /**
@@ -1371,7 +1394,7 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
             // restore last scroll position for prompt panel
             if(!this.isRefresh) {
               this.dashboard.postInit(function() {
-                if(scrollTopValue) {
+                if(scrollValue.scrollTopValue) {
                   setScroll();
                   scrollValue = undefined;
                 }
@@ -1417,6 +1440,24 @@ function(Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashb
           updateComponent(component);
         }).bind(this);
         _mapComponents(layout, updateCallback);
+
+        // NOTE: this should run AFTER all new/updated components are finished updating.
+        // However, CDF does not directly provide something like Dashboard.postInit() for updates.
+        // The following method is a compromise, has an inherent racing-condition...
+        // (Similar method to that used above to restore scroll position)
+        var focusStateOfNonPromptComponents = this._focusStateOfNonPromptComponents;
+        if(focusStateOfNonPromptComponents != null) {
+          delete this._focusStateOfNonPromptComponents;
+
+          setTimeout(function() {
+            var closest = focusStateOfNonPromptComponents.closest()
+                || focusUtil.firstTabbable(this._getDestinationElement())
+                || focusUtil.previousTabbable(this._getDestinationElement());
+            if (closest != null) {
+              closest.focus();
+            }
+          }.bind(this), 50);
+        }
       } else { // Simple parameter value initialization
         paramDefn.mapParameters(function(param) {
           // initialize parameter values regardless of whether we're showing the parameter or not

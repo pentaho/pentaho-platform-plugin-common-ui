@@ -15,7 +15,7 @@
  * Copyright (c) 2002-2023 Hitachi Vantara. All rights reserved.
  */
 
-define(["./_focus"], function(focusUtil) {
+define("common-ui/util/_a11y", ["./_focus"], function (focusUtil) {
 
   var keyCodes = {
     A: 65,
@@ -458,6 +458,224 @@ define(["./_focus"], function(focusUtil) {
 
   }
 
+  /**
+   * Creates an accessible toolbar object for the given container element.
+   *
+   * @param {Element} elem - The toolbar container element.
+   * @param {?Object} [keyArgs] - The keyword arguments object.
+   * @param {string} [keyArgs.itemSelector] - A selector string which selects the toolbar item elements.
+   *  Defaults to `.toolbar-button`.
+   * @param {function(Element):boolean} [keyArgs.filter] - Predicate function which allows further filtering
+   *  the toolbar items. Can be used, for example, in cases of custom enabled or visible conditions.
+   * @return {({destroy: function})}} The toolbar object.
+   */
+  function makeAccessibleToolbar(elem, keyArgs) {
+
+    var itemSelector = (keyArgs && keyArgs.itemSelector) || ".toolbar-button";
+    var itemFilter = (keyArgs && keyArgs.itemFilter) || null;
+
+    elem.setAttribute("role", "toolbar");
+
+    var lastTargetItem = null;
+
+    elem.addEventListener("keydown", onKeyPress);
+    elem.addEventListener("focusin", onContainerFocusIn);
+    elem.addEventListener("focusout", onContainerFocusOut);
+
+    return {
+      destroy: destroy
+    };
+
+    function destroy() {
+      elem.removeEventListener("keydown", onKeyPress);
+      elem.removeEventListener("focusin", onContainerFocusIn);
+      elem.removeEventListener("focusout", onContainerFocusOut);
+    }
+
+    // region Event handlers
+    /**
+     * Synchronizes the focus target when the container receives focus or
+     * when focus moves between contained items.
+     *
+     * If `ev.target` is the root element, then focus must be redirected to an item.
+     *
+     * Otherwise, `ev.target` is contained inside the container and its focus is accepted
+     * only if it is an item, and if not focus must be redirected.
+     * This may happen if user clicks directly on the element.
+     *
+     * If focus is redirected, first the previous focus target, if any, is chosen,
+     * if it is currently focusable. Otherwise, the first focusable item is chosen.
+     *
+     * Regarding focus redirection, see also note on `onContainerFocusOut`.
+     * @param {Event} ev - Focus in event.
+     */
+    function onContainerFocusIn(ev) {
+      var newFocusItem =
+          filterFocusableItem(ev.target === elem ? null : ev.target) ||
+          filterFocusableItem(lastTargetItem) ||
+          getFirst();
+
+      // Actually focus the item, to cover redirect cases (newFocusItem !== ev.target).
+      setFocusItem(newFocusItem);
+    }
+
+    /**
+     * Placing the focus target on the container is needed because the current
+     * target may become disabled in the meantime, later impeding focus to
+     * return to the toolbar. When focus is later placed on the toolbar,
+     * it is automatically redirected to either the previous focus target or to
+     * the first focusable item.
+     * @param {Event} ev - Focus out event.
+     */
+    function onContainerFocusOut(ev) {
+      if (!elem.contains(ev.relatedTarget)) {
+        setFocusTarget(null);
+      }
+    }
+
+    /**
+     * Manages focus when inside the container.
+     */
+    function onKeyPress(evt) {
+      var currentItem = evt.target;
+      var useTabs = useTabsForNavigation(currentItem);
+
+      switch (evt.key) {
+        case keys.ArrowRight:
+          if (currentItem == null || useTabs) {
+            return;
+          }
+
+          setFocusItem(getNext(currentItem));
+          break;
+
+        case keys.ArrowLeft:
+          if (currentItem == null || useTabs) {
+            return;
+          }
+
+          setFocusItem(getPrevious(currentItem));
+          break;
+
+        case keys.Home:
+          setFocusItem(getFirst());
+          break;
+
+        case keys.End:
+          setFocusItem(getLast());
+          break;
+
+        case keys.Tab:
+          if (currentItem == null || !useTabs) {
+            return;
+          }
+
+          if (evt.shiftKey) {
+            setFocusItem(getPrevious(currentItem));
+          } else {
+            setFocusItem(getNext(currentItem));
+          }
+
+          break;
+
+        default:
+          return;
+      }
+
+      evt.stopPropagation();
+      evt.preventDefault();
+    }
+
+    // endregion Event handlers
+
+
+    /**
+     * Sets the toolbar item which is the focus target.
+     *
+     * Updates the toolbar and items `tabindex` according to the roving tab index pattern.
+     *
+     * @param {Element?} newTargetItem - The toolbar item to be the new focus target.
+     *  When `null`, the root element becomes the focus target.
+     * @param {boolean} [shouldSetFocus=false] - Indicates if focus should be placed on
+     *  the focus target.
+     */
+    function setFocusTarget(newTargetItem, shouldSetFocus) {
+
+      /** @type Element */
+      var newTargetElem = newTargetItem || elem;
+
+      var targetElems = Array.from(elem.querySelectorAll(itemSelector));
+      targetElems.push(elem);
+
+      targetElems.forEach(function (targetElem) {
+        targetElem.tabIndex = targetElem === newTargetElem ? 0 : -1;
+      });
+
+      if (newTargetItem != null) {
+        lastTargetItem = newTargetItem;
+      }
+
+      if (shouldSetFocus) {
+        newTargetElem.focus();
+      }
+    }
+
+    function setFocusItem(focusItem) {
+      setFocusTarget(focusItem, true);
+    }
+
+    function getFirst() {
+      return focusUtil.firstTabbable(elem, {
+        selector: itemSelector,
+        focusable: "candidate",
+        filter: itemFilter
+      });
+    }
+
+    function getPrevious(currentItem) {
+      return focusUtil.previousTabbable(currentItem, {
+        root: elem,
+        selector: itemSelector,
+        focusable: "candidate",
+        filter: itemFilter
+      });
+    }
+
+    function getNext(currentItem) {
+      return focusUtil.nextTabbable(currentItem, {
+        root: elem,
+        selector: itemSelector,
+        focusable: "candidate",
+        filter: itemFilter
+      });
+    }
+
+    function getLast() {
+      return focusUtil.lastTabbable(elem, {
+        selector: itemSelector,
+        focusable: "candidate",
+        filter: itemFilter
+      });
+    }
+
+    function useTabsForNavigation(elem) {
+      return (elem && (elem.dataset.penToolbarNavUseTabs === "true"));
+    }
+
+    function isFocusableItem(item) {
+      return item != null && focusUtil.isTabbable(item, {
+        selector: itemSelector,
+        focusable: "candidate",
+        filter: itemFilter
+      });
+    }
+
+    function filterFocusableItem(item) {
+      return isFocusableItem(item) ? item : null;
+    }
+  }
+
+
   function makeAccessibleActionButton(elem, isToggleButton) {
     elem.role = "button";
     elem.tabIndex = 0;
@@ -530,6 +748,7 @@ define(["./_focus"], function(focusUtil) {
     keys: keys,
 
     makeAccessibleListbox: makeAccessibleListbox,
+    makeAccessibleToolbar: makeAccessibleToolbar,
 
     makeAccessibleActionButton: function (elem) {
       if (elem == null) {
@@ -548,4 +767,14 @@ define(["./_focus"], function(focusUtil) {
       return makeAccessibleActionButton(elem, true)
     }
   };
+});
+
+// Create global reference for non-amd users.
+var pho = pho || {};
+if (pho.util == null) {
+  pho.util = {};
+}
+
+require(["common-ui/util/_a11y"], function (a11yUtil) {
+  pho.util._a11y = a11yUtil;
 });
