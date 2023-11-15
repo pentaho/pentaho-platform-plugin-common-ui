@@ -32,6 +32,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
             templateSelectedCallback: null,
 
+            responsive: true, // Not intended to be set to false.
+
+            responsiveClasses: "dw-md ds-fill-viewport-width",
+
             updatePageArrows: function () {
               var isFirstPage = this.pageNo == 0;
               var isLastPage = (this.pageNo + 1) * 6 >= this.templates.length;
@@ -75,29 +79,20 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               this.closeBtn.callback = lang.hitch(this, this.closeClick);
               this.prevSetBtn.callback = lang.hitch(this, this.prevPage);
               this.nextSetBtn.callback = lang.hitch(this, this.nextPage);
+
               this.own(
-                on(this.templateImg0, 'click', lang.hitch(this, 'imgClick')),
-                on(this.templateImg1, 'click', lang.hitch(this, 'imgClick')),
-                on(this.templateImg2, 'click', lang.hitch(this, 'imgClick')),
-                on(this.templateImg3, 'click', lang.hitch(this, 'imgClick')),
-                on(this.templateImg4, 'click', lang.hitch(this, 'imgClick')),
-                on(this.templateImg5, 'click', lang.hitch(this, 'imgClick')),
-                on(this.templateName0, 'click',lang.hitch( this, 'imgClick')),
-                on(this.templateName1, 'click',lang.hitch( this, 'imgClick')),
-                on(this.templateName2, 'click',lang.hitch( this, 'imgClick')),
-                on(this.templateName3, 'click',lang.hitch( this, 'imgClick')),
-                on(this.templateName4, 'click',lang.hitch( this, 'imgClick')),
-                on(this.templateName5, 'click',lang.hitch( this, 'imgClick')),
-                a11yUtil.makeAccessibleActionButton(this.closeBtn.domNode),
-                a11yUtil.makeAccessibleActionButton(this.prevSetBtn.domNode),
-                a11yUtil.makeAccessibleActionButton(this.nextSetBtn.domNode),
-                a11yUtil.makeAccessibleActionButton(this.templateImg0),
-                a11yUtil.makeAccessibleActionButton(this.templateImg1),
-                a11yUtil.makeAccessibleActionButton(this.templateImg2),
-                a11yUtil.makeAccessibleActionButton(this.templateImg3),
-                a11yUtil.makeAccessibleActionButton(this.templateImg4),
-                a11yUtil.makeAccessibleActionButton(this.templateImg5)
+                  a11yUtil.makeAccessibleActionButton(this.closeBtn.domNode),
+                  a11yUtil.makeAccessibleActionButton(this.prevSetBtn.domNode),
+                  a11yUtil.makeAccessibleActionButton(this.nextSetBtn.domNode),
               );
+
+              for (var idx = 0; idx < 6; idx++) {
+                this.own(
+                    on(this['templateImg' + idx], 'click', lang.hitch(this, 'imgClick')),
+                    on(this['templateName' + idx], 'click', lang.hitch(this, 'imgClick')),
+                    a11yUtil.makeAccessibleActionButton(this['templateImg' + idx])
+                );
+              }
             },
 
             imgClick: function (event) {
