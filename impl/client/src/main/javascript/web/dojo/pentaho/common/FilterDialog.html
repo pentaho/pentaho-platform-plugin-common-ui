@@ -1,4 +1,4 @@
-<div data-dojo-attach-point="dialogContainer" class="filterDialogContainer dialog-content pentaho-padding-sm" data-dojo-attach-point="containerNode">
+<div data-dojo-attach-point="dialogContainer" class="filterDialogContainer flex-column dialog-content pentaho-padding-sm" data-dojo-attach-point="containerNode">
   <div data-dojo-attach-point="typeContainer" class="filterDialogTypeContainer">
     <div class="typeContainerStyled filterDialogHidden" data-dojo-attach-point="fieldPicklistContainer">
       <span class="filterDialogFieldPicklistText"
@@ -46,7 +46,7 @@
   <div data-dojo-attach-point="detailsContainer" class="filterDialogDetailsContainer">
     <div data-dojo-attach-point="picklistContainer"
          class="filterDialogPicklistContainer">
-      <table>
+      <table class="filterPicklist" role="presentation">
         <col style="width: 250px">
         <col style="width: 50px">
         <col style="width: 250px">
@@ -57,7 +57,7 @@
           </td>
           <td></td>
           <td>
-            <span data-dojo-attach-point="picklistCombinationTypeSpan">!Currently!</span>
+            <span class="filterDialogPicklistCombinationTypeTitle" data-dojo-attach-point="picklistCombinationTypeSpan">!Currently!</span>
           </td>
         </tr>
         <tr class="secondRow">
@@ -68,7 +68,7 @@
           <td>
           </td>
           <td>
-            <select data-dojo-attach-point="picklistCombinationType" style="width:100%">
+            <select class="filterDialogPicklistCombinationType" data-dojo-attach-point="picklistCombinationType" style="width:100%">
               <option value="!AND!" data-dojo-attach-point="picklistCombinationTypeIncludeOption">!INCLUDE!</option>
               <option value="!AND_NOT!" data-dojo-attach-point="picklistCombinationTypeExcludeOption">!EXCLUDE!</option>
             </select>
@@ -77,12 +77,12 @@
         <tr>
           <td>
             <select data-dojo-type="dijit.form.MultiSelect"
-                    class="filterDialogPicklistSelect"
+                    class="filterDialogPicklistSelect picklistAvailable"
                     data-dojo-attach-point="picklistAvailableValues" name="available"
                     dojoAttachEvent="onDblClick:_picklistAddSelected"
                     size="12"></select>
           </td>
-          <td valign="middle" align="center">
+          <td class="selectableListActions" valign="middle" align="center">
             <img dojoAttachEvent="onclick:_picklistAddSelected"
                  data-dojo-attach-point="picklistAddSelected"
                  class="filterDialogPicklistButton"
@@ -107,7 +107,7 @@
           </td>
           <td>
             <select data-dojo-type="dijit.form.MultiSelect"
-                    class="filterDialogPicklistSelect"
+                    class="filterDialogPicklistSelect picklistUsed"
                     data-dojo-attach-point="picklistUsedValues" name="used"
                     dojoAttachEvent="onDblClick:_picklistRemoveSelected"
                     size="12"></select>
@@ -119,9 +119,9 @@
     <div data-dojo-attach-point="matchContainer" class="filterDialogMatchContainer">
       <table>
         <div data-dojo-attach-point="matchFieldName">!Field name!</div>
-        <div style="display: flex">
+        <div class="flex-row flex-column-sm" style="display: flex">
           <select data-dojo-attach-point="matchAggType" style="flex-grow: 1; min-width: 170px; max-width: 180px"></select>
-          <select data-dojo-attach-point="matchComparator" dojoAttachEvent="onchange:_matchComparatorChanged" style="flex-grow: 1; min-width: 170px; max-width: 180px; margin:0px 10px"></select>
+          <select data-dojo-attach-point="matchComparator" class="filterDialogMatchComparator" dojoAttachEvent="onchange:_matchComparatorChanged" style="flex-grow: 1; min-width: 170px; max-width: 180px"></select>
           <input type="text" data-dojo-attach-point="matchValueInput" size="10" style="flex-grow: 1; min-width: 170px; max-width: 180px"/><!--data-dojo-type="dijit.form.TextBox"-->
         </div>
         <!-- Date pattern to match what metadata expects. -->
