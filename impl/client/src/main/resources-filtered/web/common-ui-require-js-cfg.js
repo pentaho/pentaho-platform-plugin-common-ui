@@ -330,6 +330,12 @@
       "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Bubble"}
     }
   };
+  requireModules["pentaho/visual/models/Treemap"] = {
+    base: "pentaho/visual/models/Abstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Treemap"}
+    }
+  };
 
   requireModules["pentaho/visual/models/PointAbstract"] = {base: "pentaho/visual/models/CartesianAbstract"};
   requireModules["pentaho/visual/models/LineAbstract"] = {base: "pentaho/visual/models/PointAbstract"};
