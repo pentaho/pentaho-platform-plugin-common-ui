@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
+ * Copyright 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,33 @@
  */
 define([
   "pentaho/module!_",
-  "./LineAbstract"
+  "./PointAbstract",
+  "./_trends"
 ], function(module, BaseView) {
 
   "use strict";
 
-  // "pentaho/visual/models/Line"
+  // "pentaho/visual/models/LineAbstract"
 
-  return BaseView.extend(module.id)
+  return BaseView.extend(module.id, {
+    _cccClass: "LineChart",
+
+    _supportsTrends: true,
+
+    _configureOptions: function() {
+
+      this.base();
+
+      var options = this.options;
+
+      var shape = this.model.shape;
+      if(shape && shape === "none") {
+        options.dotsVisible = false;
+      } else {
+        options.dotsVisible = true;
+        options.dot_shape = shape;
+      }
+    }
+  })
   .implement(module.config);
 });

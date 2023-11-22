@@ -33,6 +33,8 @@ define([
   "./Donut",
   "./HeatGrid",
   "./Line",
+  "./LineAbstract",
+  "./LineStacked",
   "./MetricPointAbstract",
   "./Pie",
   "./PointAbstract",

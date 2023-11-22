@@ -412,11 +412,22 @@
       "pentaho/visual/models/PointAbstract": {
         "base": "pentaho/visual/models/CartesianAbstract"
       },
+      "pentaho/visual/models/LineAbstract": {
+        "base": "pentaho/visual/models/PointAbstract"
+      },
       "pentaho/visual/models/Line": {
-        "base": "pentaho/visual/models/PointAbstract",
+        "base": "pentaho/visual/models/LineAbstract",
         "annotations": {
           "pentaho/visual/DefaultView": {
             "module": "pentaho/ccc/visual/Line"
+          }
+        }
+      },
+      "pentaho/visual/models/LineStacked": {
+        "base": "pentaho/visual/models/LineAbstract",
+        "annotations": {
+          "pentaho/visual/DefaultView": {
+            "module": "pentaho/ccc/visual/LineStacked"
           }
         }
       },
