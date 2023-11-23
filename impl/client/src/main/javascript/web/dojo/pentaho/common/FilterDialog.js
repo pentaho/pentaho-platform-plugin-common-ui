@@ -33,6 +33,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
   buttons: ['Ok_txt','Cancel_txt'],
 
+  responsive: true, // Not intended to be set to false.
+  responsiveClasses: "dw-sm ds-fill-viewport-width",
+
   // Row limit for search list queries
   searchListLimit: 500,
 
@@ -54,6 +57,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
   postCreate: function() {
     this.inherited(arguments);
+    domClass.add(this.popup.domNode, 'filter-dialog');
     Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');
 
     this.picklistCombinationTypeIncludeOption.setAttribute("value", pentaho.pda.Column.OPERATOR_TYPES.AND);

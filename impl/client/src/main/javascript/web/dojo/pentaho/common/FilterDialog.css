@@ -14,6 +14,10 @@
   height: 50px;
 }
 
+.filterDialogMatchComparator {
+  margin: 0px 10px;
+}
+
 .filterDialogPicklistSelect {
   height: 180px;
   width: 100%;
