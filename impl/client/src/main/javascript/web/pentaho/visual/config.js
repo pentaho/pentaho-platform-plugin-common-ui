@@ -742,19 +742,6 @@ define(function() {
         }
       },
 
-      // Donut
-      {
-        priority: RULE_PRIO_VIZ_DEFAULT,
-        select: {
-          module: "pentaho/ccc/visual/Donut"
-        },
-        apply: {
-          extension: {
-            slice_innerRadiusEx: "60%"
-          }
-        }
-      },
-
       // Heat Grid
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
