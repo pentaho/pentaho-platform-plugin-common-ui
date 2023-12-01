@@ -30,6 +30,7 @@ define([
   "./Bubble",
   "./CartesianAbstract",
   "./CategoricalContinuousAbstract",
+  "./Dot",
   "./Donut",
   "./HeatGrid",
   "./Line",
