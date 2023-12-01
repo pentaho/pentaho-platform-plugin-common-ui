@@ -439,6 +439,14 @@
           }
         }
       },
+      "pentaho/visual/models/Dot": {
+        "base": "pentaho/visual/models/PointAbstract",
+        "annotations": {
+          "pentaho/visual/DefaultView": {
+            "module": "pentaho/ccc/visual/Dot"
+          }
+        }
+      },
 
       "pentaho/visual/models/HeatGrid": {
         "base": "pentaho/visual/models/CartesianAbstract",

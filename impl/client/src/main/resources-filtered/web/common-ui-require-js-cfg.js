@@ -351,6 +351,12 @@
       "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/LineStacked"}
     }
   };
+  requireModules["pentaho/visual/models/Dot"] = {
+    base: "pentaho/visual/models/PointAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Dot"}
+    }
+  };
   requireModules["pentaho/visual/models/AreaStacked"] = {
     base: "pentaho/visual/models/PointAbstract",
     annotations: {
@@ -398,6 +404,7 @@
   requireModules["pentaho/ccc/visual/LineAbstract"] = {base: "pentaho/ccc/visual/PointAbstract"};
   requireModules["pentaho/ccc/visual/Line"] = {base: "pentaho/ccc/visual/LineAbstract"};
   requireModules["pentaho/ccc/visual/LineStacked"] = {base: "pentaho/ccc/visual/LineAbstract"};
+  requireModules["pentaho/ccc/visual/Dot"] = {base: "pentaho/ccc/visual/PointAbstract"};
   requireModules["pentaho/ccc/visual/AreaStacked"] = {base: "pentaho/ccc/visual/PointAbstract"};
 
   requireModules["pentaho/ccc/visual/HeatGrid"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
@@ -720,6 +727,7 @@
       "pentaho/visual/models/LineAbstract",
       "pentaho/visual/models/LineStacked",
       "pentaho/visual/models/Scatter",
+      "pentaho/visual/models/Dot",
       "pentaho/visual/models/types/SliceOrder",
       "pentaho/visual/models/Sunburst",
       "pentaho/visual/models/Waterfall",
@@ -770,6 +778,7 @@
       "pentaho/ccc/visual/LineAbstract",
       "pentaho/ccc/visual/Scatter",
       "pentaho/ccc/visual/LineStacked",
+      "pentaho/ccc/visual/Dot",
       "pentaho/ccc/visual/Sunburst",
       "pentaho/ccc/visual/Treemap",
       "pentaho/ccc/visual/Waterfall",
