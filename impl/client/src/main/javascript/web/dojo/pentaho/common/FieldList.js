@@ -978,7 +978,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
       }
 
-
     if (code === keys.DOWN_ARROW) {
       e.preventDefault();
       var firstChild;
@@ -998,11 +997,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         firstChild.setAttribute('tabindex', '0');
         firstChild.focus();
       } else {
-        var nextHeader = this._findNextHeader(header);
-        if (nextHeader) {
-          // Move from Nth header to (N+1) Header if Nth Header is closed
-          nextHeader.setAttribute('tabindex', '0');
-          nextHeader.focus();
+        if(!this._isLastHeader(header)) {
+          var nextHeader = this._findNextHeader(header);
+          if (nextHeader) {
+            // Move from Nth header to (N+1) Header if Nth Header is closed
+            nextHeader.setAttribute('tabindex', '0');
+            nextHeader.focus();
+          }
         }
       }
     } else if (code === keys.UP_ARROW) {
@@ -1050,6 +1051,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     return elem.classList.contains("categoryNodeFirst");
   },
 
+  _isLastHeader: function (elem) {
+    var fieldCategoriesLength = this.fieldCategories.length;
+    return elem.id === this.fieldCategories[fieldCategoriesLength - 1];
+  },
+
   _isLastField: function (elem) {
     var fieldListNodesLength = this.fieldListNodes.length;
     return elem.id === this.fieldListNodes[ fieldListNodesLength - 1].id;
@@ -1074,7 +1080,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         header.focus();
       }
     } else if (key === 'Down') {
-      if (!this._isLastField(node)) {
+      if (!this._isLastField(node) || !this._isLastHeader(groupHeader)) {
         var nextSibling = this._findNextField(node);
         if (nextSibling && this._isField(nextSibling)) {
           nextSibling.setAttribute('tabindex', '0');
@@ -1088,13 +1094,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           node.setAttribute('tabindex', '-1');
           nextHeader.focus();
         }
-      } else {
-          var nextHeader = this._findNextHeader(groupHeader);
-          if (nextHeader) {
-              nextHeader.setAttribute('tabindex', '0');
-              node.setAttribute('tabindex', '-1');
-              nextHeader.focus();
-           }
       }
     }
   },
