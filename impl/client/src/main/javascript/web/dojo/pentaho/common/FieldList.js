@@ -1037,11 +1037,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       }
     } else if (code === keys.LEFT_ARROW) {
       if (expanded) {
-        this.expandCollapseCategory({ target: header.nextElementSibling });
+        this.expandCollapseCategory({ target: header.firstChild });
       }
     } else if (code === keys.RIGHT_ARROW) {
       if (!expanded) {
-        this.expandCollapseCategory({ target: header.nextElementSibling });
+        this.expandCollapseCategory({ target: header.firstChild });
       }
     }
   },
