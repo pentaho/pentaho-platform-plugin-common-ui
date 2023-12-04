@@ -83,7 +83,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               this.own(
                   a11yUtil.makeAccessibleActionButton(this.closeBtn.domNode),
                   a11yUtil.makeAccessibleActionButton(this.prevSetBtn.domNode),
-                  a11yUtil.makeAccessibleActionButton(this.nextSetBtn.domNode),
+                  a11yUtil.makeAccessibleActionButton(this.nextSetBtn.domNode)
               );
 
               for (var idx = 0; idx < 6; idx++) {
