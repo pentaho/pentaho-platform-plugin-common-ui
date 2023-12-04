@@ -499,11 +499,13 @@ define(function() {
         }
       },
 
-      // Scatter
+      // Scatter, Dot
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          module: "pentaho/ccc/visual/Scatter"
+          module: [
+            "pentaho/ccc/visual/Scatter",
+            "pentaho/ccc/visual/Dot"]
         },
         apply: {
           extension: {
