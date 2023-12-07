@@ -499,13 +499,11 @@ define(function() {
         }
       },
 
-      // Scatter, Dot
+      // Scatter
       {
         priority: RULE_PRIO_VIZ_DEFAULT,
         select: {
-          module: [
-            "pentaho/ccc/visual/Scatter",
-            "pentaho/ccc/visual/Dot"]
+          module: "pentaho/ccc/visual/Scatter"
         },
         apply: {
           extension: {
@@ -824,7 +822,7 @@ define(function() {
         apply: {
           extension: {
             legendAreaVisible: true,
-            axisGrid: true,
+            axisGrid: true
           }
         }
       },
