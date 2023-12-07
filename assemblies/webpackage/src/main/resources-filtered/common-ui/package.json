@@ -388,6 +388,14 @@
           }
         }
       },
+      "pentaho/visual/models/Funnel": {
+        "base": "pentaho/visual/Model",
+        "annotations": {
+          "pentaho/visual/DefaultView": {
+            "module": "pentaho/visual/views/echarts/Funnel"
+          }
+        }
+      },
 
       "pentaho/visual/models/MetricPointAbstract": {
         "base": "pentaho/visual/models/CartesianAbstract"

@@ -392,6 +392,7 @@ if(!useDebug) {
     "pentaho/visual/models/Sunburst",
     "pentaho/visual/models/Waterfall",
     "pentaho/visual/models/Treemap",
+    "pentaho/visual/models/Funnel",
     "pentaho/visual/models/all",
     "pentaho/visual/role/adaptation/Strategy",
     "pentaho/visual/role/adaptation/IdentityStrategy",
@@ -442,7 +443,10 @@ if(!useDebug) {
     "pentaho/ccc/visual/Scatter",
     "pentaho/ccc/visual/Sunburst",
     "pentaho/ccc/visual/Treemap",
+    "pentaho/visual/views/echarts/echartsView",
+    "pentaho/visual/views/echarts/Funnel",
     "pentaho/ccc/visual/Waterfall",
-    "pentaho/ccc/visual/all"
+    "pentaho/ccc/visual/all",
+    "pentaho/visual/views/all"
   ];
 }

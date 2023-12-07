@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2019 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,6 +172,23 @@ define([
       }
 
       return cssClasses.join(" ");
+    },
+
+    /**
+     * Gets a visualization's default font as a CSS font string.
+     *
+     * @param {string} [font] - A CSS font string to be returned. If the string contains the special text "default",
+     * it is replaced with the default font family.
+     * @param {number} [fontSize] - The font size identifier. If font is specified, this option is ignored.
+     * Otherwise, it overrides the size of the returned font string, which defaults to 10px
+     *
+     * @return {string} Font size and Font family concatenated.
+     */
+    getDefaultFont: function(font, fontSize) {
+      if(!font) return (fontSize || 10) + "px OpenSansRegular, sans-serif";
+
+      // TODO: Analyzer specific
+      return font.replace(/\bdefault\s*$/i, "OpenSansRegular, sans-serif");
     }
   };
 

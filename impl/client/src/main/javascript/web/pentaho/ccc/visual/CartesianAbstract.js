@@ -16,7 +16,7 @@
 define([
   "pentaho/module!_",
   "./Abstract",
-  "./_util",
+  "pentaho/visual/util",
   "cdf/lib/CCC/def",
   "pentaho/i18n!./i18n/view"
 ], function(module, BaseView, util, def, bundle) {
@@ -47,7 +47,7 @@ define([
       if(value) {
         options.axisTitleFont = options.axisFont = this._labelFont;
       } else {
-        options.axisTitleFont = options.axisFont = util.defaultFont(null, 12);
+        options.axisTitleFont = options.axisFont = util.getDefaultFont(null, 12);
       }
 
       // ---
