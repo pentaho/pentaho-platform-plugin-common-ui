@@ -879,7 +879,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     // Not found or found at last position.
     var index = catArray.indexOf(currentCatId);
     if (index < 0 || index === (L - 1)) {
-      return dom.byId(catArray[0]);
+      return null;
     }
 
     var nextHeader = dom.byId(catArray[index + 1]);
@@ -905,7 +905,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     // Not found or found at first position.
     var index = catArray.indexOf(currentCatId);
     if (index <= 0) {
-      return dom.byId(catArray[L - 1]);
+      return null;
     }
 
     var prevHeader = dom.byId(catArray[index - 1]);
@@ -929,7 +929,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     // Not found or found at last position.
     var index = fieldArray.indexOf(elem);
     if (index < 0 || index === (L - 1)) {
-      return fieldArray[0];
+      return null;
     }
 
     var nextField = fieldArray[index + 1];
@@ -991,50 +991,47 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           break;
         }
       }
-      header.setAttribute('tabindex', '-1');
       if (firstChild) {
         // Move focus to first shown child under Nth Header
         firstChild.setAttribute('tabindex', '0');
+        header.setAttribute('tabindex', '-1');
         firstChild.focus();
       } else {
-        if(!this._isLastHeader(header)) {
           var nextHeader = this._findNextHeader(header);
           if (nextHeader) {
             // Move from Nth header to (N+1) Header if Nth Header is closed
             nextHeader.setAttribute('tabindex', '0');
+            header.setAttribute('tabindex', '-1');
             nextHeader.focus();
           }
-        }
       }
     } else if (code === keys.UP_ARROW) {
-      if (!this._isFirstHeader(header)) {
         e.preventDefault();
         var previousHeader = this._findPrevHeader(header);
-          if (previousHeader.firstElementChild !== null){
-              expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
-          }
-        var lastChild;
+        if (previousHeader) {
+          expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          var lastChild;
 
-        if (expanded) {
-          children = query("." + previousHeader.id, this.containerNode);
-          for (var j = children.length - 1; j > -1; j--) {
-            if (this._isHiddenChild(children[j])) {
-              continue;
+          if (expanded) {
+            children = query("." + previousHeader.id, this.containerNode);
+            for (var j = children.length - 1; j > -1; j--) {
+              if (this._isHiddenChild(children[j])) {
+                continue;
+              }
+              lastChild = children[j];
+              break;
             }
-            lastChild = children[j];
-            break;
           }
-        }
-        header.setAttribute('tabindex', '-1');
-        if (lastChild) {
-          // Move from Nth header to Last Sibling under (N-1) Header if (N-1) Header is open
-          lastChild.setAttribute('tabindex', '0');
-          lastChild.focus();
-        } else {
-          // Move from Nth header to (N-1) Header if (N-1) header is closed
-          previousHeader.setAttribute('tabindex', '0');
-          previousHeader.focus();
-        }
+          header.setAttribute('tabindex', '-1');
+          if (lastChild) {
+            // Move from Nth header to Last Sibling under (N-1) Header if (N-1) Header is open
+            lastChild.setAttribute('tabindex', '0');
+            lastChild.focus();
+          } else {
+            // Move from Nth header to (N-1) Header if (N-1) header is closed
+            previousHeader.setAttribute('tabindex', '0');
+            previousHeader.focus();
+          }
       }
     } else if (code === keys.LEFT_ARROW) {
       if (expanded) {
@@ -1045,20 +1042,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         this.expandCollapseCategory({ target: header.firstChild });
       }
     }
-  },
-
-  _isFirstHeader: function (elem) {
-    return elem.classList.contains("categoryNodeFirst");
-  },
-
-  _isLastHeader: function (elem) {
-    var fieldCategoriesLength = this.fieldCategories.length;
-    return elem.id === this.fieldCategories[fieldCategoriesLength - 1];
-  },
-
-  _isLastField: function (elem) {
-    var fieldListNodesLength = this.fieldListNodes.length;
-    return elem.id === this.fieldListNodes[ fieldListNodesLength - 1].id;
   },
 
   _isField: function (elem) {
@@ -1080,7 +1063,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         header.focus();
       }
     } else if (key === 'Down') {
-      if (!this._isLastField(node) || !this._isLastHeader(groupHeader)) {
         var nextSibling = this._findNextField(node);
         if (nextSibling && this._isField(nextSibling)) {
           nextSibling.setAttribute('tabindex', '0');
@@ -1094,7 +1076,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           node.setAttribute('tabindex', '-1');
           nextHeader.focus();
         }
-      }
     }
   },
 
