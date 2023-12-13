@@ -41,6 +41,7 @@ define([
   "./PointAbstract",
   "./Scatter",
   "./Sunburst",
+  "./Funnel",
   "./Waterfall",
   "./Treemap",
   "./mixins/Interpolated",

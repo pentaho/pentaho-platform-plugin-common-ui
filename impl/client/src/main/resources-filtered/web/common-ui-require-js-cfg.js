@@ -206,6 +206,8 @@
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
   // endregion
 
+  requirePaths["common-ui/echarts"] = basePath + "/echarts/echarts";
+
   // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 
@@ -317,6 +319,13 @@
     }
   };
 
+  requireModules["pentaho/visual/models/Funnel"] = {
+    base: "pentaho/visual/models/Abstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/visual/views/echarts/Funnel"}
+    }
+  };
+
   requireModules["pentaho/visual/models/MetricPointAbstract"] = {base: "pentaho/visual/models/CartesianAbstract"};
   requireModules["pentaho/visual/models/Scatter"] = {
     base: "pentaho/visual/models/MetricPointAbstract",
@@ -379,6 +388,7 @@
 
   // region CCC Views
   requireModules["pentaho/ccc/visual/Abstract"] = {base: null};
+  requireModules["pentaho/visual/views/echarts/Abstract"] = {base: null};
   requireModules["pentaho/ccc/visual/CartesianAbstract"] = {base: "pentaho/ccc/visual/Abstract"};
   requireModules["pentaho/ccc/visual/CategoricalContinuousAbstract"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
 
@@ -409,6 +419,7 @@
 
   requireModules["pentaho/ccc/visual/HeatGrid"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
   requireModules["pentaho/ccc/visual/Waterfall"] = {base: "pentaho/ccc/visual/BarAbstract"};
+  requireModules["pentaho/visual/views/echarts/Funnel"] = {base: "pentaho/visual/views/echarts/Abstract"};
   // endregion
 
   // region Color Palettes
@@ -721,6 +732,7 @@
       "pentaho/visual/models/Bubble",
       "pentaho/visual/models/Pie",
       "pentaho/visual/models/Donut",
+      "pentaho/visual/models/Funnel",
       "pentaho/visual/models/Treemap",
       "pentaho/visual/models/HeatGrid",
       "pentaho/visual/models/Line",
@@ -773,6 +785,8 @@
       "pentaho/ccc/visual/Bubble",
       "pentaho/ccc/visual/Pie",
       "pentaho/ccc/visual/Donut",
+      "pentaho/visual/views/echarts/Funnel",
+      "pentaho/visual/views/echarts/Abstract",
       "pentaho/ccc/visual/HeatGrid",
       "pentaho/ccc/visual/Line",
       "pentaho/ccc/visual/LineAbstract",

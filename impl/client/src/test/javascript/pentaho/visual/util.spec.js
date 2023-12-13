@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019 Hitachi Vantara.  All rights reserved.
+ * Copyright 2019 - 2023 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,6 +261,30 @@ define([], function() {
         var cssClasses = visualUtil.getCssClasses(vizTypeId, viewTypeId);
 
         expect(cssClasses).toEqual("package-Model package-2-1-1-Model package-View package-2-1-1-View");
+      });
+    });
+
+    describe("#getDefaultFont(font, fontSize)", function() {
+      it("should return default CSS font string if no argument is given", function() {
+        var defaultFont = visualUtil.getDefaultFont();
+
+        expect(defaultFont).toBe("10px OpenSansRegular, sans-serif");
+      });
+
+      it("should return CSS font string with `font`,if the `font` does not contains the special text 'default'", function() {
+        var font = "Times New Roman, serif";
+
+        var defaultFont = visualUtil.getDefaultFont(font);
+
+        expect(defaultFont).toBe("Times New Roman, serif");
+      });
+
+      it("should return CSS font string with default font and `fontSize`", function() {
+        var fontSize = 14;
+
+        var defaultFont = visualUtil.getDefaultFont(null, fontSize);
+
+        expect(defaultFont).toBe("14px OpenSansRegular, sans-serif");
       });
     });
   });

@@ -31,7 +31,8 @@ define([
         "insideEnd", "insideBase",        // StackedBar, NormalizedBar (vertical and horizontal)
         "outsideEnd",                     // Bar, HorizontalBar, BarLine
         "left", "right", "top", "bottom", // Line, MetricDot, StackedArea
-        "outside", "inside"               // Pie
+        "outside", "inside",               // Pie
+        "insideRight", "insideLeft", "topLeft", "bottomLeft", "topRight", "bottomRight" //Funnel
 
       ]
     }
