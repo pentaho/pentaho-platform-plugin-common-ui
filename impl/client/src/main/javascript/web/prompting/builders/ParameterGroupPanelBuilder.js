@@ -52,7 +52,7 @@ define(['cdf/lib/Base', '../components/HorizontalTableBasedPromptLayoutComponent
         promptPanel: args.promptPanel,
         label: label,
         components: args.components,
-        cssClass: 'parameter-wrapper'
+        cssClass: 'parameter-wrapper flex-row flex-wrap'
       };
 
       switch (widget.type) {
