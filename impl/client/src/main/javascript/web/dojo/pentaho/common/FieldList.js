@@ -259,9 +259,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (searchContainer) {
       var searchBox = construct.create("div",
       {
-        "id": "searchBox"
+        "id": "searchBox",
+        "class": "flex-row flex-center-v"
       }, searchContainer);
-      searchBox.innerHTML = this.localeStringFind + " <input type=text id='searchField' /><div id='clearSearchField' title='" + this.localeStringClearSearch + "' class='hidden pentaho-deletebutton'></div>";
+      searchBox.innerHTML = this.localeStringFind + " <input type=text id='searchField' /><div id='clearSearchField' title='" + this.localeStringClearSearch + "' class='hidden pentaho-deletebutton icon-zoomable flex-none'></div>";
       this.connectHandles.push(on(dom.byId("searchField"),  'keyup', lang.hitch( this,  "searchFields")));
       this.connectHandles.push(on(dom.byId("clearSearchField"),  'click', lang.hitch( this,  "onClearSearch")));
     }
@@ -301,7 +302,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       // create div for category
       var categoryDiv = construct.create("div",
         {
-          "id": catId
+          "id": catId,
+          "class": "flex-row flex-center-v gap-none"
         }, this.containerNode);
       if (isFirstCategory) {
         domClass.add(categoryDiv, "categoryNodeFirst");
@@ -316,7 +318,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       var categoryIndicator = construct.create("div",
         {
           "id": catId + "-indicator",
-          "class": "categoryIndicator treenode-open",
+          "class": "categoryIndicator treenode-open icon-zoomable",
           "collapsed": "false",
           "categoryId": catId
         }, categoryDiv);
@@ -428,6 +430,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       domClass.add(div, "field");
       domClass.add(div, "treenode-leaf-label");
       domClass.add(div, "pentaho-listitem");
+      domClass.add(div, "flex-row flex-center-v gap-none");
       // Wire up interaction
       this.connectHandles.push(on(div,  "contextmenu", lang.hitch( this,  function(event) {
         this.updateSelectionForContextMenu(item.fieldId);
