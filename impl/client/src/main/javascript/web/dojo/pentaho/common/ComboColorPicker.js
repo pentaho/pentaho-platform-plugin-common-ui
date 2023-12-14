@@ -128,6 +128,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                   cell.addEventListener("mouseover", function(event) { this.style.borderColor = 'black'; } );
                   cell.addEventListener("mouseleave", function(event) { this.style.borderColor = ''; } );
                   cell.appendChild(div);
+                  this.own(a11yUtil.makeAccessibleActionButton(div));
 
                   if((idx % 10) == 9) {
                       // force a new row
@@ -137,7 +138,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           },
 
           usedColorClick: function(event) {
-              var idx = parseInt(event.target.id.substr('usedcolor'.length));
+              var idx = parseInt(event.target.id.substring('usedcolor'.length));
               this._colorChange(this.usedColors[idx], false);
           },
 
