@@ -30,7 +30,7 @@ define([
       id: module.id,
       mixins: [MultiChartedModel, ScaleColorDiscreteModel],
 
-      category: "treemapchart",
+      category: "misc2",
 
       // Properties
       props: [

@@ -16,8 +16,8 @@
 define([
   "pentaho/module!_",
   "./Abstract",
-  "cdf/lib/CCC/def",
-], function (module, BaseView, def) {
+  "cdf/lib/CCC/def"
+], function(module, BaseView, def) {
 
   "use strict";
 
@@ -32,13 +32,13 @@ define([
 
     _discreteColorRole: "rows",
 
-    _configureOptions: function () {
+    _configureOptions: function() {
       this.base();
 
       this.options.layoutMode = this.model.treemapLayoutMode;
     },
 
-    _configureLabels: function (){
+    _configureLabels: function() {
       var model = this.model;
       var options = this.options;
 
@@ -46,12 +46,12 @@ define([
 
       options.valuesVisible = valuesVisible;
 
-      if (valuesVisible && model.labelsOption !== "none" && this.model.size.hasFields){
+      if(valuesVisible && model.labelsOption !== "none" && this.model.size.hasFields) {
         options.valuesMask = this._configureValuesMask();
       }
     },
 
-    _configureValuesMask: function () {
+    _configureValuesMask: function() {
       return "{category} ({size})";
     }
 

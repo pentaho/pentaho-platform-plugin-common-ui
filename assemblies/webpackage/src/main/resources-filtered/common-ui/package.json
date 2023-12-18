@@ -397,6 +397,15 @@
         }
       },
 
+      "pentaho/visual/models/Boxplot": {
+        "base": "pentaho/visual/models/CategoricalContinuousAbstract",
+        "annotations": {
+          "pentaho/visual/DefaultView": {
+            "module": "pentaho/ccc/visual/Boxplot"
+          }
+        }
+      },
+
       "pentaho/visual/models/MetricPointAbstract": {
         "base": "pentaho/visual/models/CartesianAbstract"
       },

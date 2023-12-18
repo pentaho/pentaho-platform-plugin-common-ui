@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,18 @@ define([
   "use strict";
 
   return BaseView.extend(module.id, {
-    _cccClass: "BoxplotChart"
+    _cccClass: "BoxplotChart",
+
+    _roleToCccRole: {
+      "rows": "category",
+      "columns": "series",
+      "multi": "multiChart",
+      "minimum": "minimum",
+      "lowerQuartile": "lowerQuartil",
+      "measures": "median",
+      "upperQuartile": "upperQuartil",
+      "maximum": "maximum"
+    }
   })
   .implement(module.config);
 });

@@ -28,6 +28,7 @@ define([
   "./BarStacked",
   "./BarStackedHorizontal",
   "./Bubble",
+  "./Boxplot",
   "./CartesianAbstract",
   "./CategoricalContinuousAbstract",
   "./Dot",
