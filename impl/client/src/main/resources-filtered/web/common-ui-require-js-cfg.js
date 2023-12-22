@@ -299,6 +299,12 @@
       "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Waterfall"}
     }
   };
+  requireModules["pentaho/visual/models/Boxplot"] = {
+    base: "pentaho/visual/models/CategoricalContinuousAbstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/ccc/visual/Boxplot"}
+    }
+  };
 
   requireModules["pentaho/visual/models/Sunburst"] = {
     base: "pentaho/visual/models/Abstract",
@@ -393,6 +399,7 @@
   requireModules["pentaho/ccc/visual/CategoricalContinuousAbstract"] = {base: "pentaho/ccc/visual/CartesianAbstract"};
 
   requireModules["pentaho/ccc/visual/BarAbstract"] = {base: "pentaho/ccc/visual/CategoricalContinuousAbstract"};
+  requireModules["pentaho/ccc/visual/Boxplot"] = {base: "pentaho/ccc/visual/CategoricalContinuousAbstract"};
   requireModules["pentaho/ccc/visual/Bar"] = {base: "pentaho/ccc/visual/BarAbstract"};
   requireModules["pentaho/ccc/visual/BarHorizontal"] = {base: "pentaho/ccc/visual/BarAbstract"};
   requireModules["pentaho/ccc/visual/BarStacked"] = {base: "pentaho/ccc/visual/BarAbstract"};
@@ -739,6 +746,7 @@
       "pentaho/visual/models/LineAbstract",
       "pentaho/visual/models/LineStacked",
       "pentaho/visual/models/Scatter",
+      "pentaho/visual/models/Boxplot",
       "pentaho/visual/models/Dot",
       "pentaho/visual/models/types/SliceOrder",
       "pentaho/visual/models/Sunburst",

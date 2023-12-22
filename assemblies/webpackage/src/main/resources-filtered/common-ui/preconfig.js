@@ -392,6 +392,7 @@ if(!useDebug) {
     "pentaho/visual/models/Sunburst",
     "pentaho/visual/models/Waterfall",
     "pentaho/visual/models/Treemap",
+    "pentaho/visual/models/Boxplot",
     "pentaho/visual/models/Funnel",
     "pentaho/visual/models/all",
     "pentaho/visual/role/adaptation/Strategy",
