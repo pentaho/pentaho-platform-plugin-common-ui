@@ -921,7 +921,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     return prevHeader;
   },
 
-  _findNextField: function (elem) {
+  findNextField: function (elem) {
     var fieldArray = Array.from(this.containerNode.children);
     var L = fieldArray.length;
 
@@ -936,17 +936,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
 
     var nextField = fieldArray[index + 1];
-    if (this._isHiddenChild(nextField)) {
-      return this._findNextField(nextField);
+    if (nextField.id === "fieldListFlag" || this._isHiddenChild(nextField)) {
+      return this.findNextField(nextField);
     }
-      var calButton = dom.byId("catId-add-button");
-      var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
-      calButton.setAttribute("tabindex", tabIndexValue);
+
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
 
     return nextField;
   },
 
-  _findPrevField: function (elem) {
+  findPrevField: function (elem) {
     var fieldArray = Array.from(this.containerNode.children);
     var L = fieldArray.length;
 
@@ -961,12 +962,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
 
     var prevField = fieldArray[index - 1];
-    if (this._isHiddenChild(prevField)) {
-      return this._findPrevField(prevField);
+    if (prevField.id === "fieldListFlag" || this._isHiddenChild(prevField)) {
+      return this.findPrevField(prevField);
     }
-      var calButton = dom.byId("catId-add-button");
-      var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
-      calButton.setAttribute("tabindex", tabIndexValue);
+
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
 
     return prevField;
   },
@@ -1054,7 +1056,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   _moveFocus: function (node, key) {
     var groupHeader = dom.byId(dojo.attr(node, "categoryId"));
     if (key === 'Up') {
-      var previousSibling = this._findPrevField(node);
+      var previousSibling = this.findPrevField(node);
       var header = groupHeader;
       if (previousSibling && this._isField(previousSibling)) {
         previousSibling.setAttribute('tabindex', '0');
@@ -1066,7 +1068,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         header.focus();
       }
     } else if (key === 'Down') {
-        var nextSibling = this._findNextField(node);
+        var nextSibling = this.findNextField(node);
         if (nextSibling && this._isField(nextSibling)) {
           nextSibling.setAttribute('tabindex', '0');
           node.setAttribute('tabindex', '-1');
