@@ -130,8 +130,17 @@ define([], function() {
           if (!param.attributes.hidden || param.attributes.hidden == 'false') { // Can be 'false' or undefined
             var index = group.parameters.indexOf(param);
             if (index > 0) {
-              if ( !group.parameters[index-1].attributes.hidden || group.parameters[index-1].attributes.hidden == 'false' ) {
-                param.after = group.parameters[index-1];
+              // PhantomJS doesn't work with Array.prototype.find() or similar, so we have to do it the long way...
+              var earlierParams = group.parameters.slice(0, index);
+              var lastUnhiddenParam;
+              for (var i = earlierParams.length - 1; i >= 0; i--) {
+                if (!earlierParams[i].attributes.hidden || earlierParams[i].attributes.hidden == 'false') {
+                  lastUnhiddenParam = earlierParams[i];
+                  break;
+                }
+              }
+              if (lastUnhiddenParam) {
+                param.after = lastUnhiddenParam;
               }
             }
 

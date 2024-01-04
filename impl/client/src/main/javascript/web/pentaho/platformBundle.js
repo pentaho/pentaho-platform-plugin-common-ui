@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,10 @@ define([
   "pentaho/visual/samples/calc/Model",
 
   // CCC views
-  "pentaho/ccc/visual/all"
+  "pentaho/ccc/visual/all",
+
+  // Views from arbitrary graphical libraries
+  "pentaho/visual/views/all"
 ], function() {
   // Function must be here, or r.js generates a bundle whose last module, this one, is anonymous...
   "use strict";

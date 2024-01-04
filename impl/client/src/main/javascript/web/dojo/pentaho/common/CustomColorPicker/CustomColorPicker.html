@@ -1,4 +1,4 @@
-<table dojoAttachEvent="onkeypress: _handleKey" cellpadding="0" cellspacing="0" border="0">
+<table dojoAttachEvent="onkeypress: _handleKey" cellpadding="0" cellspacing="0" border="0" role="presentation">
 	<tr>
         <td>
             <table>
@@ -29,10 +29,10 @@
     </tr>
     <tr>
 		<td valign="top">
-			<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+			<table cellpadding="0" cellspacing="0" border="0" style="width:100%" role="presentation">
 				<tr data-dojo-attach-point="previewNodes">
 					<td valign="top" class="dojoxColorPickerPreviewContainer">
-						<table cellpadding="0" cellspacing="0">
+						<table cellpadding="0" cellspacing="0" role="presentation">
 							<tr>
 								<td valign="top" class="dojoxColorPickerRightPad">
 									<div data-dojo-attach-point="previewNode" class="dojoxColorPickerPreview"></div>
@@ -46,33 +46,33 @@
 				</tr>
 				<tr>
 					<td valign="top">
-						<table class="dojoxColorPickerOptional" cellpadding="0" cellspacing="0" style="width:100%">
+						<table class="dojoxColorPickerOptional" cellpadding="0" cellspacing="0" style="width:100%" role="presentation">
 							<tr>
 								<td>
-									<div class="dijitInline dojoxColorPickerRgb" data-dojo-attach-point="rgbNode" style="width:100%">
-										<table cellpadding="1" cellspacing="1" style="width:100%">
-										<tr><td><label for="${_uId}_r">${redLabel}</label></td><td><input id="${_uId}_r" data-dojo-attach-point="Rval" size="1" dojoAttachEvent="onchange: _colorInputChange"></td>
-										<td><label for="${_uId}_g">${greenLabel}</label></td><td><input id="${_uId}_g" data-dojo-attach-point="Gval" size="1" dojoAttachEvent="onchange: _colorInputChange"></td>
-										<td><label for="${_uId}_b">${blueLabel}</label></td><td><input id="${_uId}_b" data-dojo-attach-point="Bval" size="1" dojoAttachEvent="onchange: _colorInputChange"></td></tr>
+									<div class="dijitInline dojoxColorPickerRgb flex-row gap-none" data-dojo-attach-point="rgbNode" style="width:100%">
+										<table cellpadding="1" cellspacing="1" style="width:100%" role="presentation">
+										<tr><td><label for="${_uId}_r" class="flex-none">${redLabel}</label></td><td><input id="${_uId}_r" data-dojo-attach-point="Rval" size="1" dojoAttachEvent="onchange: _colorInputChange"></td>
+										<td><label for="${_uId}_g" class="flex-none">${greenLabel}</label></td><td><input id="${_uId}_g" data-dojo-attach-point="Gval" size="1" dojoAttachEvent="onchange: _colorInputChange"></td>
+										<td><label for="${_uId}_b" class="flex-none">${blueLabel}</label></td><td><input id="${_uId}_b" data-dojo-attach-point="Bval" size="1" dojoAttachEvent="onchange: _colorInputChange"></td></tr>
 										</table>
 									</div>
 								</td>
 							</tr>
 							<tr data-dojo-attach-point="hsvRow">
 								<td>
-									<div class="dijitInline dojoxColorPickerHsv" data-dojo-attach-point="hsvNode">
-										<table cellpadding="1" cellspacing="1" style="width:100%">
-										<tr><td><label for="${_uId}_h">${hueLabel}</label></td><td><input id="${_uId}_h" data-dojo-attach-point="Hval"size="1" dojoAttachEvent="onchange: _colorInputChange"> ${degLabel}</td>
-										<td><label for="${_uId}_s">${saturationLabel}</label></td><td><input id="${_uId}_s" data-dojo-attach-point="Sval" size="1" dojoAttachEvent="onchange: _colorInputChange"> ${percentSign}</td>
-										<td><label for="${_uId}_v">${valueLabel}</label></td><td><input id="${_uId}_v" data-dojo-attach-point="Vval" size="1" dojoAttachEvent="onchange: _colorInputChange"> ${percentSign}</td></tr>
+									<div class="dijitInline dojoxColorPickerHsv flex-row gap-none" data-dojo-attach-point="hsvNode">
+										<table cellpadding="1" cellspacing="1" style="width:100%" role="presentation">
+										<tr><td><label for="${_uId}_h" class="flex-none">${hueLabel}</label></td><td><input id="${_uId}_h" data-dojo-attach-point="Hval"size="1" dojoAttachEvent="onchange: _colorInputChange"> ${degLabel}</td>
+										<td><label for="${_uId}_s" class="flex-none">${saturationLabel}</label></td><td><input id="${_uId}_s" data-dojo-attach-point="Sval" size="1" dojoAttachEvent="onchange: _colorInputChange"> ${percentSign}</td>
+										<td><label for="${_uId}_v" class="flex-none">${valueLabel}</label></td><td><input id="${_uId}_v" data-dojo-attach-point="Vval" size="1" dojoAttachEvent="onchange: _colorInputChange"> ${percentSign}</td></tr>
 										</table>
 									</div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div class="dojoxColorPickerHex" data-dojo-attach-point="hexNode" aria-live="polite">
-										<label for="${_uId}_hex">&nbsp;${hexLabel}&nbsp;</label><input id="${_uId}_hex" data-dojo-attach-point="hexCode, focusNode, valueNode" size="6" class="dojoxColorPickerHexCode" dojoAttachEvent="onchange: _colorInputChange">
+									<div class="dojoxColorPickerHex flex-row gap-none" data-dojo-attach-point="hexNode" aria-live="polite">
+										<label for="${_uId}_hex" class="flex-none">&nbsp;${hexLabel}&nbsp;</label><input id="${_uId}_hex" data-dojo-attach-point="hexCode, focusNode, valueNode" size="6" class="dojoxColorPickerHexCode" dojoAttachEvent="onchange: _colorInputChange">
 									</div>
 								</td>
 							</tr>

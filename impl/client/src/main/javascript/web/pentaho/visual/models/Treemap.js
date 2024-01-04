@@ -21,7 +21,7 @@ define([
   "./mixins/MultiCharted",
   "./mixins/ScaleColorDiscrete",
   "./types/TreemapLayoutMode",
-  "./types/LabelsOption",
+  "./types/LabelsOption"
 ], function (module, bundle, BaseModel, MultiChartedModel, ScaleColorDiscreteModel, TreemapLayoutMode, LabelsOption) {
   "use strict";
 
@@ -30,7 +30,7 @@ define([
       id: module.id,
       mixins: [MultiChartedModel, ScaleColorDiscreteModel],
 
-      category: "treemapchart",
+      category: "misc2",
 
       // Properties
       props: [
