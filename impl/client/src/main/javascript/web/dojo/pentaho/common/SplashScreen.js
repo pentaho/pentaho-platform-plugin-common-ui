@@ -20,10 +20,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       return declare("pentaho.common.SplashScreen", [Dialog],
      {
         buttons: ['ok'],
-        
         imagePath: '',
-        
         hasTitleBar: false,
+        responsive: true, // Not intended to be set to false.
+        responsiveClasses: "dw-sm",
         
         setTitle: function(title) {
             this.splashtitle.innerHTML = title;

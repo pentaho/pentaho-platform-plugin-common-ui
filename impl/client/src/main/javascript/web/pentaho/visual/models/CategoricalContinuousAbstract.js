@@ -49,7 +49,8 @@ define([
           name: "measures", // VISUAL_ROLE
           base: "pentaho/visual/role/Property",
           modes: [
-            {dataType: ["number"]}
+            {dataType: ["number"]},
+            {dataType: "number"}
           ],
           ordinal: 7
         }

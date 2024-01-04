@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
+ * Copyright 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 define([
   "pentaho/module!_",
-  "./LineAbstract"
-], function(module, BaseView) {
+  "./PointAbstract"
+], function (module, BaseView) {
 
   "use strict";
 
-  // "pentaho/visual/models/Line"
-
-  return BaseView.extend(module.id)
+  // "pentaho/visual/models/Dot"
+  return BaseView.extend(module.id, {
+    _cccClass: "DotChart"
+  })
   .implement(module.config);
 });

@@ -47,14 +47,15 @@ define([
   "dojo/aspect",
   "pentaho/common/Messages",
   "pentaho/common/propertiesPanel/Configuration",
-  "common-ui/util/_focus"
+  "common-ui/util/_focus",
+  "dijit/Tooltip"
 ], function(declare, ItemFileReadStore,
             registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
             BorderContainer, HorizontalSlider, TextBox, ComboBox,
             Select, CheckBox, TitlePane,
             on, query, array, lang, html, construct, string, domClass,
             Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
-            Messages, Configuration, focusUtil) {
+            Messages, Configuration, focusUtil, Tooltip) {
 
   /* eslint-disable dot-notation, new-cap */
 
@@ -1487,29 +1488,64 @@ define([
 
   var SliderUI = declare([HorizontalSlider, StatefulUI, Evented], {
 
-      className: "propPanel_slider propPanel_control",
-      minimum: 0,
-      maximum: 100,
-      style: "width: 100%",
-      intermediateChanges: true,
-      discreteValues: true,
+    className: "propPanel_slider propPanel_control",
+    minimum: 0,
+    maximum: 100,
+    style: "width: 100%",
+    intermediateChanges: true,
+    discreteValues: true,
 
-      constructor: function(options) {
+    constructor: function (options) {
 
-        options.id = newId(this.model.id + "_slider"); // -> this.id
+      options.id = newId(this.model.id + "_slider"); // -> this.id
 
-        this.value = this.model.value;
+      this.value = this.model.value;
 
-        if(this.model.minimum) { this.minimum = this.model.minimum; }
-        if(this.model.maximum) { this.maximum = this.model.maximum; }
-
-        this.discreteValues = this.maximum - this.minimum + 1;
-      },
-
-      onChange: function() {
-        this.model.set('value', this.value);
+      if (this.model.minimum) {
+        this.minimum = this.model.minimum;
       }
-    });
+      if (this.model.maximum) {
+        this.maximum = this.model.maximum;
+      }
+
+      this.discreteValues = this.maximum - this.minimum + 1;
+    },
+
+    postCreate: function () {
+
+      this.slider = registry.byId(this.id);
+
+      this.own(
+        on(this.domNode, "mouseover", lang.hitch(this, "onMouseOver")),
+        on(this.domNode, "mouseleave", lang.hitch(this, "hideTooltip")),
+        on(this.domNode, "focusin", lang.hitch(this, "onFocusIn")),
+        on(this.domNode, "focusout", lang.hitch(this, "hideTooltip"))
+      );
+
+      this.uiKeyNode = this.slider.focusNode;
+      this.inherited(arguments);
+    },
+
+    destroy: function () {
+      this.inherited(arguments);
+    },
+
+    onMouseOver: function () {
+      Tooltip.show(this.value, this.slider.focusNode, ['above']);
+    },
+
+    hideTooltip: function () {
+      Tooltip.hide(this.slider.focusNode);
+    },
+
+    onFocusIn: function () {
+      Tooltip.show(this.value, this.slider.focusNode, ['above']);
+    },
+
+    onChange: function () {
+      this.model.set('value', this.value);
+    }
+  });
   Panel.registeredTypes["slider"] = SliderUI;
 
   var TextboxUI = declare([TextBox, StatefulUI, Evented], {

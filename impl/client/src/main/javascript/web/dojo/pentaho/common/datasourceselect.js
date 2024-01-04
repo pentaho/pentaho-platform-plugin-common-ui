@@ -34,6 +34,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         models: null,
         buttons: ['Ok_txt', 'Cancel_txt'],
         scrollPosition: 0,
+        responsive: true, // Not intended to be set to false.
+        responsiveClasses: "dw-md",
 
         setModelList: function (list) {
           this.models = list;

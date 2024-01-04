@@ -22,6 +22,7 @@ define([
   "cdf/lib/CCC/pvc",
   "cdf/lib/CCC/protovis",
   "./_util",
+  "pentaho/visual/util",
   "pentaho/data/util",
   "pentaho/data/filter/Or",
   "pentaho/data/filter/And",
@@ -36,7 +37,7 @@ define([
   "pentaho/debug/Levels",
   "pentaho/i18n!view",
   "css!./theme/tipsy.css"
-], function(module, BaseView, Model, UserError, def, pvc, pv, util, dataUtil, OrFilter, AndFilter, IsEqualFilter,
+], function(module, BaseView, Model, UserError, def, pvc, pv, util, visualUtil, dataUtil, OrFilter, AndFilter, IsEqualFilter,
             O, visualColorUtils, DataView, logger, specUtil, arg, debugMgr, DebugLevels, bundle) {
 
   "use strict";
@@ -715,7 +716,7 @@ define([
       var options = this.options;
       var model = this.model;
 
-      this._labelFont = util.defaultFont(model.labelSize ? util.readFontModel(model, "label") : null);
+      this._labelFont = visualUtil.getDefaultFont(model.labelSize ? util.readFontModel(model, "label") : null);
 
       var value = model.backgroundFill;
       if(value && value !== "none") {
@@ -1220,9 +1221,9 @@ define([
       var labelSize = model.labelSize;
       if(labelSize) {
         var labelFontFamily = model.labelFontFamily;
-        titleFont = util.defaultFont((labelSize + 2) + "px " + labelFontFamily);
+        titleFont = visualUtil.getDefaultFont((labelSize + 2) + "px " + labelFontFamily);
       } else {
-        titleFont = util.defaultFont(null, 12);
+        titleFont = visualUtil.getDefaultFont(null, 12);
       }
 
       options.titleFont = titleFont;
@@ -1483,7 +1484,7 @@ define([
         options.legendFont = util.readFontModel(model, "legend");
       }
 
-      options.legendFont = util.defaultFont(options.legendFont, 10);
+      options.legendFont = visualUtil.getDefaultFont(options.legendFont, 10);
 
       var legendPosition = options.legendPosition;
       var isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";

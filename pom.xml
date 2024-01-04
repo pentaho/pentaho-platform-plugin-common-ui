@@ -32,6 +32,7 @@
     <dojo.version>1.9.2</dojo.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <pentaho-cdf-plugin.version>10.1.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
+    <echarts.version>5.4.3</echarts.version>
     <!-- Removed due to custom changes in the current common-ui version -->
     <!-- (mainly the exporting of the Handlebars global variable) -->
     <!--<handlebars.version>4.0.5</handlebars.version>-->
@@ -91,6 +92,11 @@
             <groupId>*</groupId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>echarts</artifactId>
+        <version>${echarts.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

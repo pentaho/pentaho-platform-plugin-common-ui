@@ -8,7 +8,7 @@
             <td>
         </tr>
     </table>
-    <div class="dialog-content pentaho-padding-sm" style="heightx:400px">
+    <div class="dialog-content pentaho-padding-sm flex-column gap-none" style="heightx:400px">
         <table style="width:100%;heightx:270px" border="0">
             <tr>
                 <td class="label" data-dojo-attach-point="currentLbl" style="width:50%">
@@ -25,11 +25,11 @@
         </div> 
         <div data-dojo-attach-point="colorpickertabs" data-dojo-typex="dijit.layout.StackContainer" class="colorpickertabs tabpanel" isLayoutContainer="true" tabStrip="true">
             <div data-dojo-attach-point="palettetab" data-dojo-typex="dijit.layout.ContentPane" selected="true" style="heightx: 210px; padding: 0px; overflow:hidden;" class="palettetab">
-                <div style="height:218px; width:218px;">
-                    <table style="width:100%;height:100%">
+                <div class="flex-column gap-none" style="height:218px; width:218px;">
+                    <table style="width:100%;height:100%" role="presentation">
                         <tr>    
                             <td style="text-align:center">
-                                <div data-dojo-attach-point="palette" data-dojo-type="dijit.ColorPalette">
+                                <div data-dojo-attach-point="palette" data-dojo-type="dijit.ColorPalette" class="flex-row flex-wrap gap-none">
                                 </div>
                             </td>
                         </tr>
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div data-dojo-attach-point="customtab" data-dojo-typex="dijit.layout.ContentPane" selected="false" style="height: 230px; padding: 0px; overflow:hidden;" class="hidden">
-                <div style="height:230px; width:180px; padding: 4px 20px; position: absolute; left: 15px">
+                <div class="flex-column gap-none" style="height:230px; width:180px; padding: 4px 20px; position: absolute; left: 15px">
                     <div data-dojo-type="pentaho.common.CustomColorPicker" data-dojo-attach-point="colorPicker" showPreview="false" showHsv="false" webSafe="false" style="height:220px">
                     </div>
                 </div>

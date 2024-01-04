@@ -259,9 +259,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     if (searchContainer) {
       var searchBox = construct.create("div",
       {
-        "id": "searchBox"
+        "id": "searchBox",
+        "class": "flex-row flex-center-v"
       }, searchContainer);
-      searchBox.innerHTML = this.localeStringFind + " <input type=text id='searchField' /><div id='clearSearchField' title='" + this.localeStringClearSearch + "' class='hidden pentaho-deletebutton'></div>";
+      searchBox.innerHTML = this.localeStringFind + " <input type=text id='searchField' /><div id='clearSearchField' title='" + this.localeStringClearSearch + "' class='hidden pentaho-deletebutton icon-zoomable flex-none'></div>";
       this.connectHandles.push(on(dom.byId("searchField"),  'keyup', lang.hitch( this,  "searchFields")));
       this.connectHandles.push(on(dom.byId("clearSearchField"),  'click', lang.hitch( this,  "onClearSearch")));
     }
@@ -301,7 +302,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       // create div for category
       var categoryDiv = construct.create("div",
         {
-          "id": catId
+          "id": catId,
+          "class": "flex-row flex-center-v gap-none"
         }, this.containerNode);
       if (isFirstCategory) {
         domClass.add(categoryDiv, "categoryNodeFirst");
@@ -316,7 +318,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       var categoryIndicator = construct.create("div",
         {
           "id": catId + "-indicator",
-          "class": "categoryIndicator treenode-open",
+          "class": "categoryIndicator treenode-open icon-zoomable",
           "collapsed": "false",
           "categoryId": catId
         }, categoryDiv);
@@ -428,6 +430,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       domClass.add(div, "field");
       domClass.add(div, "treenode-leaf-label");
       domClass.add(div, "pentaho-listitem");
+      domClass.add(div, "flex-row flex-center-v gap-none");
       // Wire up interaction
       this.connectHandles.push(on(div,  "contextmenu", lang.hitch( this,  function(event) {
         this.updateSelectionForContextMenu(item.fieldId);
@@ -879,7 +882,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     // Not found or found at last position.
     var index = catArray.indexOf(currentCatId);
     if (index < 0 || index === (L - 1)) {
-      return dom.byId(catArray[0]);
+      return null;
     }
 
     var nextHeader = dom.byId(catArray[index + 1]);
@@ -905,7 +908,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     // Not found or found at first position.
     var index = catArray.indexOf(currentCatId);
     if (index <= 0) {
-      return dom.byId(catArray[L - 1]);
+      return null;
     }
 
     var prevHeader = dom.byId(catArray[index - 1]);
@@ -918,7 +921,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     return prevHeader;
   },
 
-  _findNextField: function (elem) {
+  findNextField: function (elem) {
     var fieldArray = Array.from(this.containerNode.children);
     var L = fieldArray.length;
 
@@ -929,21 +932,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     // Not found or found at last position.
     var index = fieldArray.indexOf(elem);
     if (index < 0 || index === (L - 1)) {
-      return fieldArray[0];
+      return null;
     }
 
     var nextField = fieldArray[index + 1];
-    if (this._isHiddenChild(nextField)) {
-      return this._findNextField(nextField);
+    if (nextField.id === "fieldListFlag" || this._isHiddenChild(nextField)) {
+      return this.findNextField(nextField);
     }
-      var calButton = dom.byId("catId-add-button");
-      var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
-      calButton.setAttribute("tabindex", tabIndexValue);
+
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(nextField.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
 
     return nextField;
   },
 
-  _findPrevField: function (elem) {
+  findPrevField: function (elem) {
     var fieldArray = Array.from(this.containerNode.children);
     var L = fieldArray.length;
 
@@ -958,12 +962,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
 
     var prevField = fieldArray[index - 1];
-    if (this._isHiddenChild(prevField)) {
-      return this._findPrevField(prevField);
+    if (prevField.id === "fieldListFlag" || this._isHiddenChild(prevField)) {
+      return this.findPrevField(prevField);
     }
-      var calButton = dom.byId("catId-add-button");
-      var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
-      calButton.setAttribute("tabindex", tabIndexValue);
+
+    var calButton = dom.byId("catId-add-button");
+    var tabIndexValue = this.isCalcField(prevField.id) ? "0" : "-1";
+    calButton.setAttribute("tabindex", tabIndexValue);
 
     return prevField;
   },
@@ -978,7 +983,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         expanded = dojo.attr(header.firstElementChild, "collapsed") !== "true";
       }
 
-
     if (code === keys.DOWN_ARROW) {
       e.preventDefault();
       var firstChild;
@@ -992,67 +996,57 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           break;
         }
       }
-      header.setAttribute('tabindex', '-1');
       if (firstChild) {
         // Move focus to first shown child under Nth Header
         firstChild.setAttribute('tabindex', '0');
+        header.setAttribute('tabindex', '-1');
         firstChild.focus();
       } else {
-        var nextHeader = this._findNextHeader(header);
-        if (nextHeader) {
-          // Move from Nth header to (N+1) Header if Nth Header is closed
-          nextHeader.setAttribute('tabindex', '0');
-          nextHeader.focus();
-        }
+          var nextHeader = this._findNextHeader(header);
+          if (nextHeader) {
+            // Move from Nth header to (N+1) Header if Nth Header is closed
+            nextHeader.setAttribute('tabindex', '0');
+            header.setAttribute('tabindex', '-1');
+            nextHeader.focus();
+          }
       }
     } else if (code === keys.UP_ARROW) {
-      if (!this._isFirstHeader(header)) {
         e.preventDefault();
         var previousHeader = this._findPrevHeader(header);
-          if (previousHeader.firstElementChild !== null){
-              expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
-          }
-        var lastChild;
+        if (previousHeader) {
+          expanded = dojo.attr(previousHeader.firstElementChild, "collapsed") !== "true";
+          var lastChild;
 
-        if (expanded) {
-          children = query("." + previousHeader.id, this.containerNode);
-          for (var j = children.length - 1; j > -1; j--) {
-            if (this._isHiddenChild(children[j])) {
-              continue;
+          if (expanded) {
+            children = query("." + previousHeader.id, this.containerNode);
+            for (var j = children.length - 1; j > -1; j--) {
+              if (this._isHiddenChild(children[j])) {
+                continue;
+              }
+              lastChild = children[j];
+              break;
             }
-            lastChild = children[j];
-            break;
           }
-        }
-        header.setAttribute('tabindex', '-1');
-        if (lastChild) {
-          // Move from Nth header to Last Sibling under (N-1) Header if (N-1) Header is open
-          lastChild.setAttribute('tabindex', '0');
-          lastChild.focus();
-        } else {
-          // Move from Nth header to (N-1) Header if (N-1) header is closed
-          previousHeader.setAttribute('tabindex', '0');
-          previousHeader.focus();
-        }
+          header.setAttribute('tabindex', '-1');
+          if (lastChild) {
+            // Move from Nth header to Last Sibling under (N-1) Header if (N-1) Header is open
+            lastChild.setAttribute('tabindex', '0');
+            lastChild.focus();
+          } else {
+            // Move from Nth header to (N-1) Header if (N-1) header is closed
+            previousHeader.setAttribute('tabindex', '0');
+            previousHeader.focus();
+          }
       }
     } else if (code === keys.LEFT_ARROW) {
       if (expanded) {
-        this.expandCollapseCategory({ target: header.nextElementSibling });
+        this.expandCollapseCategory({ target: header.firstChild });
       }
     } else if (code === keys.RIGHT_ARROW) {
       if (!expanded) {
-        this.expandCollapseCategory({ target: header.nextElementSibling });
+        this.expandCollapseCategory({ target: header.firstChild });
       }
     }
-  },
-
-  _isFirstHeader: function (elem) {
-    return elem.classList.contains("categoryNodeFirst");
-  },
-
-  _isLastField: function (elem) {
-    var fieldListNodesLength = this.fieldListNodes.length;
-    return elem.id === this.fieldListNodes[ fieldListNodesLength - 1].id;
   },
 
   _isField: function (elem) {
@@ -1062,7 +1056,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   _moveFocus: function (node, key) {
     var groupHeader = dom.byId(dojo.attr(node, "categoryId"));
     if (key === 'Up') {
-      var previousSibling = this._findPrevField(node);
+      var previousSibling = this.findPrevField(node);
       var header = groupHeader;
       if (previousSibling && this._isField(previousSibling)) {
         previousSibling.setAttribute('tabindex', '0');
@@ -1074,8 +1068,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         header.focus();
       }
     } else if (key === 'Down') {
-      if (!this._isLastField(node)) {
-        var nextSibling = this._findNextField(node);
+        var nextSibling = this.findNextField(node);
         if (nextSibling && this._isField(nextSibling)) {
           nextSibling.setAttribute('tabindex', '0');
           node.setAttribute('tabindex', '-1');
@@ -1088,14 +1081,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           node.setAttribute('tabindex', '-1');
           nextHeader.focus();
         }
-      } else {
-          var nextHeader = this._findNextHeader(groupHeader);
-          if (nextHeader) {
-              nextHeader.setAttribute('tabindex', '0');
-              node.setAttribute('tabindex', '-1');
-              nextHeader.focus();
-           }
-      }
     }
   },
 

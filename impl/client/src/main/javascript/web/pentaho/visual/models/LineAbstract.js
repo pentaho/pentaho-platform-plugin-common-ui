@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara. All rights reserved.
+ * Copyright 2023 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,38 @@
  */
 define([
   "pentaho/module!_",
-  "./LineAbstract",
+  "./PointAbstract",
+  "./types/Shape",
+  "./types/LineWidth",
+  "./mixins/Trended",
   "pentaho/i18n!./i18n/model"
-], function(module, BaseModel, bundle) {
+], function(module, BaseModel, Shape, LineWidth, TrendedModel, bundle) {
 
   "use strict";
 
   return BaseModel.extend({
     $type: {
       id: module.id,
-      v2Id: "ccc_line"
+      category: "linechart",
+      mixins: [TrendedModel],
+      isAbstract: true,
+
+      props: [
+        {
+          name: "lineWidth",
+          valueType: LineWidth,
+          isRequired: true,
+          defaultValue: 1
+        },
+        {
+          name: "shape",
+          valueType: Shape,
+          isRequired: true,
+          defaultValue: "circle"
+        }
+      ]
     }
   })
-  .localize({$type: bundle.structured.Line})
+  .localize({$type: bundle.structured.LineAbstract})
   .configure();
 });

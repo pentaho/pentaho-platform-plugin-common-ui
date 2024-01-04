@@ -21,6 +21,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
      {
         buttons: ['btn1','btn2','btn3'],
         messageType: null,                         // options are null, ERROR, WARN, INFO
+        responsive: true, // Not intended to be set to false.
+        responsiveClasses: "dw-sm",
 
         setTitle: function(title) {
             this.titleNode.innerHTML = title;
