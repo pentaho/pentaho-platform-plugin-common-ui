@@ -76,6 +76,48 @@
       </excludes>
     </fileSet>
 
+    <!-- region Angular -->
+    <fileSet>
+      <directory>${webjars.target.directory}/angular/${angular.version}</directory>
+      <outputDirectory>angularjs</outputDirectory>
+      <includes>
+        <include>angular.js</include>
+        <include>LICENSE*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-animate/${angular.version}</directory>
+      <outputDirectory>angularjs</outputDirectory>
+      <includes>
+        <include>angular-animate.js</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/angular-i18n/${angular.version}</directory>
+      <outputDirectory>angularjs/i18n</outputDirectory>
+      <includes>
+        <include>angular*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>${webjars.target.directory}/uirouter__core/${uirouter-core.version}</directory>
+      <outputDirectory>angularjs/uirouter/core</outputDirectory>
+      <includes>
+        <include>_bundles/ui-router-core.min.js*</include>
+        <include>LICENSE*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/uirouter__angularjs/${uirouter-angularjs.version}</directory>
+      <outputDirectory>angularjs/uirouter/angularjs</outputDirectory>
+      <includes>
+        <include>release/ui-router-angularjs.min.js*</include>
+        <include>LICENSE*</include>
+      </includes>
+    </fileSet>
+    <!-- endregion Angular -->
+
   </fileSets>
 
   <files>

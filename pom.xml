@@ -36,6 +36,9 @@
     <!-- Removed due to custom changes in the current common-ui version -->
     <!-- (mainly the exporting of the Handlebars global variable) -->
     <!--<handlebars.version>4.0.5</handlebars.version>-->
+    <angular.version>1.8.0</angular.version>
+    <uirouter-core.version>5.0.23</uirouter-core.version>
+    <uirouter-angularjs.version>1.0.22</uirouter-angularjs.version>
   </properties>
 
   <dependencyManagement>
@@ -51,6 +54,31 @@
         <groupId>org.webjars.bower</groupId>
         <artifactId>jquery-i18n-properties</artifactId>
         <version>${jquery-i18n-properties.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.bower</groupId>
+        <artifactId>angular</artifactId>
+        <version>${angular.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.bower</groupId>
+        <artifactId>angular-animate</artifactId>
+        <version>${angular.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>angular-i18n</artifactId>
+        <version>${angular.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>uirouter__core</artifactId>
+        <version>${uirouter-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>uirouter__angularjs</artifactId>
+        <version>${uirouter-angularjs.version}</version>
       </dependency>
       <dependency>
         <groupId>pentaho</groupId>

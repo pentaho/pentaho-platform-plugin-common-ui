@@ -86,6 +86,7 @@ if(!useDebug) {
     "dojox/rpc",
     "dojo/_base/kernel",
     "dojo/_base/config",
+    "dojo/store/JsonRest",
     "dojo/store/Memory",
     "dijit/_HasDropDown",
     "dijit/_CssStateMixin",
