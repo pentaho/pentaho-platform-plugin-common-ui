@@ -1,10 +1,28 @@
 {
-  "extends": "google",
+  "extends": [
+    "plugin:import/recommended",
+    "airbnb-base",
+    "prettier"
+  ],
+
+  "plugins": ["import"],
+
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+
   "env": {
     "amd" : true,
     "jasmine": true,
     "browser": true
   },
+
+  "globals": {
+    "inject": true,
+    "module": true,
+    "requirejs": true
+  },
+
   "rules": {
     "indent": ["error", 2, {
       "VariableDeclarator": {
@@ -81,11 +99,13 @@
       {"blankLine": "always", "prev": "block-like", "next": "return"},
       {"blankLine": "always", "prev": "directive", "next": "*"},
       {"blankLine": "any",    "prev": "directive", "next": "directive"}
-    ]
-  },
-  "globals": {
-    "inject": true,
-    "module": true,
-    "requirejs": true
+    ],
+
+    "no-restricted-syntax": "off",
+    "no-plusplus": ["warn", { "allowForLoopAfterthoughts": true }],
+    "no-underscore-dangle": "off",
+    "import/no-amd": "off",
+    "prefer-rest-params": "off",
+    "prefer-spread": "off"
   }
 }

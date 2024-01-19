@@ -90,22 +90,31 @@
   // removed from the output folder.
   removeCombined: true,
 
-  // How to optimize all the JS files in the build output directory.
-  optimize: "${js.build.optimizer}",
+  // Disable the included UglifyJS that only understands ES5 or earlier syntax.
+  // If the source uses ES2015 or later syntax, pass "optimize: 'none'" to r.js
+  // and use an ES2015+ compatible minifier after running r.js.
+  optimize: "none",
 
   optimizeCss: "none",
 
-  // If using UglifyJS2 for script optimization, these config options can be
-  // used to pass configuration values to UglifyJS2.
-  // For possible `output`   values see: https://github.com/mishoo/UglifyJS2#beautifier-options
-  // For possible `compress` values see: https://github.com/mishoo/UglifyJS2#compressor-options
-  uglify2: {
-    output: {
-      beautify: false
-    },
-    warnings: false,
-    mangle: true,
-    compress: true
+  onBuildWrite(moduleName, path, contents) {
+    // check value to see if code should be minified/uglified
+    if ("${js.build.optimizer}" === "none") {
+      return contents;
+    }
+
+    const { minify } = require.nodeRequire("uglify-js");
+    const { code, error } = minify(contents, {
+      output: {
+        beautify: false
+      }
+    });
+
+    if (error) {
+      throw new Error(error);
+    }
+
+    return code;
   },
 
   // Cannot use preserveLicenseComments and generateSourceMaps together...

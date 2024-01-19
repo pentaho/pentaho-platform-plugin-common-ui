@@ -19,7 +19,7 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo-release,requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular,angular-animate,angular-i18n,uirouter__core,uirouter__angularjs,echarts</js.project.list>
+    <js.project.list>dojo-release,prantlf__requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular,angular-animate,angular-i18n,uirouter__core,uirouter__angularjs,echarts</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
 
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
@@ -29,6 +29,9 @@
     <js.build.optimizer>uglify2</js.build.optimizer>
     <requirejs.config.files.pattern>**/*-require-js-cfg.js</requirejs.config.files.pattern>
     <webjars.target.directory>${build.dependenciesDirectory}/META-INF/resources/webjars</webjars.target.directory>
+
+    <nodejs.version>v16.20.2</nodejs.version>
+    <npm.version>8.19.4</npm.version>
 
     <!-- The parent POM declarations of these properties
          use `project.rootdir` which does not seem to exist...
@@ -59,7 +62,7 @@
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
-      <artifactId>requirejs</artifactId>
+      <artifactId>prantlf__requirejs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
