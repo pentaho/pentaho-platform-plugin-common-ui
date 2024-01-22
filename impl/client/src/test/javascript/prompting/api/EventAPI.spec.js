@@ -168,6 +168,12 @@ define([
           promptPanel.guid = "1";
           promptPanel.dashboard = dashboard;
 
+          spyOn(promptPanel, "_getDestinationElement");
+          var destinationElement = jasmine.createSpyObj("destinationElementSpy", [
+            "contains"
+          ]);
+          promptPanel._getDestinationElement.and.returnValue(destinationElement);
+
           apiSpy = jasmine.createSpy("PromptingAPI");
           apiSpy.operation = jasmine.createSpyObj("OperationAPI", ["_getPromptPanel"]);
           apiSpy.operation._getPromptPanel.and.returnValue(promptPanel);
