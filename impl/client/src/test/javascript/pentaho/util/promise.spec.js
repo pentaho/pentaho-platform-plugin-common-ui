@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/util/promise",
-  "tests/pentaho/util/errorMatch"
-], function(promiseUtil, errorMatch) {
+  "tests/pentaho/util/errorMatch",
+  "tests/test-utils",
+], function(promiseUtil, errorMatch, testUtils) {
 
   "use strict";
 
@@ -137,10 +138,9 @@ define([
         });
       });
 
-      it("should call function when the promise gets rejected", function(done) {
-        promiseUtil["finally"](Promise.reject(0), function() {
-          done();
-        });
+      it("should call function when the promise gets rejected", (done) => {
+        const promise = promiseUtil["finally"](Promise.reject(0), done);
+        testUtils.catchTopLevelPromise(promise);
       });
 
       it("should call fun on the given ctx object when fulfilled", function(done) {
@@ -153,14 +153,15 @@ define([
         promiseUtil["finally"](Promise.resolve(1), handler, ctx);
       });
 
-      it("should call fun on the given ctx object when rejected", function(done) {
-        var ctx = {};
-        var handler = function() {
+      it("should call fun on the given ctx object when rejected", (done) => {
+        const ctx = {};
+        const handler = function() {
           expect(this).toBe(ctx);
           done();
         };
 
-        promiseUtil["finally"](Promise.reject(0), handler, ctx);
+        const promise = promiseUtil["finally"](Promise.reject(0), handler, ctx);
+        testUtils.catchTopLevelPromise(promise);
       });
 
       it("should return a promise that is fulfilled when the original promise is " +
