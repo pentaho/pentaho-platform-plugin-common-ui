@@ -1,0 +1,17 @@
+<div class="dijitDialog responsive responsive-content pentaho-dialog modal pentaho-common-responsive-dialog"
+     role="dialog" aria-modal="true" aria-labelledby="${id}_title">
+  <div>
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar Caption">
+      <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+      <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon"
+            data-dojo-attach-event="ondijitclick: onCancel"
+            title="${buttonCancel}" role="button" tabindex="0">
+			  <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+		  </span>
+    </div>
+    <div data-dojo-attach-point="containerNode" class="dijitDialogPaneContent">
+      <div class="dialog-content">${!bodyHtml}</div>
+      <div data-dojo-attach-point="_buttonPanelNode" class="button-panel"></div>
+    </div>
+  </div>
+</div>
