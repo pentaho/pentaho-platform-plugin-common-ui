@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,19 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             _onCancelCallback: undefined,
             responsive: false,
             responsiveClasses: undefined,
+
+            dialogOpener: null,
+
+            /**
+             * Sets the element opening the dialog and to which focus should be restored when the dialog is hidden.
+             *
+             * Supports WCAG focus maintenance.
+             *
+             * @param {Element} dialogOpener - The element opening the dialog.
+             */
+            setDialogOpener: function(dialogOpener) {
+              this.dialogOpener = dialogOpener;
+            },
 
             // ElementRefresher: function(Element) : Element
             // Supports WCAG focus maintenance.
@@ -232,6 +245,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this._createButtons();
 
               this.popup.setElementRefresher(this.elementRefresher);
+              this.popup.setDialogOpener(this.dialogOpener);
 
               this.popup.show();
               this.shown = true;
@@ -287,9 +301,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 //                this.popup.attr("content", this.domNode);
               }
 
-              this.popup.setElementRefresher(function(elem) {
-                return focusUtil.refreshElement(elem);
-              });
               this.inherited(arguments);
             },
 
