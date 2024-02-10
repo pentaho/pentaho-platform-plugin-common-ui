@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         },
 
         datasourceSelected: function () {
-          var id = this.getSelectedModel().id;
-          var model = this.getModel(id);
-          var enable = model.modelId === 'MODEL_1' && this.canDataSourceAdmin;
+          var enable = false;
+          if ( this.models.length > 0 ) {
+            var id = this.getSelectedModel().id;
+            var model = this.getModel(id);
+            enable = model.modelId === 'MODEL_1' && this.canDataSourceAdmin;
+          } else {
+            enable = this.canDataSourceAdmin;
+          }
           this.enableIconButton(this.editdatasourceimg, enable, this.editDatasource);
           this.enableIconButton(this.deletedatasourceimg, enable, this.deleteDatasource);
           this.enableIconButton(this.adddatasourceimg, this.canDataSourceAdmin, this.addDatasource);
