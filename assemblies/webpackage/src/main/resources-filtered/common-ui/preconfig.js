@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 - 2023 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -395,6 +395,7 @@ if(!useDebug) {
     "pentaho/visual/models/Treemap",
     "pentaho/visual/models/Boxplot",
     "pentaho/visual/models/Funnel",
+    "pentaho/visual/models/Gauge",
     "pentaho/visual/models/all",
     "pentaho/visual/role/adaptation/Strategy",
     "pentaho/visual/role/adaptation/IdentityStrategy",
@@ -447,6 +448,7 @@ if(!useDebug) {
     "pentaho/ccc/visual/Treemap",
     "pentaho/visual/views/echarts/echartsView",
     "pentaho/visual/views/echarts/Funnel",
+    "pentaho/visual/views/echarts/Gauge",
     "pentaho/ccc/visual/Waterfall",
     "pentaho/ccc/visual/all",
     "pentaho/visual/views/all"
