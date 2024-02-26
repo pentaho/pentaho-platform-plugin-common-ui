@@ -390,7 +390,7 @@
         }
       },
       "pentaho/visual/models/Funnel": {
-        "base": "pentaho/visual/Model",
+        "base": "pentaho/visual/models/Abstract",
         "annotations": {
           "pentaho/visual/DefaultView": {
             "module": "pentaho/visual/views/echarts/Funnel"
@@ -403,6 +403,15 @@
         "annotations": {
           "pentaho/visual/DefaultView": {
             "module": "pentaho/ccc/visual/Boxplot"
+          }
+        }
+      },
+
+      "pentaho/visual/models/Gauge": {
+        "base": "pentaho/visual/models/Abstract",
+        "annotations": {
+          "pentaho/visual/DefaultView": {
+            "module": "pentaho/visual/views/echarts/Gauge"
           }
         }
       },
