@@ -82,7 +82,7 @@ define([
       // Read data from dataTable and push it to records
       for(var i = 0; i < rowLength; i++) {
         records.push({
-          name: this._getTableFormattedValue(dataTable, i, categoriesColIndexes),
+          name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes),
           value: dataTable.getValue(i, measureColIndex),
           tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font)
         });

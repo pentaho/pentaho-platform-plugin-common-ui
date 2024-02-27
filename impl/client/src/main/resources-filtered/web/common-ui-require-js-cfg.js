@@ -399,6 +399,13 @@
     }
   };
 
+  requireModules["pentaho/visual/models/Radar"] = {
+    base: "pentaho/visual/models/Abstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/visual/views/echarts/Radar"}
+    }
+  };
+
   requireModules["pentaho/visual/models/MetricPointAbstract"] = {base: "pentaho/visual/models/CartesianAbstract"};
   requireModules["pentaho/visual/models/Scatter"] = {
     base: "pentaho/visual/models/MetricPointAbstract",
@@ -496,6 +503,7 @@
   requireModules["pentaho/ccc/visual/Waterfall"] = {base: "pentaho/ccc/visual/BarAbstract"};
   requireModules["pentaho/visual/views/echarts/Funnel"] = {base: "pentaho/visual/views/echarts/Abstract"};
   requireModules["pentaho/visual/views/echarts/Gauge"] = {base: "pentaho/visual/views/echarts/Abstract"};
+  requireModules["pentaho/visual/views/echarts/Radar"] = {base: "pentaho/visual/views/echarts/Abstract"};
   // endregion
 
   // region Color Palettes
@@ -808,19 +816,21 @@
       "pentaho/visual/models/Dot",
       "pentaho/visual/models/Pie",
       "pentaho/visual/models/Donut",
+      "pentaho/visual/models/types/SliceOrder",
+      "pentaho/visual/models/Funnel",
+      "pentaho/visual/models/Gauge",
       "pentaho/visual/models/HeatGrid",
       "pentaho/visual/models/LineAbstract",
       "pentaho/visual/models/Line",
       "pentaho/visual/models/LineStacked",
+      "pentaho/visual/models/types/RadarShape",
+      "pentaho/visual/models/Radar",
       "pentaho/visual/models/Scatter",
-      "pentaho/visual/models/types/SliceOrder",
       "pentaho/visual/models/Sunburst",
-      "pentaho/visual/models/Funnel",
-      "pentaho/visual/models/Gauge",
-      "pentaho/visual/models/types/WaterDirection",
-      "pentaho/visual/models/Waterfall",
       "pentaho/visual/models/types/TreemapLayoutMode",
       "pentaho/visual/models/Treemap",
+      "pentaho/visual/models/types/WaterDirection",
+      "pentaho/visual/models/Waterfall",
       "pentaho/visual/models/all",
       "pentaho/visual/role/adaptation/Strategy",
       "pentaho/visual/role/adaptation/IdentityStrategy",
@@ -876,6 +886,7 @@
       "pentaho/visual/views/echarts/Abstract",
       "pentaho/visual/views/echarts/Funnel",
       "pentaho/visual/views/echarts/Gauge",
+      "pentaho/visual/views/echarts/Radar",
       "pentaho/visual/views/all"
     ];
   }
