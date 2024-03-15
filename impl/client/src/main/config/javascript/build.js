@@ -1,7 +1,7 @@
 /*!
  * HITACHI VANTARA PROPRIETARY AND CONFIDENTIAL
  *
- * Copyright 2002 - 2018 Hitachi Vantara. All rights reserved.
+ * Copyright 2002 - 2024 Hitachi Vantara. All rights reserved.
  *
  * NOTICE: All information including source code contained herein is, and
  * remains the sole property of Hitachi Vantara and its licensors. The intellectual
@@ -134,6 +134,7 @@
     "cdf/lib/CCC/pvc": "empty:",
     "cdf/lib/CCC/cdo": "empty:",
     "cdf/lib/CCC/protovis": "empty:",
+    "common-ui/echarts": "empty:",
 
     // These AMD loader plugins are used in lots of code which has nothing to do with
     // the platform bundle code.
