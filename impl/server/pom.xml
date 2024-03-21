@@ -14,7 +14,6 @@
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
   <properties>
-    <jmock-junit4.version>2.5.1</jmock-junit4.version>
     <pentaho-connections.version>10.2.0.0-SNAPSHOT</pentaho-connections.version>
     <pentaho-reporting.version>10.2.0.0-SNAPSHOT</pentaho-reporting.version>
     <pentaho-metadata.version>10.2.0.0-SNAPSHOT</pentaho-metadata.version>
@@ -22,7 +21,7 @@
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <hsqldb.version>2.3.2</hsqldb.version>
     <commons-xul.version>10.2.0.0-SNAPSHOT</commons-xul.version>
-    <mockito-all.version>1.8.4</mockito-all.version>
+    <mockito-core.version>5.10.0</mockito-core.version>
     <commons-database.version>10.2.0.0-SNAPSHOT</commons-database.version>
     <pdi.version>10.2.0.0-SNAPSHOT</pdi.version>
     <flexjson.version>2.1</flexjson.version>
@@ -203,8 +202,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${mockito-all.version}</version>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito-core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -277,11 +276,12 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-junit4</artifactId>
-      <version>${jmock-junit4.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>pentaho</groupId>
       <artifactId>simple-jndi</artifactId>
