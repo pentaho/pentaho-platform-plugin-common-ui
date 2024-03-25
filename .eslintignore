@@ -1,0 +1,13 @@
+node_modules
+target
+config
+assembly
+docs
+resources
+resources-filtered
+
+# ignored sources (external libs)
+**/web/bootstrap
+**/web/dataapi/Xmla.js
+**/web/handlebars
+**/web/underscore

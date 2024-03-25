@@ -24,7 +24,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>${webjars.target.directory}/requirejs/${requirejs.version}</directory>
+      <directory>${webjars.target.directory}/prantlf__requirejs/${prantlf.requirejs.version}</directory>
       <outputDirectory>.</outputDirectory>
       <includes>
         <include>**/require.js</include>

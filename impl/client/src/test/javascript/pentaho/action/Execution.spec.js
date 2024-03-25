@@ -21,11 +21,12 @@ define([
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
   "tests/pentaho/util/errorMatch",
+  "tests/test-utils",
   "pentaho/debug",
   "pentaho/debug/Levels",
   "pentaho/util/logger"
 ], function(BaseAction, Execution, States, ValidationError, UserError, RuntimeError, errorMatch,
-            debugMgr, DebugLevels, logger) {
+            testUtils, debugMgr, DebugLevels, logger) {
 
   "use strict";
 
@@ -1342,22 +1343,21 @@ define([
 
       function itsPhaseMethodReturnValueSync(phase) {
 
-        it("should ignore a returned value", function() {
+        it("should ignore a returned value", () => {
+          const upToPhase = phase;
+          const promise = Promise.reject();
 
-          var upToPhase = phase;
-
-          var spySpec = {};
-          spySpec[phase] = function() {
-            return Promise.reject();
-          };
-
+          const spySpec = {};
+          spySpec[phase] = () => promise;
           spySpec["finally"] = function() {
             expectStateDid(this, undefined);
           };
 
-          var ae = createExecution(spySpec);
+          const ae = createExecution(spySpec);
 
-          return testExecute(ae, upToPhase);
+          return testExecute(ae, upToPhase, () => {
+            testUtils.catchTopLevelPromise(promise);
+          });
         });
       }
 
@@ -1653,29 +1653,30 @@ define([
 
       function itsPhaseMethodTriesSettleWhenAlreadySettledAsync(phase) {
 
-        it("should ignore a returned rejected promise and remain successful", function() {
+        it("should ignore a returned rejected promise and remain successful", () => {
 
-          var result = {};
-          var upToPhase = phase;
+          const result = {};
+          const upToPhase = phase;
+          const promise = Promise.reject(new Error("Cabum!"));
 
           spyOn(debugMgr, "testLevel").and.returnValue(true);
           spyOn(logger, "warn");
 
-          var spySpec = {};
+          const spySpec = {};
           spySpec[phase] = function() {
-
             this.done(result);
 
-            return Promise.reject(new Error("Cabum!"));
+            return promise;
           };
 
-          var ae = createExecution(spySpec);
+          const ae = createExecution(spySpec);
 
-          return testExecute(ae, upToPhase, function() {
-
+          return testExecute(ae, upToPhase, () => {
             expect(logger.warn).not.toHaveBeenCalled();
 
             expectStateDid(ae, result);
+
+            testUtils.catchTopLevelPromise(promise);
           });
         });
 
@@ -1705,31 +1706,31 @@ define([
           });
         });
 
-        it("should ignore a returned rejected promise and preserve existing error", function() {
+        it("should ignore a returned rejected promise and preserve existing error", () => {
+          const error = new Error("Oh no!");
+          const error2Text = "Another error!";
 
-          var error = new Error("Oh no!");
-          var error2Text = "Another error!";
-
-          var upToPhase = phase;
+          const upToPhase = phase;
+          const promise = Promise.reject(new Error(error2Text));
 
           spyOn(debugMgr, "testLevel").and.returnValue(true);
           spyOn(logger, "warn");
 
-          var spySpec = {};
+          const spySpec = {};
           spySpec[phase] = function() {
-
             this.reject(error);
 
-            return Promise.reject(new Error(error2Text));
+            return promise;
           };
 
-          var ae = createExecution(spySpec);
+          const ae = createExecution(spySpec);
 
-          return testExecute(ae, upToPhase, function() {
-
+          return testExecute(ae, upToPhase, () => {
             expectStateFailed(ae, error);
 
             expect(logger.warn).not.toHaveBeenCalled();
+
+            testUtils.catchTopLevelPromise(promise);
           });
         });
 

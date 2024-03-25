@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 define([
-  "./echarts/Abstract",
-  "./echarts/Funnel",
-  "./echarts/Gauge",
-  "./echarts/Radar"
-], function() {
+  "pentaho/module!_",
+  "pentaho/type/String",
+  "pentaho/type/mixins/Enum",
+  "pentaho/i18n!../i18n/model"
+], function(module, PentahoString, EnumMixin, bundle) {
+
   "use strict";
+
+  return PentahoString.extend({
+    $type: {
+      id: module.id,
+      mixins: [EnumMixin],
+      domain: ["circle", "polygon"]
+    }
+  })
+  .localize({$type: bundle.structured.RadarShape})
+  .configure();
 });

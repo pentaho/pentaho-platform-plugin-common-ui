@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,6 +115,55 @@
  * @param {number} rowIndex The row index (zero-based).
  * @param {number} colIndex The column index (zero-based).
  * @return {pentaho.data.ICell} The specified cell object.
+ */
+
+/**
+ * Gets an array of cells, given its row index and columns' indexes.
+ *
+ * @name pentaho.data.ITable#getRowCells
+ * @abstract
+ * @function
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {Array.<number>} colIndexes The array of column indexes (zero-based).
+ * @return {Array.<pentaho.data.ICell>} The cell objects' array.
+ */
+
+/**
+ * Gets the composite value of a given row index and columns' indexes.
+ *
+ * When <i>colIndexes</i> is {@code null} or empty, then {@code null} is returned.
+ * When <i>colIndexes</i> has a single entry, the value of the single cell is returned directly,
+ * preserving its original data type.
+ * Otherwise, the returned value is a string composed of the multiple cell values joined with the given separator,
+ * <i>valueSep</i>.
+ * When one of the cell values is {@code null}, it is accounted for as empty.
+ *
+ * @name pentaho.data.ITable#getCompositeValue
+ * @abstract
+ * @function
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {Array.<number>} colIndexes The array of column indexes (zero-based).
+ * @param {string} [valueSep] The value separator. Defaults to {@code "~"}.
+ * @return {*} The composite value.
+ */
+
+/**
+ * Gets the composite formatted value of a given row index and columns' indexes.
+ *
+ * When <i>colIndexes</i> is {@code null} or empty, then {@code ""} is returned.
+ * When <i>colIndexes</i> has a single entry, the {@link ITable#getFormattedValue} of the single cell is returned
+ * directly.
+ * Otherwise, a string composed of the multiple cell formatted values, joined with the given separator,
+ * <i>labelSep</i>, is returned.
+ * Cell formatted values which are {@code null} or empty are skipped.
+ *
+ * @name pentaho.data.ITable#getCompositeFormattedValue
+ * @abstract
+ * @function
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {Array.<number>} colIndexes The array of column indexes (zero-based).
+ * @param {string} [labelSep] The label separator. Defaults to {@code " ~ "}.
+ * @return {string} The composite formatted value.
  */
 
 /**

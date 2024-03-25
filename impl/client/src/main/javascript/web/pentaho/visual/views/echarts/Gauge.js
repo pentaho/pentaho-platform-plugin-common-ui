@@ -25,35 +25,13 @@ define([
 
     _buildSeries: function() {
       var dataTable = this.model.data;
-      var range = dataTable.getColumnRange(dataTable.getNumberOfColumns() - 1);
-
-      function log10Ceil(x) {
-        return (x > 0)
-            ? Math.pow(10, Math.ceil(Math.log10(x)))
-            : -Math.pow(10, -Math.ceil(-Math.log10(-x)));
-      }
-
-      function log10Floor(x) {
-        return (x > 0)
-            ? Math.pow(10, Math.floor(Math.log(x)))
-            : -Math.pow(10, -Math.floor(-Math.log(-x)));
-      }
-
-      var minEf = log10Floor(range.min);
-      var maxEf = log10Ceil(range.max);
-
-      // Make sure range includes 0.
-      if (maxEf < 0) {
-        maxEf = 0;
-      } else if (minEf > 0) {
-        minEf = 0;
-      }
+      var range = this._getColumnRange(dataTable, dataTable.getNumberOfColumns() - 1, true);
 
       return [
         {
           type: "gauge",
-          min: minEf,
-          max: maxEf,
+          min: range.min,
+          max: range.max,
 
           pointer: {
             width: 8,
@@ -130,7 +108,7 @@ define([
         var offsetCenterX = offsetCenterX0 + stepWidth * i;
 
         records.push({
-          name: this._getTableFormattedValue(dataTable, i, categoriesColIndexes),
+          name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes),
           value: dataTable.getValue(i, measureColIndex),
           tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font),
           title: {

@@ -31,15 +31,14 @@ define([
 
     /** @override */
     _updateSize: function() {
-      // this.base();
       this._chart.resize();
     },
 
     _getEChartsLabel: function(labelsOption) {
       switch(labelsOption) {
-        case "topLeft" :
+        case "topLeft":
           return "leftTop";
-        case "bottomLeft" :
+        case "bottomLeft":
           return "leftBottom";
         case "topRight":
           return "rightTop";
@@ -48,6 +47,28 @@ define([
         default:
           return labelsOption;
       }
+    },
+
+    _getColumnRange: function(dataTable, colIndex, ensureZero) {
+      var range = dataTable.getColumnRange(colIndex);
+      var min = range.min;
+      var max = range.max;
+
+      // Make sure range includes 0.
+      if (ensureZero) {
+        if (max < 0) {
+          max = 0;
+        } else if (min > 0) {
+          min = 0;
+        }
+      }
+
+      var span = max - min;
+      var step = Math.pow(10, Math.round(Math.log10(span)) - 1);
+      return {
+        min: Math.floor(min / step) * step,
+        max: Math.ceil(max / step) * step
+      };
     },
 
     _configureLabel: function(options, labelPosition, formatter) {
@@ -67,12 +88,6 @@ define([
       });
     },
 
-    _getTableFormattedValue: function(dataTable, rowIndex, categoriesColIndexes) {
-      return categoriesColIndexes.map(function(colIndex) {
-        return dataTable.getFormattedValue(rowIndex, colIndex);
-      }).join(" ~ ");
-    },
-
     _configureLegend: function(options, records) {
       var categories = [];
       var font = util.getDefaultFont(null, 14);
@@ -82,6 +97,7 @@ define([
       });
 
       options.legend = {
+        show: categories.length <= 1 ? false : true,
         data: categories,
         type: "scroll",
         align: "auto",
@@ -93,9 +109,9 @@ define([
       };
     },
 
-    _configureData: function(options, records) {
-      options.series.forEach(function(row) {
-        row.data = records;
+    _configureData: function(options, data) {
+      options.series.forEach(function(seriesEntry) {
+        seriesEntry.data = data;
       });
     },
 
@@ -116,7 +132,7 @@ define([
     _buildRowTooltipHtml: function(dataTable, rowNum) {
       var rowTooltipHtml = "";
 
-      function escapeHTML(str){
+      function escapeHTML(str) {
         var elem = document.createElement("e");
         elem.appendChild(document.createTextNode(str));
         return elem.innerHTML;
@@ -147,11 +163,11 @@ define([
      *configures all the properties, data that are required for the chart and renders it.
      *
      * @override */
-    _updateAll: function () {
+    _updateAll: function() {
 
       this.base();
 
-      if (this._chart == null){
+      if(this._chart == null) {
         this._initializeChart();
       }
 

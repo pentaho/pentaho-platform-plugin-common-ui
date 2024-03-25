@@ -1,6 +1,6 @@
 
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ define([
      *
      * When a table is loaded with data in a _crossed_ format,
      * it exposes a somewhat distorted view of that data.
-     * This is only supported only for legacy reasons.
+     * This is only supported for legacy reasons.
      *
      * It is advisable to immediately convert a table loaded with data in _crossed_ format
      * to a table with the same data,
