@@ -23,8 +23,9 @@ define([
 
   return BaseView.extend(module.id, {
 
-    _buildSeries: function() {
+    _buildSeries: function(echartData) {
       var dataTable = this.model.data;
+
       var range = this._getColumnRange(dataTable, dataTable.getNumberOfColumns() - 1, true);
 
       return [
@@ -32,6 +33,7 @@ define([
           type: "gauge",
           min: range.min,
           max: range.max,
+          data: echartData,
 
           pointer: {
             width: 8,
@@ -108,7 +110,7 @@ define([
         var offsetCenterX = offsetCenterX0 + stepWidth * i;
 
         records.push({
-          name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes),
+          name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, this.groupedLabelSeparator),
           value: dataTable.getValue(i, measureColIndex),
           tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font),
           title: {
