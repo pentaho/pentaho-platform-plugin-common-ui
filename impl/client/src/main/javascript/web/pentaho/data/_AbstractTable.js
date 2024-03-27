@@ -154,7 +154,7 @@ define([
       }
 
       if(labelSep == null) {
-        labelSep = " ~ ";
+        labelSep = "~";
       }
 
       var label = "";
