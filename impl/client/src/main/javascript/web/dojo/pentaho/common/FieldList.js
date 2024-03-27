@@ -281,7 +281,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     calc.id = pentaho.pda.Column.ELEMENT_TYPES.CAT_CALC_FIELD;
     calc.elementType = pentaho.pda.Column.ELEMENT_TYPES.CATEGORY;
     calc.dataType = pentaho.pda.Column.DATA_TYPES.NONE;
-    calc.name = "Calculated Fields";
+    calc.name = this.getLocaleString("calcFieldDlgSelectCalculatedFields");
 
     categories.push(calc);
 
