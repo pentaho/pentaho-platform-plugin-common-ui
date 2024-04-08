@@ -24,6 +24,8 @@ define([
 
   return BaseView.extend(module.id, {
 
+    groupedLabelSeparator: "~",
+
     _initializeChart: function() {
       this._chart = echarts.init(this.domContainer, null, {});
       return this._chart;
@@ -35,7 +37,7 @@ define([
     },
 
     _getEChartsLabel: function(labelsOption) {
-      switch(labelsOption) {
+      switch (labelsOption) {
         case "topLeft":
           return "leftTop";
         case "bottomLeft":
@@ -71,48 +73,105 @@ define([
       };
     },
 
-    _configureLabel: function(options, labelPosition, formatter) {
+    _configureLabel: function(labelPosition, formatter) {
       var font = util.getDefaultFont(null, 12);
+      var model = this.model;
+      var fontWeight = model.labelStyle;
+      var fontFamily = model.labelFontFamily;
 
-      var label = {
+      return {
         show: true,
         position: labelPosition,
         formatter: formatter,
         backgroundColor: "transparent",
-        fontSize: font.substring(0, font.indexOf(" ")),
-        fontFamily: font.substring(font.indexOf(" ") + 1)
+        fontWeight: fontWeight === "plain" ? "normal" : fontWeight,
+        color: model.labelColor,
+        fontSize: model.labelSize || 12,
+        fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily
       };
+    },
 
-      options.series.forEach(function(row) {
-        row.label = label;
-      });
+    _legendOrientation: function(position) {
+      switch (position) {
+        case "left":
+        case "right":
+          return "vertical";
+        case "top":
+        case "bottom":
+          return "horizontal";
+        default:
+          return "horizontal";
+      }
     },
 
     _configureLegend: function(options, records) {
       var categories = [];
+      var model = this.model;
       var font = util.getDefaultFont(null, 14);
 
+      var top = "auto";
+      var left = "auto";
+      var position = model.legendPosition;
+      var orient = this._legendOrientation(position);
+      var fontWeight = model.legendStyle;
+      var fontFamily = model.legendFontFamily;
+      var legendBgColor = model.legendBackgroundColor;
+
+      if(position === "top" || position === "bottom") {
+        top = position;
+      } else {
+        left = position;
+      }
+      
       records.forEach(function(record) {
         categories.push(record.name);
       });
 
       options.legend = {
-        show: categories.length <= 1 ? false : true,
+        show: model.showLegend && categories.length > 1,
         data: categories,
         type: "scroll",
-        align: "auto",
+        align: "left",
+        icon: "circle",
+        orient: orient,
+        left: left,
+        top: top,
+        backgroundColor: legendBgColor.toLowerCase() !== "#ffffff" ? legendBgColor : "transparent",
+        itemWidth: 8,
+        itemHeight: 8,
         padding: 10,
         textStyle: {
-          fontSize: font.substring(0, font.indexOf(" ")),
-          fontFamily: font.substring(font.indexOf(" ") + 1)
+          fontWeight: fontWeight === "plain" ? "normal" : fontWeight,
+          color: model.legendColor,
+          fontSize: model.legendSize,
+          fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily
         }
       };
     },
 
-    _configureData: function(options, data) {
-      options.series.forEach(function(seriesEntry) {
-        seriesEntry.data = data;
-      });
+    _buildBgColor: function() {
+      var model = this.model;
+      var bgFillType = model.backgroundFill;
+      var bgColorFill = model.backgroundColor;
+      var bgColorEnd = model.backgroundColorEnd;
+
+      if(bgFillType === "none") {
+        return "transparent";
+      }
+
+      if(bgFillType === "solid") {
+        return bgColorFill;
+      }
+
+      return {
+        type: "linear",
+        x: 0, y: 0,
+        x2: 0, y2: 1,
+        colorStops: [
+          { offset: 0, color: bgColorEnd },
+          { offset: 1, color: bgColorFill }
+        ],
+      };
     },
 
     _buildColors: function() {
@@ -140,7 +199,7 @@ define([
 
       for(var colNum = 0; colNum < dataTable.getNumberOfColumns(); colNum++) {
         rowTooltipHtml = rowTooltipHtml + escapeHTML(dataTable.getColumnLabel(colNum)) + " : " +
-            escapeHTML(dataTable.getFormattedValue(rowNum, colNum)) + "<br />";
+          escapeHTML(dataTable.getFormattedValue(rowNum, colNum)) + "<br />";
       }
 
       return rowTooltipHtml;
@@ -153,10 +212,9 @@ define([
           trigger: "item"
         },
         color: this._buildColors(),
-        series: this._buildSeries()
+        backgroundColor: this._buildBgColor(),
+        series: this._buildSeries(this._echartData)
       };
-
-      this._configureData(this._echartOptions, this._echartData);
     },
 
     /** This method initializes the eChart library,

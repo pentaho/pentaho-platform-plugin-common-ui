@@ -17,8 +17,9 @@ define([
   "pentaho/module!_",
   "./Abstract",
   "pentaho/data/TableView",
-  "pentaho/util/object"
-], function(module, BaseView, TableView, O) {
+  "pentaho/util/object",
+  "pentaho/visual/util"
+], function(module, BaseView, TableView, O, util) {
 
   "use strict";
 
@@ -80,12 +81,12 @@ define([
     },
 
     _getRowVisualEntity: function(dataTable, rowIndex, colIndexes, entityList) {
-      var value = dataTable.getCompositeValue(rowIndex, colIndexes);
+      var value = dataTable.getCompositeValue(rowIndex, colIndexes, this.groupedLabelSeparator);
       var key = O.getSameTypeKey(value);
 
       var entity = O.getOwn(entityList.set, key);
       if(entity == null) {
-        var label = dataTable.getCompositeFormattedValue(rowIndex, colIndexes);
+        var label = dataTable.getCompositeFormattedValue(rowIndex, colIndexes, this.groupedLabelSeparator);
         entity = {
           key: key,
           value: value,
@@ -125,7 +126,7 @@ define([
 
         // When  category is not mapped, do not include the category label.
         // Example: "Cars ~ "
-        var categoryLabelPrefix = category.label ? (category.label + " ~ ") : "";
+        var categoryLabelPrefix = category.label ? (category.label + this.groupedLabelSeparator) : "";
 
         visualMappings.measures.forEach(function(measureColIndex) {
           // Example: "Quantity"
@@ -168,7 +169,7 @@ define([
           value: values,
           _label: labels
         };
-        
+
         // Given that series x category together form the
         // [visual key]{@link pentaho.visual.role.AbstractPropertyType#isVisualKey},
         // there can be a single data row per series and category combination.
@@ -192,8 +193,8 @@ define([
             ? dataTable.getValue(rowIndex, measureColIndex)
             : null;
           var label = rowIndex != null
-              ? dataTable.getFormattedValue(rowIndex, measureColIndex)
-              : "";
+            ? dataTable.getFormattedValue(rowIndex, measureColIndex)
+            : "";
           values.push(value);
           labels.push(label);
         });
@@ -204,7 +205,7 @@ define([
       function buildSeriesRowIndexByCategory(seriesTableView) {
         var rowIndexByCategory = Object.create(null);
         var rowCount = seriesTableView.getNumberOfRows();
-        for (var rowViewIndex = 0; rowViewIndex < rowCount; rowViewIndex++) {
+        for(var rowViewIndex = 0; rowViewIndex < rowCount; rowViewIndex++) {
           // Recover the corresponding visual row.
           var rowIndex = seriesTableView.getSourceRowIndex(rowViewIndex);
           var visualRow = visualData.rows[rowIndex];
@@ -216,34 +217,51 @@ define([
       }
     },
 
-    _configureData: function(options, radarData) {
-      options.series.forEach(function(row) {
-        row.data = radarData.records;
-      });
-    },
-
     _configureOptions: function() {
       this.base();
 
       var options = this._echartOptions;
       var model = this.model;
       var radarData = this._echartData;
+      var font = util.getDefaultFont(null, 12);
+      var fontWeight = model.labelStyle;
+      fontWeight = fontWeight === "plain" ? "normal" : fontWeight;
+      var fontFamily = model.labelFontFamily;
 
       options.radar = {
         indicator: radarData.indicator,
-
+        triggerEvent: true,
         shape: model.radarShape,
         axisName: {
+          color: model.labelColor,
+          fontWeight: fontWeight,
+          fontSize: model.labelSize || 12,
+          fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily,
           formatter: function(value) {
-            var maxAxisNameLength = 14;
-            return value.length > maxAxisNameLength
-              ? value.substring(0, maxAxisNameLength) + "\n" + value.substring(maxAxisNameLength)
-              : value;
+            var maxLength = 14;
+            var words = value.split(" ");
+            var l = 0;
+            var formattedText = "";
+            for(var token of words) {
+              if(l + token.length >= maxLength) {
+                formattedText += (l ? "\n" : "") + token + " ";
+                l = token.length + 1;
+              } else {
+                formattedText += token + " ";
+                l += token.length + 1;
+              }
+            }
+            
+            return formattedText;
           }
         },
         axisLabel: {
           show: model.showAxisTickLabel,
-          showMinLabel: false,
+          color: model.labelColor,
+          fontWeight: fontWeight,
+          fontSize: model.labelSize || 12,
+          fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily,
+          showMinLabel: radarData.indicator.length < 3,
           formatter: function(value) {
             return Intl.NumberFormat("en-US", {
               notation: "compact",
@@ -254,20 +272,23 @@ define([
         }
       };
 
-      this._configureLabel(options, this._getEChartsLabel(model.labelsOption), function(params) {
-        return params.data._label[params.dimensionIndex];
-      });
-
       this._configureLegend(options, radarData.records);
     },
 
     /** @override */
-    _buildSeries: function() {
+    _buildSeries: function(echartData) {
       var model = this.model;
+      var label = this._configureLabel(this._getEChartsLabel(model.labelsOption),
+       function(params) {
+          return params.data._label[params.dimensionIndex];
+        });
+
       return [
         {
           name: "Radar Series",
           type: "radar",
+          data: echartData.records,
+          label: label,
           labelLayout: {
             hideOverlap: "true"
           },
