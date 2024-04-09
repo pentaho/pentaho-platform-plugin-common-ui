@@ -17,9 +17,8 @@ define([
   "pentaho/module!_",
   "./Abstract",
   "pentaho/data/TableView",
-  "pentaho/util/object",
-  "pentaho/visual/util"
-], function(module, BaseView, TableView, O, util) {
+  "pentaho/util/object"
+], function(module, BaseView, TableView, O) {
 
   "use strict";
 
@@ -223,32 +222,31 @@ define([
       var options = this._echartOptions;
       var model = this.model;
       var radarData = this._echartData;
-      var font = util.getDefaultFont(null, 12);
-      var fontWeight = model.labelStyle;
-      fontWeight = fontWeight === "plain" ? "normal" : fontWeight;
-      var fontFamily = model.labelFontFamily;
+
+      var fontWeight = this._getFontWeight(model.labelStyle);
+      var fontFamily = this._getFontFamily(model.labelFontFamily);
 
       options.radar = {
         indicator: radarData.indicator,
         triggerEvent: true,
         shape: model.radarShape,
         axisName: {
-          color: model.labelColor,
+          color: model.labelColor || this.fontColor,
           fontWeight: fontWeight,
-          fontSize: model.labelSize || 12,
-          fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily,
+          fontSize: model.labelSize || this.fontSize,
+          fontFamily: fontFamily,
           formatter: function(value) {
             var maxLength = 14;
             var words = value.split(" ");
-            var l = 0;
+            var formattedTextLength = 0;
             var formattedText = "";
             for(var token of words) {
-              if(l + token.length >= maxLength) {
-                formattedText += (l ? "\n" : "") + token + " ";
-                l = token.length + 1;
+              if(formattedTextLength + token.length >= maxLength) {
+                formattedText += (formattedTextLength ? "\n" : "") + token + " ";
+                formattedTextLength = token.length + 1;
               } else {
                 formattedText += token + " ";
-                l += token.length + 1;
+                formattedTextLength += token.length + 1;
               }
             }
             
@@ -257,10 +255,10 @@ define([
         },
         axisLabel: {
           show: model.showAxisTickLabel,
-          color: model.labelColor,
+          color: model.labelColor || this.fontColor,
           fontWeight: fontWeight,
-          fontSize: model.labelSize || 12,
-          fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily,
+          fontSize: model.labelSize || this.fontSize,
+          fontFamily: fontFamily,
           showMinLabel: radarData.indicator.length < 3,
           formatter: function(value) {
             return Intl.NumberFormat("en-US", {

@@ -26,6 +26,25 @@ define([
 
     groupedLabelSeparator: "~",
 
+    font: util.getDefaultFont(null, 12),
+    fontFamily: "Default",
+    fontWeight: "plain",
+    fontSize: 12,
+    fontColor: "#333333",
+
+    _getFontWeight: function(modelValue) {
+      var fontWeight = modelValue || this.fontWeight;
+      fontWeight = fontWeight === "plain" ? "normal" : fontWeight;
+      return fontWeight;
+    },
+
+    _getFontFamily: function(modelValue) {
+      var font = this.font;
+      var fontFamily = modelValue || this.fontFamily;
+      fontFamily = fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily;
+      return fontFamily;
+    },
+
     _initializeChart: function() {
       this._chart = echarts.init(this.domContainer, null, {});
       return this._chart;
@@ -74,20 +93,19 @@ define([
     },
 
     _configureLabel: function(labelPosition, formatter) {
-      var font = util.getDefaultFont(null, 12);
       var model = this.model;
-      var fontWeight = model.labelStyle;
-      var fontFamily = model.labelFontFamily;
+      var fontWeight = this._getFontWeight(model.labelStyle);
+      var fontFamily = this._getFontFamily(model.labelFontFamily);
 
       return {
         show: true,
         position: labelPosition,
         formatter: formatter,
         backgroundColor: "transparent",
-        fontWeight: fontWeight === "plain" ? "normal" : fontWeight,
-        color: model.labelColor,
-        fontSize: model.labelSize || 12,
-        fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily
+        fontWeight: fontWeight,
+        color: model.labelColor || this.fontColor,
+        fontSize: model.labelSize || this.fontSize,
+        fontFamily: fontFamily
       };
     },
 
@@ -107,22 +125,24 @@ define([
     _configureLegend: function(options, records) {
       var categories = [];
       var model = this.model;
-      var font = util.getDefaultFont(null, 14);
 
       var top = "auto";
       var left = "auto";
-      var position = model.legendPosition;
+      var position = model.legendPosition || "top";
       var orient = this._legendOrientation(position);
-      var fontWeight = model.legendStyle;
-      var fontFamily = model.legendFontFamily;
-      var legendBgColor = model.legendBackgroundColor;
+
+      var fontWeight = this._getFontWeight(model.legendStyle);
+      var fontFamily = this._getFontFamily(model.legendFontFamily);
+
+      var legendBgColor = model.legendBackgroundColor || "transparent";
+      legendBgColor = legendBgColor.toLowerCase() !== "#ffffff" ? legendBgColor : "transparent";
 
       if(position === "top" || position === "bottom") {
         top = position;
       } else {
         left = position;
       }
-      
+
       records.forEach(function(record) {
         categories.push(record.name);
       });
@@ -136,24 +156,29 @@ define([
         orient: orient,
         left: left,
         top: top,
-        backgroundColor: legendBgColor.toLowerCase() !== "#ffffff" ? legendBgColor : "transparent",
+        backgroundColor: legendBgColor,
         itemWidth: 8,
         itemHeight: 8,
         padding: 10,
+        tooltip: {
+          show: true
+        },
         textStyle: {
-          fontWeight: fontWeight === "plain" ? "normal" : fontWeight,
-          color: model.legendColor,
-          fontSize: model.legendSize,
-          fontFamily: fontFamily === "Default" ? font.substring(font.indexOf(" ") + 1) : fontFamily
+          width: 80,
+          overflow: "truncate",
+          fontWeight: fontWeight,
+          color: model.legendColor || this.fontColor,
+          fontSize: model.legendSize || 14,
+          fontFamily: fontFamily
         }
       };
     },
 
     _buildBgColor: function() {
       var model = this.model;
-      var bgFillType = model.backgroundFill;
-      var bgColorFill = model.backgroundColor;
-      var bgColorEnd = model.backgroundColorEnd;
+      var bgFillType = model.backgroundFill || "none";
+      var bgColorFill = model.backgroundColor || "transparent";
+      var bgColorEnd = model.backgroundColorEnd || "transparent";
 
       if(bgFillType === "none") {
         return "transparent";
