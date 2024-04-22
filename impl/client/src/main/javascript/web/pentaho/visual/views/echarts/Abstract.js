@@ -17,8 +17,10 @@ define([
   "pentaho/module!_",
   "pentaho/visual/impl/View",
   "pentaho/visual/util",
+  "pentaho/visual/scene/util",
+  "pentaho/data/util",
   "common-ui/echarts"
-], function(module, BaseView, util, echarts) {
+], function(module, BaseView, util, sceneUtil, dataUtil, echarts) {
 
   "use strict";
 
@@ -45,14 +47,27 @@ define([
       return fontFamily;
     },
 
+    _getModelSize: function() {
+      var model = this.model;
+      return {
+        height: model.height || 400,
+        width: model.width || 400
+      };
+    },
+
     _initializeChart: function() {
-      this._chart = echarts.init(this.domContainer, null, {});
+      var size = this._getModelSize();
+      this._chart = echarts.init(this.domContainer, null, {width: size.width, height: size.height});
       return this._chart;
     },
 
     /** @override */
     _updateSize: function() {
-      this._chart.resize();
+      var size = this._getModelSize();
+      var clientHeight = this._chart.getDom().clientHeight;
+      var height = Math.max(clientHeight, size.height);
+
+      this._chart.resize({width: size.width, height:height});
     },
 
     _getEChartsLabel: function(labelsOption) {
@@ -256,8 +271,92 @@ define([
 
       this._configureOptions();
 
+      this._chart.on("dblclick", function (params) {
+        this._onExecute(params);
+      }, this);
+
+      // When 'click' and 'dblclick' are bound to same element
+      // and user double-clicks, 'click' is fired twice followed by dbl-click
+      // Reference: https://stackoverflow.com/a/7119911
+      var clickTimeout;
+      this._chart.on("click", function (params) {
+        clearTimeout(clickTimeout);
+        var me = this;
+        clickTimeout = setTimeout(function() {
+          me._onSelect(params);
+        }, 300);
+      }, this);
+
       // Draw the chart
       this._chart.setOption(this._echartOptions);
+    },
+
+    _onExecute: function(params) {
+      params.cancelBubble = true;
+      var model = this.model;
+      if(model.isDirty) {
+        return;
+      }
+
+      var filter = null;
+      var srcEvent = params.event;
+
+      var filter = this._createFilter(params);
+
+      if(filter === null) {
+        return;
+      }
+
+      model.execute({
+        dataFilter: filter,
+        position: srcEvent ? {x: srcEvent.offsetX, y: srcEvent.offsetY} : null
+      });
+    },
+
+    _onSelect: function(params) {
+      params.cancelBubble = true;
+      var model = this.model;
+      if(model.isDirty) {
+        return;
+      }
+
+      var filter = null;
+      var srcEvent = params.event.event;
+
+      var filter = this._createFilter(params);
+
+      if(filter === null) {
+        return;
+      }
+
+      model.select({
+        dataFilter: filter,
+        selectionMode: srcEvent.ctrlKey || srcEvent.metaKey ? "toggle" : "replace"
+      });
+    },
+
+    _createFilter: function(params) {
+      var model = this.model;
+
+      var varsMap = this._getVars(params.data.visualKey);
+
+      var keyDataCellsMap = sceneUtil.invertVars(varsMap, model);
+
+      return dataUtil.createFilterFromCellsMap(keyDataCellsMap, model.data);
+    },
+
+    _getVars: function(eventData) {
+      if(eventData == null) {
+        return null;
+      }
+
+      var varsMap = Object.create(null);
+      var value = eventData.split(this.groupedLabelSeparator);
+      var key = "rows";
+
+      varsMap[key] = value;
+
+      return varsMap;
     },
 
     /** @inheritDoc */
