@@ -124,14 +124,14 @@ define([
         var categoryTableView = this._getEntityTableView(category, dataTable);
 
         // When  category is not mapped, do not include the category label.
-        // Example: "Cars ~ "
+        // Example: "Cars~"
         var categoryLabelPrefix = category.label ? (category.label + this.groupedLabelSeparator) : "";
 
         visualMappings.measures.forEach(function(measureColIndex) {
           // Example: "Quantity"
           var measureLabel = dataTable.getColumnLabel(measureColIndex);
           indicators.push({
-            // Example: "Cars ~ Quantity"
+            // Example: "Cars~Quantity"
             name: categoryLabelPrefix + measureLabel,
             max: this._getColumnRange(categoryTableView, measureColIndex, false).max,
 
@@ -165,6 +165,16 @@ define([
         var record = {
           // May be "" for the virtual null series.
           name: seriesEntity.label,
+
+          // For Radar, click event handler params do not contain the information about the
+          // data point that is clicked. It gives the entire series data.
+          // Because of which tooltip also shows the entire series data
+          // and Chart Interactions ( Select and Execute ) are using Series'
+          // visual key instead of a combination of series key and category key.
+          // Reference: https://github.com/apache/echarts/issues/16160 &
+          // https://github.com/apache/echarts/issues/10537#issuecomment-608339356
+          visualKey: seriesEntity.key,
+
           value: values,
           _label: labels
         };

@@ -121,7 +121,8 @@ define([
           detail: {
             offsetCenter: [offsetCenterX, (offsetCenterYPercent + 15) + "%"],
             width: detailWidth
-          }
+          },
+          visualKey: dataTable.getCompositeValue(i, categoriesColIndexes, this.groupedLabelSeparator)
         });
       }
 

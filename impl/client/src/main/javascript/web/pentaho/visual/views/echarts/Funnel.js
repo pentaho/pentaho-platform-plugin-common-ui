@@ -87,7 +87,8 @@ define([
         records.push({
           name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, this.groupedLabelSeparator),
           value: dataTable.getValue(i, measureColIndex),
-          tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font)
+          tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font),
+          visualKey: dataTable.getCompositeValue(i, categoriesColIndexes, this.groupedLabelSeparator)
         });
       }
 
