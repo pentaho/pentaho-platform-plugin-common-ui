@@ -57,7 +57,15 @@ define("common-ui/util/URLEncoder", [], function() {
 
   var O_proto = Object.prototype;
 
-  Encoder.encode = function(str, args, queryObj) {
+  /**
+   * We want to preserve the old behavior of this function here, as we have overloaded it to disable double-encoding.
+   * We do not wish to double-encode slashes in all cases, e.g. URL parameters that are paths.
+   */
+  Encoder.encode = function(str, args, queryObj){
+    return Encoder.encode(str, args, queryObj, true);
+  }
+
+  Encoder.encode = function(str, args, queryObj, doubleEncodeSlashes) {
 
     "use strict";
 
@@ -70,22 +78,24 @@ define("common-ui/util/URLEncoder", [], function() {
       args = [args];
     }
 
-    // Detect the presence of the "?" to determine
-    // when the special double-slash encoding should end.
-    var pathPart = str.split("?")[0];
-    var pathBounds = (pathPart.match(/\{[\d]+\}/g) || []).length;
+    if (doubleEncodeSlashes) {
+      // Detect the presence of the "?" to determine
+      // when the special double-slash encoding should end.
+      var pathPart = str.split("?")[0];
+      var pathBounds = (pathPart.match(/\{[\d]+\}/g) || []).length;
 
-    args = (args || []).map(function(item, pos) {
+      args = (args || []).map(function (item, pos) {
 
-      var encodedStr = encodeURIComponent(String(item));
+        var encodedStr = encodeURIComponent(String(item));
 
-      // Double-encode / and \ to work around Tomcat issue.
-      if(pos < pathBounds) {
-        encodedStr = encodedStr.replace(/%5C/g, "%255C").replace(/%2F/g, "%252F");
-      }
+        // Double-encode / and \ to work around Tomcat issue.
+        if (pos < pathBounds) {
+          encodedStr = encodedStr.replace(/%5C/g, "%255C").replace(/%2F/g, "%252F");
+        }
 
-      return encodedStr;
-    });
+        return encodedStr;
+      });
+    }
 
     var result = format(str, args);
     if(queryObj) {
@@ -123,7 +133,7 @@ define("common-ui/util/URLEncoder", [], function() {
         .replaceAll(":", "~")
         .replaceAll("/", ":");
   }
-  
+
   // Return encoder for AMD use.
   return Encoder;
 
