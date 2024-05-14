@@ -17,10 +17,11 @@ define([
   "pentaho/module!_",
   "pentaho/visual/impl/View",
   "pentaho/visual/util",
+  "pentaho/visual/color/util",
   "pentaho/visual/scene/util",
   "pentaho/data/util",
   "common-ui/echarts"
-], function(module, BaseView, util, sceneUtil, dataUtil, echarts) {
+], function(module, BaseView, util, visualColorUtils, sceneUtil, dataUtil,echarts) {
 
   "use strict";
 
@@ -218,6 +219,20 @@ define([
       return this.model.palette.colors.toArray(function(color) {
         return color.value;
       });
+    },
+
+    _getContinuousColorScale: function() {
+      var model = this.model;
+      var colorScale;
+
+      var paletteQuantitative = model.paletteQuantitative;
+      if(paletteQuantitative) {
+        colorScale = paletteQuantitative.colors.toArray(function(color) { return color.value; });
+      } else {
+        colorScale = visualColorUtils.buildPalette(model.colorSet, model.pattern, model.reverseColors);
+      }
+
+      return colorScale;
     },
 
     _buildTooltip: function(tooltipFormatString, font) {
