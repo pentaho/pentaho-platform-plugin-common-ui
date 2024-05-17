@@ -12,14 +12,14 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2017 Hitachi Vantara..  All rights reserved.
+ * Copyright (c) 2002-2024 Hitachi Vantara..  All rights reserved.
  */
 
 package org.pentaho.common.ui.services;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -141,7 +141,7 @@ public class SolutionUrlContentGeneratorTest {
   @Test( expected = InvalidParameterException.class )
   public void testCreateContentWithoutOutputStream() throws Exception {
     doReturn( null ).when( pluginManager ).getContentGenerator( "doc", null );
-    doReturn( null ).when( contentItem ).getOutputStream( anyString() );
+    doReturn( null ).when( contentItem ).getOutputStream( any() );
     doReturn( "local/resources/web/test.doc" ).when( provider ).getStringParameter( PATH_PARAM, null );
     generator.createContent();
   }
