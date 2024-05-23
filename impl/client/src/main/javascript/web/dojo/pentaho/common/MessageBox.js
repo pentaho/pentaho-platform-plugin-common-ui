@@ -18,13 +18,14 @@ define([
   "dojo/_base/declare",
   "dijit/_WidgetBase",
   "dijit/_Templated",
+  "dojo/dom-class",
   "dojo/on",
   "dojo/query",
+  "dojox/html/entities",
   "pentaho/common/button",
   "pentaho/common/Dialog",
-  "dojo/dom-class",
   "dojo/text!pentaho/common/MessageBox.html",
-], (declare, _WidgetBase, _Templated, on, query, button, Dialog, domClass, templateStr) =>
+], (declare, _WidgetBase, _Templated, domClass, on, query, htmlEntities, button, Dialog, templateStr) =>
   declare("pentaho.common.MessageBox", [Dialog], {
     buttons: ["btn1", "btn2", "btn3"],
     messageType: null, // Options are null, ERROR, WARN, INFO
@@ -32,7 +33,7 @@ define([
     responsiveClasses: "dw-sm",
 
     setTitle(title) {
-      this.titleNode.innerHTML = title;
+      this.titleNode.innerHTML = htmlEntities.encode(title);
     },
 
     postCreate() {
@@ -57,7 +58,7 @@ define([
     },
 
     setMessage(message) {
-      this.messagelbl.innerHTML = message;
+      this.messagelbl.innerHTML = htmlEntities.encode(message);
     },
 
     setButtons(buttons) {
@@ -65,9 +66,12 @@ define([
 
       for (let i = 0; i < 3; i++) {
         const buttonNode = query(`button${i}`, this.popup.domNode);
+
         if (buttonNode) {
           if (i < this.buttons.length) {
-            buttonNode.innerHTML = this.buttons[i];
+            const { [i]: buttonText } = this.buttons;
+            buttonNode.innerHTML = htmlEntities.encode(buttonText);
+
             domClass.remove(buttonNode, "hidden");
           } else {
             domClass.add(buttonNode, "hidden");
