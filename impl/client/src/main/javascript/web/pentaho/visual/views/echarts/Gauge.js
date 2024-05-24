@@ -81,7 +81,15 @@ define([
           min: range.min,
           max: range.max,
           data: echartData,
+          selectedMode: "multiple",
 
+          /*
+           If user wishes to fire a select action when 'useMeasureColors' is true,
+           it is recommended to click on the dial and not on "colored partition".
+           The dial is clickable and provides the value. The "colored partition" is just an
+           axis and not clickable, like any other axis in ECharts.
+           Reference: https://github.com/apache/echarts/issues/18093#issuecomment-1366918061
+          */
           axisLine: {
             lineStyle: {
               color: colorScale
@@ -131,11 +139,13 @@ define([
             }
           },
           title: {
+            show: model.showLegend,
             fontFamily: titleFontFamily,
             fontWeight: titleFontWeight,
             fontSize: model.legendSize || 14
           },
           detail: {
+            show: model.showLegend,
             width: "auto",
             height: "auto",
             legendHoverLink: true,
@@ -197,6 +207,7 @@ define([
             name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, self.groupedLabelSeparator),
             value: dataTable.getValue(i, measureColIndex),
             tooltip: self._buildTooltip(self._buildRowTooltipHtml(dataTable, i), font),
+            vars: {"rows": self._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))},
             title: {
               offsetCenter: [offsetCenterX, offsetCenterYPercent + "%"],
               overflow: "truncate",
@@ -206,8 +217,7 @@ define([
               offsetCenter: [offsetCenterX, (offsetCenterYPercent + 15) + "%"],
               width: detailWidthHorizontal,
               backgroundColor: bgColorDetail[i]
-            },
-            visualKey: dataTable.getCompositeValue(i, categoriesColIndexes, self.groupedLabelSeparator)
+            }
           });
         }
       }
@@ -227,6 +237,7 @@ define([
             name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, self.groupedLabelSeparator),
             value: dataTable.getValue(i, measureColIndex),
             tooltip: self._buildTooltip(self._buildRowTooltipHtml(dataTable, i), font),
+            vars: {"rows": self._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))},
             title: {
               offsetCenter: [offsetCenterXPercent + "%", offsetCenterY],
               overflow: "truncate",
@@ -236,8 +247,7 @@ define([
               offsetCenter: [(offsetCenterXPercent + 40) + "%", offsetCenterY],
               width: detailWidthVertical,
               backgroundColor: bgColorDetail[i]
-            },
-            visualKey: dataTable.getCompositeValue(i, categoriesColIndexes, self.groupedLabelSeparator)
+            }
           });
         }
       }
