@@ -21,9 +21,15 @@ define([
   "pentaho/visual/scene/util",
   "pentaho/data/util",
   "common-ui/echarts"
-], function(module, BaseView, util, visualColorUtils, sceneUtil, dataUtil,echarts) {
+], function(module, BaseView, util, visualColorUtils, sceneUtil, dataUtil, echarts) {
 
   "use strict";
+
+  var SelectionStates = {
+    NoneSelected: 0,
+    AnySelected: 1,
+    IsSelected: 2
+  }
 
   return BaseView.extend(module.id, {
 
@@ -34,6 +40,8 @@ define([
     fontWeight: "plain",
     fontSize: 12,
     fontColor: "#333333",
+
+    __clickTimeout: null,
 
     _getFontWeight: function(modelValue) {
       var fontWeight = modelValue || this.fontWeight;
@@ -56,19 +64,58 @@ define([
       };
     },
 
+    _getCellsValues: function(cells) {
+      return cells.map(function(cell) {
+        return cell.valueOf();
+      })
+    },
+
     _initializeChart: function() {
       var size = this._getModelSize();
       this._chart = echarts.init(this.domContainer, null, {width: size.width, height: size.height});
+
+      this._chart.on("dblclick", function (echartsEvent) {
+        this._onDoubleClick(echartsEvent);
+      }, this);
+
+      this._chart.on("click", function (echartsEvent) {
+        if (this.__clickTimeout) {
+          clearTimeout(this.__clickTimeout);
+          this.__clickTimeout = null;
+          return;
+        }
+
+        this.__clickTimeout = setTimeout(function() {
+          this.__clickTimeout = null;
+          this._onClick(echartsEvent);
+        }.bind(this), 301);
+      }, this);
+
       return this._chart;
+    },
+
+    _onClick: function(echartsEvent) {
+      if(this.model.isDirty) {
+        return;
+      }
+
+      this._onSelect(echartsEvent);
+    },
+
+    _onDoubleClick: function(echartsEvent) {
+      if(this.model.isDirty) {
+        return;
+      }
+
+      this._onExecute(echartsEvent);
     },
 
     /** @override */
     _updateSize: function() {
       var size = this._getModelSize();
-      var clientHeight = this._chart.getDom().clientHeight;
-      var height = Math.max(clientHeight, size.height);
+      var width = size.width, height = size.height;
 
-      this._chart.resize({width: size.width, height:height});
+      this._chart.resize({width: width, height: height});
     },
 
     _getEChartsLabel: function(labelsOption) {
@@ -286,38 +333,14 @@ define([
 
       this._configureOptions();
 
-      this._chart.on("dblclick", function (params) {
-        this._onExecute(params);
-      }, this);
-
-      // When 'click' and 'dblclick' are bound to same element
-      // and user double-clicks, 'click' is fired twice followed by dbl-click
-      // Reference: https://stackoverflow.com/a/7119911
-      var clickTimeout;
-      this._chart.on("click", function (params) {
-        clearTimeout(clickTimeout);
-        var me = this;
-        clickTimeout = setTimeout(function() {
-          me._onSelect(params);
-        }, 300);
-      }, this);
-
       // Draw the chart
       this._chart.setOption(this._echartOptions);
     },
 
-    _onExecute: function(params) {
-      params.cancelBubble = true;
+    _onExecute: function (echartsEvent) {
       var model = this.model;
-      if(model.isDirty) {
-        return;
-      }
-
-      var filter = null;
-      var srcEvent = params.event;
-
-      var filter = this._createFilter(params);
-
+      var srcEvent = echartsEvent.event;
+      var filter = this._createFilter(echartsEvent);
       if(filter === null) {
         return;
       }
@@ -328,50 +351,98 @@ define([
       });
     },
 
-    _onSelect: function(params) {
-      params.cancelBubble = true;
+    _onSelect: function(echartsEvent) {
       var model = this.model;
-      if(model.isDirty) {
-        return;
-      }
-
-      var filter = null;
-      var srcEvent = params.event.event;
-
-      var filter = this._createFilter(params);
-
+      var filter = this._createFilter(echartsEvent);
       if(filter === null) {
         return;
       }
 
       model.select({
         dataFilter: filter,
-        selectionMode: srcEvent.ctrlKey || srcEvent.metaKey ? "toggle" : "replace"
+        selectionMode: "toggle"
       });
     },
 
-    _createFilter: function(params) {
-      var model = this.model;
-
-      var varsMap = this._getVars(params.data.visualKey);
-
-      var keyDataCellsMap = sceneUtil.invertVars(varsMap, model);
-
-      return dataUtil.createFilterFromCellsMap(keyDataCellsMap, model.data);
-    },
-
-    _getVars: function(eventData) {
-      if(eventData == null) {
+    _createFilter: function(echartsEvent) {
+      // This is needed when user clicks on `axisName`.
+      // Only Radar uses axisName , for now.
+      if(echartsEvent.targetType === "axisName") {
         return null;
       }
 
-      var varsMap = Object.create(null);
-      var value = eventData.split(this.groupedLabelSeparator);
-      var key = "rows";
+      var model = this.model;
 
-      varsMap[key] = value;
+      var varMap = echartsEvent.data.vars;
+      var keyDataCellsMap = sceneUtil.invertVars(varMap, model);
+      return dataUtil.createFilterFromCellsMap(keyDataCellsMap, model.data);
+    },
 
-      return varsMap;
+     /** @override */
+    _updateSelection: function() {
+      var myChart = this._chart;
+      var records = myChart.getOption().series[0].data;
+      var selectionFilter = this.model.selectionFilter;
+      var globalSelectionState = null;
+      var modelData = this.model.data;
+      var colorArray = this._echartOptions.color;
+      var colorArrayLen = colorArray.length;
+
+      if (selectionFilter === null ||
+          selectionFilter.toDnf().kind === "false") {
+        // Nothing is selected.
+        globalSelectionState = SelectionStates.NoneSelected;  // 00
+      }
+
+      records.forEach(function(record, recordIndex) {
+        var colorIndex = recordIndex % colorArrayLen;
+        var color = colorArray[colorIndex];
+
+        var selectionState;
+
+        if (globalSelectionState === SelectionStates.NoneSelected) {
+          selectionState = globalSelectionState;
+        } else {
+          var rowIndexes = record.rowIndexes ?? [recordIndex];
+          var isSelected = rowIndexes.some( (rowIndex) => {
+            return rowIndex != null && modelData.filterMatchesRow(selectionFilter, rowIndex);
+          });
+
+          if (isSelected) {
+            // Among the selected
+            selectionState = SelectionStates.AnySelected | SelectionStates.IsSelected; // 11
+          } else {
+            // Not among the selected
+            selectionState = SelectionStates.AnySelected;
+          }
+        }
+
+        this.__configureItemSelection(record, selectionState, color);
+      }, this);
+
+      myChart.setOption({
+        series: [
+          {
+            data: records
+          }
+        ],
+      });
+    },
+
+    __configureItemSelection: function(dataItem, selectionState, baseColor) {
+      var isSelected = (selectionState & SelectionStates.IsSelected) !== 0;
+      // Is Selected or Nothing Is Selected ?
+      var isSelectedOrNoneIs = isSelected || selectionState === SelectionStates.NoneSelected;
+
+        if (isSelectedOrNoneIs) {
+          dataItem.itemStyle = {
+            color: baseColor
+          };
+        } else {
+          dataItem.itemStyle = {
+            color: "#999999"
+          };
+        }
     },
 
     /** @inheritDoc */
@@ -383,7 +454,10 @@ define([
     },
 
     /**
-     * Disposes an existing eChart chart.
+     * Disposes an existing eChart chart, along with
+     * {@link https://github.com/ecomfe/zrender/blob/master/src/dom/HandlerProxy.ts#L525 removing}
+     * event listeners.
+     *
      * @private
      */
     __disposeChart: function() {

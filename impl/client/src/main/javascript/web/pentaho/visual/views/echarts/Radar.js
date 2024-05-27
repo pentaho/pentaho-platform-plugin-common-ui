@@ -86,9 +86,11 @@ define([
       var entity = O.getOwn(entityList.set, key);
       if(entity == null) {
         var label = dataTable.getCompositeFormattedValue(rowIndex, colIndexes, this.groupedLabelSeparator);
+        var cells = dataTable.getRowCells(rowIndex, colIndexes);
         entity = {
           key: key,
           value: value,
+          cells: cells,
           label: label,
           rowIndexes: []
         };
@@ -154,7 +156,7 @@ define([
 
       visualData.series.forEach(function(seriesEntity) {
         var seriesTableView = this._getEntityTableView(seriesEntity, dataTable);
-        records.push(buildRecord(seriesEntity, seriesTableView));
+        records.push(buildRecord.call(this, seriesEntity, seriesTableView));
       }, this);
 
       return records;
@@ -162,6 +164,7 @@ define([
       function buildRecord(seriesEntity, seriesTableView) {
         var values = [];
         var labels = [];
+        var rowIndexes = [];
         var record = {
           // May be "" for the virtual null series.
           name: seriesEntity.label,
@@ -173,10 +176,11 @@ define([
           // visual key instead of a combination of series key and category key.
           // Reference: https://github.com/apache/echarts/issues/16160 &
           // https://github.com/apache/echarts/issues/10537#issuecomment-608339356
-          visualKey: seriesEntity.key,
+          vars: {"rows": this._getCellsValues(seriesEntity.cells)},
 
           value: values,
-          _label: labels
+          _label: labels,
+          rowIndexes: rowIndexes
         };
 
         // Given that series x category together form the
@@ -206,6 +210,7 @@ define([
             : "";
           values.push(value);
           labels.push(label);
+          rowIndexes.push(rowIndex);
         });
 
         return record;
@@ -259,7 +264,7 @@ define([
                 formattedTextLength += token.length + 1;
               }
             }
-            
+
             return formattedText;
           }
         },
@@ -296,6 +301,7 @@ define([
           name: "Radar Series",
           type: "radar",
           data: echartData.records,
+          selectedMode: "multiple",
           label: label,
           labelLayout: {
             hideOverlap: "true"

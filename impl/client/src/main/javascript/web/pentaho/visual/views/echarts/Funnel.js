@@ -36,6 +36,7 @@ define([
           right: "20%",
           top: "10%",
           data: echartData,
+          selectedMode: "multiple",
           label: label,
           bottom: "10%",
           width: "auto",
@@ -55,8 +56,7 @@ define([
             }
           },
           itemStyle: {
-            borderColor: "#fff",
-            borderWidth: 1
+            borderWidth: 0
           },
           emphasis: {
             label: {
@@ -88,7 +88,7 @@ define([
           name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, this.groupedLabelSeparator),
           value: dataTable.getValue(i, measureColIndex),
           tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font),
-          visualKey: dataTable.getCompositeValue(i, categoriesColIndexes, this.groupedLabelSeparator)
+          vars: {"rows": this._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))}
         });
       }
 
