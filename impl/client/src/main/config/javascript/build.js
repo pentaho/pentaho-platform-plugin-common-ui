@@ -106,7 +106,26 @@
     const { minify } = require.nodeRequire("uglify-js");
     const { code, error } = minify(contents, {
       output: {
+        /** @default true */
         beautify: false
+      },
+
+      /*
+        Overriding these properties to match 'uglify-js2' default values.
+        The properties new default values were breaking the code functionality.
+      */
+      compress: {
+        /** @default true */
+        collapse_vars: false,
+
+        /** @default false */
+        keep_fargs: true,
+
+        /** @default "strict" */
+        pure_getters: false,
+
+        /** @default true */
+        reduce_vars: false,
       }
     });
 
