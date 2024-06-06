@@ -395,8 +395,8 @@ public class MetadataServiceUtil2 extends PentahoBase {
       ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-        PentahoJsonValidator.validateJson( json, Query.class );
-        return new JSONDeserializer<Query>().deserialize( json, Query.CLASS_LIST );
+        PentahoJsonValidator.validateJson( json, Query.CLASS_LIST );
+        return new JSONDeserializer<Query>().deserialize( json, Query.class );
       } catch (Exception e){
       e.printStackTrace();
       return null;
