@@ -214,8 +214,8 @@ public class MetadataServiceUtil2Test {
     String json =
         "{\"class\":\"org.pentaho.metadata.model.thin.Query\",\"conditions\":[{\"class\":\"org.pentaho.metadata.model.thin.Condition\","
             + "\"combinationType\":\"AND\",\"elementId\":\"MY_ELEM_ID\",\"operator\":\"EQUAL\",\"parameterized\":false,"
-            + "\"parentId\":\"MY_PARENT_ID\",\"selectedAggregation\":\"SUM\",\"value\":[\"Val_0\"]}],\"defaultParameterMap\":null,"
-            + "\"disableDistinct\":false,\"elements\":[{\"availableAggregations\":null,\"capabilities\":{},"
+            + "\"parentId\":\"MY_PARENT_ID\",\"selectedAggregation\":\"SUM\",\"value\":[ ]}],\"defaultParameterMap\":null,"
+            + "\"disableDistinct\":false,\"elements\":[{\"availableAggregations\":null,\"capabilities\":null,"
             + "\"class\":\"org.pentaho.metadata.model.thin.Element\",\"dataType\":null,\"defaultAggregation\":\"NONE\","
             + "\"description\":null,\"elementType\":null,\"formatMask\":null,\"hiddenForUser\":false,\"horizontalAlignment\":\"LEFT\","
             + "\"id\":\"MY_ELEM_ID\",\"isQueryElement\":true,\"name\":null,\"parentId\":\"PARENT_ID\",\"selectedAggregation\":\"SUM\"}],"
@@ -246,7 +246,7 @@ public class MetadataServiceUtil2Test {
     assertEquals( "EQUAL", condition.getOperator() );
     assertFalse( condition.isParameterized() );
     assertEquals( "SUM", condition.getSelectedAggregation() );
-    Assert.assertArrayEquals( new String[] { "Val_0" }, condition.getValue() );
+    Assert.assertArrayEquals( new String[] {  }, condition.getValue() );
     assertEquals( 1, result.getOrders().length );
     Order order = result.getOrders()[0];
     assertEquals( "MY_ELEM_ID", order.getElementId() );
