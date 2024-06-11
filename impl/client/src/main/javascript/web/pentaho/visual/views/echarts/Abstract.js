@@ -403,7 +403,7 @@ define([
         if (globalSelectionState === SelectionStates.NoneSelected) {
           selectionState = globalSelectionState;
         } else {
-          var rowIndexes = record.rowIndexes ?? [recordIndex];
+          var rowIndexes = record.rowIndexes || [recordIndex];
           var isSelected = rowIndexes.some( (rowIndex) => {
             return rowIndex != null && modelData.filterMatchesRow(selectionFilter, rowIndex);
           });
