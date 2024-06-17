@@ -212,6 +212,7 @@
   // endregion
 
   requirePaths["common-ui/echarts"] = basePath + "/echarts/echarts";
+  requirePaths["common-ui/dompurify"] = basePath + "/dompurify/purify";
 
   // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
