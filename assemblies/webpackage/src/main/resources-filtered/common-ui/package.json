@@ -416,6 +416,15 @@
         }
       },
 
+      "pentaho/visual/models/Radar": {
+        "base": "pentaho/visual/models/Abstract",
+        "annotations": {
+          "pentaho/visual/DefaultView": {
+            "module": "pentaho/visual/views/echarts/Radar"
+          }
+        }
+      },
+
       "pentaho/visual/models/MetricPointAbstract": {
         "base": "pentaho/visual/models/CartesianAbstract"
       },

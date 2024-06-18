@@ -65,7 +65,13 @@ define([
   .configure();
 
   function __isColorInContinuousMode() {
-    var mode = this.color.mode;
+    // If the color role does not exist, enable the controls. A sub-class may have other means to control applicability.
+    var colorRole = this.color;
+    if (colorRole == null) {
+      return true;
+    }
+
+    var mode = colorRole.mode;
     return mode !== null && mode.isContinuous;
   }
 });

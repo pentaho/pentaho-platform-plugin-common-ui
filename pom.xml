@@ -33,6 +33,7 @@
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <pentaho-cdf-plugin.version>10.2.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
     <echarts.version>5.4.3</echarts.version>
+    <dompurify.version>3.1.5</dompurify.version>
     <!-- Removed due to custom changes in the current common-ui version -->
     <!-- (mainly the exporting of the Handlebars global variable) -->
     <!--<handlebars.version>4.0.5</handlebars.version>-->
@@ -97,6 +98,11 @@
         <groupId>org.webjars.npm</groupId>
         <artifactId>echarts</artifactId>
         <version>${echarts.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>dompurify</artifactId>
+        <version>${dompurify.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

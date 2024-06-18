@@ -114,6 +114,16 @@ define("common-ui/util/URLEncoder", [], function() {
       .replace(new RegExp("\\t", "g"), ":");
   };
 
+  Encoder.encodeGenericFilePath = function (str) {
+
+    "use strict";
+
+    return String(str)
+        .replaceAll("~", "\t")
+        .replaceAll(":", "~")
+        .replaceAll("/", ":");
+  }
+  
   // Return encoder for AMD use.
   return Encoder;
 

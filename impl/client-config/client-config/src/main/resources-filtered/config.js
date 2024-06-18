@@ -28,13 +28,13 @@ define(function() {
    * Links to the documentation of the options being configured are provided.
    *
    * For help on configuration, please check the following help topics:
-   * 1. [General information on configuration](https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Configuration_API)
-   * 2. [Configuring a visualization](https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Configuring_a_visualization)
+   * 1. [General information on configuration](https://docs.hitachivantara.com/r/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia002/developer-center/platform-javascript-apis/configuration-api)
+   * 2. [Configuring a visualization](https://docs.hitachivantara.com/r/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia002/developer-center/platform-javascript-apis/visualization-api/configuring-a-visualization)
    *
    * If you need to know the identifiers of well-known modules, check the following help topics:
-   * 1. [Ids of Well-Known Applications](https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Configuration_API#Known_values_of_Pentaho_platform_environment_variables)
-   * 2. [Ids of Stock Visualization Models and Views](https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Stock_visualizations_identifiers)
-   * 3. [Ids of Stock Color Palettes](https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Stock_color_palettes_identifiers)
+   * 1. [Ids of Well-Known Applications](https://docs.hitachivantara.com/r/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia002/developer-center/platform-javascript-apis/configuration-api/known-values-of-pentaho-platform-environment-variables)
+   * 2. [Ids of Stock Visualization Models and Views](https://docs.hitachivantara.com/r/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia002/developer-center/platform-javascript-apis/visualization-api/configuring-a-visualization/stock-visualizations-identifiers)
+   * 3. [Ids of Stock Color Palettes](https://docs.hitachivantara.com/r/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia002/developer-center/platform-javascript-apis/visualization-api/configuring-a-visualization/stock-color-palettes-identifiers)
    *
    * Almost all stock visualizations are based on the CCC charting library.
    * To experiment with CCC options and styles you can use the [CCC playground](https://webdetails.github.io/ccc).
@@ -55,7 +55,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -80,7 +80,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -104,7 +104,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#label
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -129,7 +129,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.ModelType#isBrowsable
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -192,8 +192,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette#colors
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -217,7 +216,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.spec.IPalette
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -248,7 +247,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalLight
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */
@@ -282,8 +281,7 @@ define(function() {
        *
        * Uncomment the following comment block to activate the rule.
        *
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.visual.color.palettes#.nominalPrimary
-       * @see https://help.hitachivantara.com/Documentation/Pentaho/9.4/Developer_center/Platform_JavaScript_APIs/platform/pentaho.module.spec.IInstanceMeta#ranking
+       * @see https://docs.hitachivantara.com/v/u/en-us/pentaho-data-integration-and-analytics/10.2.x/mk-95pdia012
        *
        * @type {pentaho.config.spec.IRule}
        */

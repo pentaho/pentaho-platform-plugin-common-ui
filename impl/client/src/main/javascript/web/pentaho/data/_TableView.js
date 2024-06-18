@@ -1,6 +1,6 @@
 
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,7 +317,7 @@ define([
      * Gets a `Table` loaded with the
      * data accessible through the view's visible rows and columns.
      *
-     * This is method is convenience for abbreviating:
+     * This method is convenience for abbreviating:
      *
      *    require("pentaho/data/Table", function(Table) {
      *      // ...
@@ -338,7 +338,7 @@ define([
      * Creates a specification of the view, in _plain table_ format.
      *
      * This implementation creates a specification
-     * not of the views own properties but of the data it shows through.
+     * not of the views' own properties but of the data it shows through.
      * The resulting specification can be used to create a `Table`.
      *
      * The resulting model will have one attribute per distinct view column.

@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2014 - 2024 Hitachi Vantara. All rights reserved.
  */
 
 define(["common-ui/util/URLEncoder"], function(Encoder) {
@@ -51,6 +51,10 @@ define(["common-ui/util/URLEncoder"], function(Encoder) {
 
     it("should handle no args and no queryObjs", function() {
       expect(Encoder.encode("http://www.foo.com/")).toBe("http://www.foo.com/");
+    });
+
+    it("should encode generic file path characters", function() {
+      expect(Encoder.encodeGenericFilePath("/home/Ab`~!@#$%^&()_+{}<>?'=-yZ:")).toBe(":home:Ab`\t!@#$%^&()_+{}<>?'=-yZ~");
     });
   });
 });

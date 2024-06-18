@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ define([
      * The value of a member defines it — it is unique amongst its attribute's members.
      * See property {@link pentaho.data.Member#value}.
      *
-     * A member can also hold a _context agnostic_, human readable
+     * A member can also hold a _context agnostic_, human-readable
      * label of its value. See property {@link pentaho.data.Member#label}.
      *
      * A member is an {@link pentaho.lang.IAnnotatable}.
