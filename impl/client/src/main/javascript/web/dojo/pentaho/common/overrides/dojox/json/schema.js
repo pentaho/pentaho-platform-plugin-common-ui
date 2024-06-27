@@ -1,8 +1,13 @@
-define(["dojo/_base/array", "dojo/_base/lang"], function(array, lang){
+/* Overridden to remove "dojox" require
+   see lines starting with Pentaho
+    - lines: 8-9
+*/
 
+define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array"], function(dojo, lang){
 
-
-dojo.getObject("json.schema", true, lang.getObject("dojox", true));
+// Pentaho
+var dojox = lang.getObject("dojox", true);
+dojo.getObject("json.schema", true, dojox);
 
 
 dojox.json.schema.validate = function(/*Any*/instance,/*Object*/schema){
@@ -47,11 +52,11 @@ dojox.json.schema.mustBeValid = function(result){
 	//		This checks to ensure that the result is valid and will throw an appropriate error message if it is not
 	// result: the result returned from checkPropertyChange or validate
 	if(!result.valid){
-		throw new TypeError(array.map(result.errors,function(error){return "for property " + error.property + ': ' + error.message;}).join(", "));
+		throw new TypeError(dojo.map(result.errors,function(error){return "for property " + error.property + ': ' + error.message;}).join(", "));
 	}
 };
 dojox.json.schema._validate = function(/*Any*/instance,/*Object*/schema,/*Boolean*/ _changing){
-	
+
 	var errors = [];
 		// validate a value against a property definition
 	function checkProp(value, schema, path,i){
@@ -60,7 +65,7 @@ dojox.json.schema._validate = function(/*Any*/instance,/*Object*/schema,/*Boolea
 		function addError(message){
 			errors.push({property:path,message:message});
 		}
-		
+
 		if((typeof schema != 'object' || schema instanceof Array) && (path || typeof schema != 'function')){
 			if(typeof schema == 'function'){
 				if(!(Object(value) instanceof schema)){
@@ -179,12 +184,12 @@ dojox.json.schema._validate = function(/*Any*/instance,/*Object*/schema,/*Boolea
 	}
 	// validate an object against a schema
 	function checkObj(instance,objTypeDef,path,additionalProp){
-	
+
 		if(typeof objTypeDef =='object'){
 			if(typeof instance != 'object' || instance instanceof Array){
 				errors.push({property:path,message:"an object is required"});
 			}
-			
+
 			for(var i in objTypeDef){
 				if(objTypeDef.hasOwnProperty(i) && !(i.charAt(0) == '_' && i.charAt(1) == '_')){
 					var value = instance[i];
