@@ -1,5 +1,5 @@
 /* Overridden due to [BACKLOG-36890]
-		see lines: 170-185
+		see lines: 167-185
 */
 
 define([
@@ -164,6 +164,7 @@ define([
 		postCreate: function(){
 			this.inherited(arguments);
 
+			/* BACKLOG-36890 */
 			// Set initial navigable node.
 			var cell = this._getValueCell() || this._cells[0];
 			if (cell) {
@@ -181,6 +182,7 @@ define([
 			}
 			return null;
 		},
+		/* end of BACKLOG-36890 hack */
 
 		focus: function(){
 			// summary:

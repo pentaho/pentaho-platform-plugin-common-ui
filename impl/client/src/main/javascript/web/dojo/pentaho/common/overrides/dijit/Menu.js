@@ -1,5 +1,6 @@
 /* Overridden due to BACKLOG-37807
-  see comments starting with // Pentaho
+   see comments starting with // Pentaho
+    - line: 188
 */
 
 define([
@@ -22,7 +23,7 @@ define([
 ], function(require, array, declare, dom, domAttr, domGeometry, domStyle, keys, lang, on, has, win, winUtils, pm, DropDownMenu, ready){
 
     // module:
-    //      dijit/Menu
+    //		dijit/Menu
 
     // Back compat w/1.6, remove for 2.0
     if(has("dijit-legacy-requires")){
@@ -34,35 +35,35 @@ define([
 
     return declare("dijit.Menu", DropDownMenu, {
         // summary:
-        //      A context menu you can assign to multiple elements
+        //		A context menu you can assign to multiple elements
 
         constructor: function(/*===== params, srcNodeRef =====*/){
             // summary:
-            //      Create the widget.
+            //		Create the widget.
             // params: Object|null
-            //      Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
-            //      and functions, typically callbacks like onClick.
-            //      The hash can contain any of the widget's properties, excluding read-only properties.
+            //		Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
+            //		and functions, typically callbacks like onClick.
+            //		The hash can contain any of the widget's properties, excluding read-only properties.
             // srcNodeRef: DOMNode|String?
-            //      If a srcNodeRef (DOM node) is specified:
+            //		If a srcNodeRef (DOM node) is specified:
             //
-            //      - use srcNodeRef.innerHTML as my contents
-            //      - replace srcNodeRef with my generated DOM tree
+            //		- use srcNodeRef.innerHTML as my contents
+            //		- replace srcNodeRef with my generated DOM tree
 
             this._bindings = [];
         },
 
         // targetNodeIds: [const] String[]
-        //      Array of dom node ids of nodes to attach to.
-        //      Fill this with nodeIds upon widget creation and it becomes context menu for those nodes.
+        //		Array of dom node ids of nodes to attach to.
+        //		Fill this with nodeIds upon widget creation and it becomes context menu for those nodes.
         targetNodeIds: [],
 
         // selector: String?
-        //      CSS expression to apply this Menu to descendants of targetNodeIds, rather than to
-        //      the nodes specified by targetNodeIds themselves.    Useful for applying a Menu to
-        //      a range of rows in a table, tree, etc.
+        //		CSS expression to apply this Menu to descendants of targetNodeIds, rather than to
+        //		the nodes specified by targetNodeIds themselves.  Useful for applying a Menu to
+        //		a range of rows in a table, tree, etc.
         //
-        //      The application must require() an appropriate level of dojo/query to handle the selector.
+        //		The application must require() an appropriate level of dojo/query to handle the selector.
         selector: "",
 
         // TODO: in 2.0 remove support for multiple targetNodeIds.   selector gives the same effect.
@@ -70,22 +71,23 @@ define([
 
         /*=====
         // currentTarget: [readonly] DOMNode
-        //      For context menus, set to the current node that the Menu is being displayed for.
-        //      Useful so that the menu actions can be tailored according to the node
+        //		For context menus, set to the current node that the Menu is being displayed for.
+        //		Useful so that the menu actions can be tailored according to the node
         currentTarget: null,
         =====*/
 
         // contextMenuForWindow: [const] Boolean
-        //      If true, right clicking anywhere on the window will cause this context menu to open.
-        //      If false, must specify targetNodeIds.
+        //		If true, right clicking anywhere on the window will cause this context menu to open.
+        //		If false, must specify targetNodeIds.
         contextMenuForWindow: false,
 
         // leftClickToOpen: [const] Boolean
-        //      If true, menu will open on left click instead of right click, similar to a file menu.
+        //		If true, menu will open on left click instead of right click, similar to a file menu.
         leftClickToOpen: false,
+        // TODO: remove in 2.0, we have better ways of opening a menu with a left click, by extending _HasDropDown.
 
         // refocus: Boolean
-        //      When this menu closes, re-focus the element which had focus before it was opened.
+        //		When this menu closes, re-focus the element which had focus before it was opened.
         refocus: true,
 
         postCreate: function(){
@@ -100,29 +102,29 @@ define([
         // thanks burstlib!
         _iframeContentWindow: function(/* HTMLIFrameElement */iframe_el){
             // summary:
-            //      Returns the window reference of the passed iframe
+            //		Returns the window reference of the passed iframe
             // tags:
-            //      private
+            //		private
             return winUtils.get(this._iframeContentDocument(iframe_el)) ||
-                // Moz. TODO: is this available when defaultView isn't?
-                this._iframeContentDocument(iframe_el)['__parent__'] ||
-                (iframe_el.name && document.frames[iframe_el.name]) || null;	//	Window
+              // Moz. TODO: is this available when defaultView isn't?
+              this._iframeContentDocument(iframe_el)['__parent__'] ||
+              (iframe_el.name && document.frames[iframe_el.name]) || null;	//	Window
         },
 
         _iframeContentDocument: function(/* HTMLIFrameElement */iframe_el){
             // summary:
-            //      Returns a reference to the document object inside iframe_el
+            //		Returns a reference to the document object inside iframe_el
             // tags:
-            //      protected
+            //		protected
             return iframe_el.contentDocument // W3
-                || (iframe_el.contentWindow && iframe_el.contentWindow.document) // IE
-                || (iframe_el.name && document.frames[iframe_el.name] && document.frames[iframe_el.name].document)
-                || null;	//	HTMLDocument
+              || (iframe_el.contentWindow && iframe_el.contentWindow.document) // IE
+              || (iframe_el.name && document.frames[iframe_el.name] && document.frames[iframe_el.name].document)
+              || null;	//	HTMLDocument
         },
 
         bindDomNode: function(/*String|DomNode*/ node){
             // summary:
-            //      Attach menu to given node
+            //		Attach menu to given node
             node = dom.byId(node, this.ownerDocument);
 
             var cn;	// Connect node
@@ -131,7 +133,7 @@ define([
             // to bind to the <body> node inside the iframe.
             if(node.tagName.toLowerCase() == "iframe"){
                 var iframe = node,
-                    window = this._iframeContentWindow(iframe);
+                  window = this._iframeContentWindow(iframe);
                 cn = win.body(window.document);
             }else{
                 // To capture these events at the top level, attach to <html>, not <body>.
@@ -157,31 +159,45 @@ define([
             // we need to monitor keyboard events in addition to the oncontextmenu event.
             var doConnects = lang.hitch(this, function(cn){
                 var selector = this.selector,
-                    delegatedEvent = selector ?
-                        function(eventType){
-                            return on.selector(selector, eventType);
-                        } :
-                        function(eventType){
-                            return eventType;
-                        },
-                    self = this;
+                  delegatedEvent = selector ?
+                    function(eventType){
+                        return on.selector(selector, eventType);
+                    } :
+                    function(eventType){
+                        return eventType;
+                    },
+                  self = this;
                 return [
-                    // TODO: when leftClickToOpen is true then shouldn't space/enter key trigger the menu,
-                    // rather than shift-F10?
                     on(cn, delegatedEvent(this.leftClickToOpen ? "click" : "contextmenu"), function(evt){
-                        // Schedule context menu to be opened unless it's already been scheduled from onkeydown handler
                         evt.stopPropagation();
                         evt.preventDefault();
-                        self._scheduleOpen(this, iframe, {x: evt.pageX, y: evt.pageY});
+
+                        if((new Date()).getTime() < self._lastKeyDown + 500){
+                            // Ignore contextmenu/click events that were already processed in keydown handler below.
+                            // But still call preventDefault() (above) so system context menu doesn't appear.
+                            return;
+                        }
+
+                        // Schedule context menu to be opened.
+                        // Note that this won't work will if the click was generated by the keyboard, while
+                        // focused on a <button> etc.   In that case evt.pageX and evt.pageY are either (0,0) or
+                        // wherever the mouse cursor is.  See keydown handler below.
+                        self._scheduleOpen(this, iframe, {x: evt.pageX, y: evt.pageY}, evt.target);
                     }),
                     on(cn, delegatedEvent("keydown"), function(evt){
                         // Pentaho : 'ENTER' and 'SPACE' keys to be used to open context menus.
                         if(evt.keyCode === keys.ENTER || evt.keyCode === keys.SPACE){
-                            var component = evt.target;
-                            var rect = domGeometry.position(component);
+                            var rect = domGeometry.position(evt.target);
+                            var coords = {x : rect.x + rect.w, y : rect.y + rect.h};
+
                             evt.stopPropagation();
                             evt.preventDefault();
-                            self._scheduleOpen(this, iframe,{x : rect.x + rect.w, y : rect.y + rect.h} );
+
+                            // Open the menu around evt.target.  Note that "this" and evt.target
+                            // are likely different, especially for global context menu, where "this" is <body>.
+                            self._scheduleOpen(this, iframe, coords, evt.target);
+
+                            self._lastKeyDown = (new Date()).getTime();
                         }
                     })
                 ];
@@ -199,7 +215,7 @@ define([
                     // access the <body> node because it's already gone, or at least in a state of limbo
 
                     var window = this._iframeContentWindow(iframe),
-                        cn = win.body(window.document);
+                      cn = win.body(window.document);
                     binding.connects = doConnects(cn);
                 });
                 if(iframe.addEventListener){
@@ -212,7 +228,7 @@ define([
 
         unBindDomNode: function(/*String|DomNode*/ nodeName){
             // summary:
-            //      Detach menu from given node
+            //		Detach menu from given node
 
             var node;
             try{
@@ -247,23 +263,26 @@ define([
             }
         },
 
-        _scheduleOpen: function(/*DomNode?*/ target, /*DomNode?*/ iframe, /*Object?*/ coords){
+        _scheduleOpen: function(delegatedTarget, iframe, coords, target){
             // summary:
-            //      Set timer to display myself.  Using a timer rather than displaying immediately solves
-            //      two problems:
-            //
-            //      1. IE: without the delay, focus work in "open" causes the system
-            //      context menu to appear in spite of stopEvent.
-            //
-            //      2. Avoid double-shows on linux, where shift-F10 generates an oncontextmenu event
-            //      even after a evt.preventDefault().  (Shift-F10 on windows doesn't generate the
-            //      oncontextmenu event.)
+            //		Set timer to display myself.  Using a timer rather than displaying immediately solves
+            //		IE problem: without the delay, focus work in "open" causes the system
+            //		context menu to appear in spite of evt.preventDefault().
+            // delegatedTarget: Element
+            //		The node specified in targetNodeIds or matching selector that the menu is being opened for.
+            // iframe: HTMLIframeElement?
+            //		Set if target is inside the specified iframe.
+            // coords: Object
+            //		x/y position to center the menu around.  Undefined if menu was opened via keyboard.
+            // target: Element
+            //		The actual clicked node, either delegatedTarget or a descendant.
 
             if(!this._openTimer){
                 this._openTimer = this.defer(function(){
                     delete this._openTimer;
                     this._openMyself({
                         target: target,
+                        delegatedTarget: delegatedTarget,
                         iframe: iframe,
                         coords: coords
                     });
@@ -273,26 +292,28 @@ define([
 
         _openMyself: function(args){
             // summary:
-            //      Internal function for opening myself when the user does a right-click or something similar.
+            //		Internal function for opening myself when the user does a right-click or something similar.
             // args:
-            //      This is an Object containing:
+            //		This is an Object containing:
             //
-            //      - target: The node that is being clicked
-            //      - iframe: If an `<iframe>` is being clicked, iframe points to that iframe
-            //      - coords: Put menu at specified x/y position in viewport, or if iframe is
-            //        specified, then relative to iframe.
+            //		- target: The node that is being clicked.
+            //		- delegatedTarget: The node from this.targetNodeIds or matching this.selector,
+            //		  either the same as target or an ancestor of target.
+            //		- iframe: If an `<iframe>` is being clicked, iframe points to that iframe
+            //		- coords: Mouse cursor x/y coordinates.  Null when opened via keyboard.
+            //		  Put menu at specified position in iframe (if iframe specified) or otherwise in viewport.
             //
-            //      _openMyself() formerly took the event object, and since various code references
-            //      evt.target (after connecting to _openMyself()), using an Object for parameters
-            //      (so that old code still works).
+            //		_openMyself() formerly took the event object, and since various code references
+            //		evt.target (after connecting to _openMyself()), using an Object for parameters
+            //		(so that old code still works).
 
             var target = args.target,
-                iframe = args.iframe,
-                coords = args.coords,
-                byKeyboard = !coords;
+              iframe = args.iframe,
+              coords = args.coords,
+              byKeyboard = !coords;
 
             // To be used by MenuItem event handlers to tell which node the menu was opened on
-            this.currentTarget = target;
+            this.currentTarget = args.delegatedTarget;
 
             // Get coordinates to open menu, either at specified (mouse) position or (if triggered via keyboard)
             // then near the node the menu is assigned to.
@@ -300,13 +321,13 @@ define([
                 if(iframe){
                     // Specified coordinates are on <body> node of an <iframe>, convert to match main document
                     var ifc = domGeometry.position(iframe, true),
-                        window = this._iframeContentWindow(iframe),
-                        scroll = domGeometry.docScroll(window.document);
+                      window = this._iframeContentWindow(iframe),
+                      scroll = domGeometry.docScroll(window.document);
 
                     var cs = domStyle.getComputedStyle(iframe),
-                        tp = domStyle.toPixelValue,
-                        left = (has("ie") && has("quirks") ? 0 : tp(iframe, cs.paddingLeft)) + (has("ie") && has("quirks") ? tp(iframe, cs.borderLeftWidth) : 0),
-                        top = (has("ie") && has("quirks") ? 0 : tp(iframe, cs.paddingTop)) + (has("ie") && has("quirks") ? tp(iframe, cs.borderTopWidth) : 0);
+                      tp = domStyle.toPixelValue,
+                      left = (has("ie") && has("quirks") ? 0 : tp(iframe, cs.paddingLeft)) + (has("ie") && has("quirks") ? tp(iframe, cs.borderLeftWidth) : 0),
+                      top = (has("ie") && has("quirks") ? 0 : tp(iframe, cs.paddingTop)) + (has("ie") && has("quirks") ? tp(iframe, cs.borderTopWidth) : 0);
 
                     coords.x += ifc.x + left - scroll.x;
                     coords.y += ifc.y + top - scroll.y;

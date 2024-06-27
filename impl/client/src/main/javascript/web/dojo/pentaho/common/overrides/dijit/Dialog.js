@@ -1,29 +1,36 @@
 /* Overridden due to BACKLOG-36893
-  see comments starting with // Pentaho
+   see comments starting with // Pentaho
+    - lines: 106-116
+    - lines: 285-302
+    - lines: 685-689
+    - lines: 696-697
+    - lines: 755-758
+    - lines: 766-769
 */
 
 define([
   "require",
-  "dojo/_base/array", // Array.forEach array.indexOf array.map
+  "dojo/_base/array", // array.forEach array.indexOf array.map
   "dojo/aspect",
-  "dojo/_base/declare", // Declare
+  "dojo/_base/declare", // declare
   "dojo/Deferred", // Deferred
-  "dojo/dom", // Dom.isDescendant
-  "dojo/dom-class", // DomClass.add domClass.contains
-  "dojo/dom-geometry", // DomGeometry.position
-  "dojo/dom-style", // DomStyle.set
-  "dojo/_base/fx", // Fx.fadeIn fx.fadeOut
-  "dojo/i18n", // I18n.getLocalization
+  "dojo/dom", // dom.isDescendant
+  "dojo/dom-class", // domClass.add domClass.contains
+  "dojo/dom-geometry", // domGeometry.position
+  "dojo/dom-style", // domStyle.set
+  "dojo/_base/fx", // fx.fadeIn fx.fadeOut
+  "dojo/i18n", // i18n.getLocalization
   "dojo/keys",
-  "dojo/_base/lang", // Lang.mixin lang.hitch
+  "dojo/_base/lang", // lang.mixin lang.hitch
   "dojo/on",
   "dojo/ready",
-  "dojo/sniff", // Has("ie") has("opera") has("dijit-legacy-requires")
-  "dojo/window", // WinUtils.getBox, winUtils.get
+  "dojo/sniff", // has("ie") has("opera") has("dijit-legacy-requires")
+  "dojo/touch",
+  "dojo/window", // winUtils.getBox, winUtils.get
   "dojo/dnd/Moveable", // Moveable
   "dojo/dnd/TimedMoveable", // TimedMoveable
   "./focus",
-  "./_base/manager", // Manager.defaultDuration
+  "./_base/manager", // manager.defaultDuration
   "./_Widget",
   "./_TemplatedMixin",
   "./_CssStateMixin",
@@ -31,15 +38,22 @@ define([
   "./_DialogMixin",
   "./DialogUnderlay",
   "./layout/ContentPane",
+  "./layout/utils",
   "dojo/text!./templates/Dialog.html",
+  "./a11yclick",	// template uses ondijitclick
   "dojo/i18n!./nls/common"
 ], function(require, array, aspect, declare, Deferred,
-            dom, domClass, domGeometry, domStyle, fx, i18n, keys, lang, on, ready, has, winUtils,
-            Moveable, TimedMoveable, focus, manager, _Widget, _TemplatedMixin, _CssStateMixin, _FormMixin, _DialogMixin,
-            DialogUnderlay, ContentPane, template) {
+  dom, domClass, domGeometry, domStyle, fx, i18n, keys, lang, on, ready, has, touch, winUtils,
+  Moveable, TimedMoveable, focus, manager, _Widget, _TemplatedMixin, _CssStateMixin, _FormMixin, _DialogMixin,
+  DialogUnderlay, ContentPane, utils, template){
 
-  // Module:
+  // module:
   //		dijit/Dialog
+
+  var resolvedDeferred = new Deferred();
+  resolvedDeferred.resolve(true);
+
+  function nop(){}
 
   var _DialogBase = declare("dijit._DialogBase" + (has("dojo-bidi") ? "_NoBidi" : ""), [_TemplatedMixin, _FormMixin, _DialogMixin, _CssStateMixin], {
     templateString: template,
@@ -51,23 +65,23 @@ define([
     },
 
     // Map widget attributes to DOMNode attributes.
-    _setTitleAttr: {node: "titleNode", type: "innerHTML"},
+    _setTitleAttr: { node: "titleNode", type: "innerHTML" },
 
-    // Open: [readonly] Boolean
+    // open: [readonly] Boolean
     //		True if Dialog is currently displayed on screen.
     open: false,
 
-    // Duration: Integer
+    // duration: Integer
     //		The time in milliseconds it takes the dialog to fade in and out
     duration: manager.defaultDuration,
 
-    // Refocus: Boolean
+    // refocus: Boolean
     //		A Toggle to modify the default focus behavior of a Dialog, which
     //		is to re-focus the element which had focus before being opened.
     //		False will disable refocusing. Default: true
     refocus: true,
 
-    // Autofocus: Boolean
+    // autofocus: Boolean
     //		A Toggle to modify the default focus behavior of a Dialog, which
     //		is to focus on the first dialog element after opening the dialog.
     //		False will disable autofocusing. Default: true
@@ -83,57 +97,49 @@ define([
     //		Set by `dijit/_DialogMixin._getFocusItems()`.
     _lastFocusItem: null,
 
-    // DoLayout: [protected] Boolean
-    //		Don't change this parameter from the default value.
-    //		This ContentPane parameter doesn't make sense for Dialog, since Dialog
-    //		is never a child of a layout container, nor can you specify the size of
-    //		Dialog in order to control the size of an inner widget.
-    doLayout: false,
-
-    // Draggable: Boolean
+    // draggable: Boolean
     //		Toggles the movable aspect of the Dialog. If true, Dialog
     //		can be dragged by it's title. If false it will remain centered
     //		in the viewport.
     draggable: true,
 
-    // DialogOpener: DomNode
+    // dialogOpener: DomNode
     // Pentaho - Added to fix WCAG's focus-order when the dialogs are closed.
     //      Especially for the dialogs that are opened via popupmenu.
     //      Restores the focus back to element that opened popupmenu.
     dialogOpener: null,
 
-    // ElementRefresher: function(Element) : Element
+    // elementRefresher: function(Element) : Element
     // Pentaho - Added to support WCAG focus maintenance.
     // Allows "refreshing" the element to use for "refocus" to a corresponding one which is attached
     // to the document. Required to deal with UI elements which are discarded and rebuilt.
     elementRefresher: null,
 
-    _setDraggableAttr: function(/* Boolean*/ val) {
+    _setDraggableAttr: function(/*Boolean*/ val){
       // Avoid _WidgetBase behavior of copying draggable attribute to this.domNode,
       // as that prevents text select on modern browsers (#14452)
       this._set("draggable", val);
     },
 
-    // MaxRatio: Number
+    // maxRatio: Number
     //		Maximum size to allow the dialog to expand to, relative to viewport size
     maxRatio: 0.9,
 
-    // Closable: Boolean
+    // closable: Boolean
     //		Dialog show [x] icon to close itself, and ESC key will close the dialog.
     closable: true,
-
-    _setClosableAttr: function(val) {
+    _setClosableAttr: function(val){
       this.closeButtonNode.style.display = val ? "" : "none";
       this._set("closable", val);
     },
 
-    postMixInProperties: function() {
+    postMixInProperties: function(){
       var _nlsResources = i18n.getLocalization("dijit", "common");
       lang.mixin(this, _nlsResources);
       this.inherited(arguments);
     },
 
-    postCreate: function() {
+    postCreate: function(){
       domStyle.set(this.domNode, {
         display: "none",
         position: "absolute"
@@ -144,12 +150,15 @@ define([
 
       aspect.after(this, "onExecute", lang.hitch(this, "hide"), true);
       aspect.after(this, "onCancel", lang.hitch(this, "hide"), true);
+      on(this.closeButtonNode, touch.press, function(e){
+        e.stopPropagation();
+      });
 
       this._modalconnects = [];
     },
 
-    onLoad: function() {
-      // Summary:
+    onLoad: function(){
+      // summary:
       //		Called when data has been loaded from an href.
       //		Unlike most other callbacks, this function can be connected to (via `dojo.connect`)
       //		but should *not* be overridden.
@@ -158,36 +167,36 @@ define([
 
       // when href is specified we need to reposition the dialog after the data is loaded
       // and find the focusable elements
-      this._size();
+      this.resize();
       this._position();
 
-      if(this.autofocus && DialogLevelManager.isTop(this)) {
-        this._getFocusItems(this.domNode);
+      if(this.autofocus && DialogLevelManager.isTop(this)){
+        this._getFocusItems();
         focus.focus(this._firstFocusItem);
       }
 
       this.inherited(arguments);
     },
 
-    focus: function() {
-      this._getFocusItems(this.domNode);
+    focus: function(){
+      this._getFocusItems();
       focus.focus(this._firstFocusItem);
     },
 
-    _endDrag: function() {
-      // Summary:
+    _endDrag: function(){
+      // summary:
       //		Called after dragging the Dialog. Saves the position of the dialog in the viewport,
       //		and also adjust position to be fully within the viewport, so user doesn't lose access to handle
-      var nodePosition = domGeometry.position(this.domNode);
-      var viewport = winUtils.getBox(this.ownerDocument);
+      var nodePosition = domGeometry.position(this.domNode),
+        viewport = winUtils.getBox(this.ownerDocument);
       nodePosition.y = Math.min(Math.max(nodePosition.y, 0), (viewport.h - nodePosition.h));
       nodePosition.x = Math.min(Math.max(nodePosition.x, 0), (viewport.w - nodePosition.w));
       this._relativePosition = nodePosition;
       this._position();
     },
 
-    _setup: function() {
-      // Summary:
+    _setup: function(){
+      // summary:
       //		Stuff we need to do before showing the Dialog for the first
       //		time (but we defer it until right beforehand, for
       //		performance reasons).
@@ -196,95 +205,45 @@ define([
 
       var node = this.domNode;
 
-      if(this.titleBar && this.draggable) {
-        this._moveable = new ((has("ie") == 6) ? TimedMoveable // Prevent overload, see #5285
-          : Moveable)(node, {handle: this.titleBar});
+      if(this.titleBar && this.draggable){
+        this._moveable = new ((has("ie") == 6) ? TimedMoveable // prevent overload, see #5285
+          : Moveable)(node, { handle: this.titleBar });
         aspect.after(this._moveable, "onMoveStop", lang.hitch(this, "_endDrag"), true);
-      } else {
+      }else{
         domClass.add(node, "dijitDialogFixed");
       }
 
       this.underlayAttrs = {
         dialogId: this.id,
-        "class": array.map(this.class.split(/\s/), function(s) {
+        "class": array.map(this["class"].split(/\s/),function(s){
           return s + "_underlay";
-        })
-          .join(" "),
+        }).join(" "),
         _onKeyDown: lang.hitch(this, "_onKey"),
         ownerDocument: this.ownerDocument
       };
     },
 
-    _size: function() {
-      // Summary:
-      //		If necessary, shrink dialog contents so dialog fits in viewport.
-      // tags:
-      //		private
-
-      this._checkIfSingleChild();
-
-      // If we resized the dialog contents earlier, reset them back to original size, so
-      // that if the user later increases the viewport size, the dialog can display w/out a scrollbar.
-      // Need to do this before the domGeometry.position(this.domNode) call below.
-      if(this._singleChild) {
-        if(typeof this._singleChildOriginalStyle !== "undefined") {
-          this._singleChild.domNode.style.cssText = this._singleChildOriginalStyle;
-          delete this._singleChildOriginalStyle;
-        }
-      } else {
-        domStyle.set(this.containerNode, {
-          width: "auto",
-          height: "auto"
-        });
-      }
-
-      var bb = domGeometry.position(this.domNode);
-
-      // Get viewport size but then reduce it by a bit; Dialog should always have some space around it
-      // to indicate that it's a popup.  This will also compensate for possible scrollbars on viewport.
-      var viewport = winUtils.getBox(this.ownerDocument);
-      viewport.w *= this.maxRatio;
-      viewport.h *= this.maxRatio;
-
-      if(bb.w >= viewport.w || bb.h >= viewport.h) {
-        // Reduce size of dialog contents so that dialog fits in viewport
-
-        var containerSize = domGeometry.position(this.containerNode);
-        var w = Math.min(bb.w, viewport.w) - (bb.w - containerSize.w);
-        var h = Math.min(bb.h, viewport.h) - (bb.h - containerSize.h);
-
-        if(this._singleChild && this._singleChild.resize) {
-          if(typeof this._singleChildOriginalStyle === "undefined") {
-            this._singleChildOriginalStyle = this._singleChild.domNode.style.cssText;
-          }
-          this._singleChild.resize({w: w, h: h});
-        } else {
-          domStyle.set(this.containerNode, {
-            width: w + "px",
-            height: h + "px",
-            overflow: "auto",
-            position: "relative" // Workaround IE bug moving scrollbar or dragging dialog
-          });
-        }
-      } else if(this._singleChild && this._singleChild.resize) {
-        this._singleChild.resize();
-      }
+    _size: function(){
+      // TODO: remove for 2.0
+      this.resize();
     },
 
-    _position: function() {
-      // Summary:
+    _position: function(){
+      // summary:
       //		Position the dialog in the viewport.  If no relative offset
       //		in the viewport has been determined (by dragging, for instance),
       //		center the dialog.  Otherwise, use the Dialog's stored relative offset,
-      //		adjusted by the viewport's scroll.
-      if(!domClass.contains(this.ownerDocumentBody, "dojoMove")) { // Don't do anything if called during auto-scroll
-        var node = this.domNode;
-        var viewport = winUtils.getBox(this.ownerDocument);
-        var p = this._relativePosition;
-        var bb = p ? null : domGeometry.position(node);
-        var l = Math.floor(viewport.l + (p ? p.x : (viewport.w - bb.w) / 2));
-        var t = Math.floor(viewport.t + (p ? p.y : (viewport.h - bb.h) / 2))
-        ;
+      //		clipped to fit inside the viewport (which may have been shrunk).
+      //		Finally, adjust position according to viewport's scroll.
+
+      if(!domClass.contains(this.ownerDocumentBody, "dojoMove")){    // don't do anything if called during auto-scroll
+        var node = this.domNode,
+          viewport = winUtils.getBox(this.ownerDocument),
+          p = this._relativePosition,
+          bb = domGeometry.position(node),
+          l = Math.floor(viewport.l + (p ? Math.min(p.x, viewport.w - bb.w) : (viewport.w - bb.w) / 2)),
+          t = Math.floor(viewport.t + (p ? Math.min(p.y, viewport.h - bb.h) : (viewport.h - bb.h) / 2));
+
         domStyle.set(node, {
           left: l + "px",
           top: t + "px"
@@ -292,31 +251,31 @@ define([
       }
     },
 
-    _onKey: function(/* Event*/ evt) {
-      // Summary:
+    _onKey: function(/*Event*/ evt){
+      // summary:
       //		Handles the keyboard events for accessibility reasons
       // tags:
       //		private
 
-      if(evt.keyCode == keys.TAB) {
-        this._getFocusItems(this.domNode);
+      if(evt.keyCode == keys.TAB){
+        this._getFocusItems();
         var node = evt.target;
-        if(this._firstFocusItem == this._lastFocusItem) {
-          // Don't move focus anywhere, but don't allow browser to move focus off of dialog either
+        if(this._firstFocusItem == this._lastFocusItem){
+          // don't move focus anywhere, but don't allow browser to move focus off of dialog either
           evt.stopPropagation();
           evt.preventDefault();
-        } else if(node == this._firstFocusItem && evt.shiftKey) {
-          // If we are shift-tabbing from first focusable item in dialog, send focus to last item
+        }else if(node == this._firstFocusItem && evt.shiftKey){
+          // if we are shift-tabbing from first focusable item in dialog, send focus to last item
           focus.focus(this._lastFocusItem);
           evt.stopPropagation();
           evt.preventDefault();
-        } else if(node == this._lastFocusItem && !evt.shiftKey) {
-          // If we are tabbing from last focusable item in dialog, send focus to first item
+        }else if(node == this._lastFocusItem && !evt.shiftKey){
+          // if we are tabbing from last focusable item in dialog, send focus to first item
           focus.focus(this._firstFocusItem);
           evt.stopPropagation();
           evt.preventDefault();
         }
-      } else if(this.closable && evt.keyCode == keys.ESCAPE) {
+      }else if(this.closable && evt.keyCode == keys.ESCAPE){
         this.onCancel();
         evt.stopPropagation();
         evt.preventDefault();
@@ -342,27 +301,27 @@ define([
       return elem;
     },
 
-    show: function() {
-      // Summary:
+    show: function(){
+      // summary:
       //		Display the dialog
       // returns: dojo/promise/Promise
       //		Promise object that resolves when the display animation is complete
 
-      if(this.open) {
-        return;
+      if(this.open){
+        return resolvedDeferred.promise;
       }
 
-      if(!this._started) {
+      if(!this._started){
         this.startup();
       }
 
-      // First time we show the dialog, there's some initialization stuff to do
-      if(!this._alreadyInitialized) {
+      // first time we show the dialog, there's some initialization stuff to do
+      if(!this._alreadyInitialized){
         this._setup();
         this._alreadyInitialized = true;
       }
 
-      if(this._fadeOutDeferred) {
+      if(this._fadeOutDeferred){
         // There's a hide() operation in progress, so cancel it, but still call DialogLevelManager.hide()
         // as though the hide() completed, in preparation for the DialogLevelManager.show() call below.
         this._fadeOutDeferred.cancel();
@@ -370,8 +329,10 @@ define([
       }
 
       // Recenter Dialog if user scrolls browser.  Connecting to document doesn't work on IE, need to use window.
+      // Be sure that event object doesn't get passed to resize() method, because it's expecting an optional
+      // {w: ..., h:...} arg.
       var win = winUtils.get(this.ownerDocument);
-      this._modalconnects.push(on(win, "scroll", lang.hitch(this, "resize")));
+      this._modalconnects.push(on(win, "scroll", lang.hitch(this, "resize", null)));
 
       this._modalconnects.push(on(this.domNode, "keydown", lang.hitch(this, "_onKey")));
 
@@ -381,18 +342,19 @@ define([
       });
 
       this._set("open", true);
-      this._onShow(); // Lazy load trigger
+      this._onShow(); // lazy load trigger
 
-      this._size();
+      this.resize();
       this._position();
 
-      // Fade-in Animation object, setup below
+      // fade-in Animation object, setup below
       var fadeIn;
 
-      this._fadeInDeferred = new Deferred(lang.hitch(this, function() {
+      this._fadeInDeferred = new Deferred(lang.hitch(this, function(){
         fadeIn.stop();
         delete this._fadeInDeferred;
       }));
+      this._fadeInDeferred.then(undefined, nop);	// avoid spurious CancelError message to console
 
       // If delay is 0, code below will delete this._fadeInDeferred instantly, so grab promise while we can.
       var promise = this._fadeInDeferred.promise;
@@ -400,50 +362,50 @@ define([
       fadeIn = fx.fadeIn({
         node: this.domNode,
         duration: this.duration,
-        beforeBegin: lang.hitch(this, function() {
+        beforeBegin: lang.hitch(this, function(){
           DialogLevelManager.show(this, this.underlayAttrs);
         }),
-        onEnd: lang.hitch(this, function() {
-          if(this.autofocus && DialogLevelManager.isTop(this)) {
-            // Find focusable items each time dialog is shown since if dialog contains a widget the
+        onEnd: lang.hitch(this, function(){
+          if(this.autofocus && DialogLevelManager.isTop(this)){
+            // find focusable items each time dialog is shown since if dialog contains a widget the
             // first focusable items can change
-            this._getFocusItems(this.domNode);
+            this._getFocusItems();
             focus.focus(this._firstFocusItem);
           }
           this._fadeInDeferred.resolve(true);
           delete this._fadeInDeferred;
         })
-      })
-        .play();
+      }).play();
 
       return promise;
     },
 
-    hide: function() {
-      // Summary:
+    hide: function(){
+      // summary:
       //		Hide the dialog
       // returns: dojo/promise/Promise
       //		Promise object that resolves when the display animation is complete
 
       // If we haven't been initialized yet then we aren't showing and we can just return.
       // Likewise if we are already hidden, or are currently fading out.
-      if(!this._alreadyInitialized || !this.open) {
-        return;
+      if(!this._alreadyInitialized || !this.open){
+        return resolvedDeferred.promise;
       }
-      if(this._fadeInDeferred) {
+      if(this._fadeInDeferred){
         this._fadeInDeferred.cancel();
       }
 
-      // Fade-in Animation object, setup below
+      // fade-in Animation object, setup below
       var fadeOut;
 
-      this._fadeOutDeferred = new Deferred(lang.hitch(this, function() {
+      this._fadeOutDeferred = new Deferred(lang.hitch(this, function(){
         fadeOut.stop();
         delete this._fadeOutDeferred;
       }));
+      this._fadeOutDeferred.then(undefined, nop);	// avoid spurious CancelError message to console
 
-      // Fire onHide when the promise resolves.
-      this._fadeOutDeferred.then(lang.hitch(this, "onHide"));
+      // fire onHide when the promise resolves.
+      this._fadeOutDeferred.then(lang.hitch(this, 'onHide'));
 
       // If delay is 0, code below will delete this._fadeOutDeferred instantly, so grab promise while we can.
       var promise = this._fadeOutDeferred.promise;
@@ -451,24 +413,23 @@ define([
       fadeOut = fx.fadeOut({
         node: this.domNode,
         duration: this.duration,
-        onEnd: lang.hitch(this, function() {
+        onEnd: lang.hitch(this, function(){
           this.domNode.style.display = "none";
           DialogLevelManager.hide(this);
           this._fadeOutDeferred.resolve(true);
           delete this._fadeOutDeferred;
         })
-      })
-        .play();
+      }).play();
 
-      if(this._scrollConnected) {
+      if(this._scrollConnected){
         this._scrollConnected = false;
       }
       var h;
-      while(h = this._modalconnects.pop()) {
+      while(h = this._modalconnects.pop()){
         h.remove();
       }
 
-      if(this._relativePosition) {
+      if(this._relativePosition){
         delete this._relativePosition;
       }
       this._set("open", false);
@@ -476,15 +437,115 @@ define([
       return promise;
     },
 
-    resize: function() {
-      // Summary:
-      //		Called when viewport scrolled or size changed.  Adjust Dialog as necessary to keep it visible.
-      // tags:
-      //		private
-      if(this.domNode.style.display != "none") {
-        this._size();
-        if(!has("touch")) {
-          // If the user has scrolled the display then reposition the Dialog.  But don't do it for touch
+    resize: function(dim){
+      // summary:
+      //		Called with no argument when viewport scrolled or viewport size changed.  Adjusts Dialog as
+      //		necessary to keep it visible.
+      //
+      //		Can also be called with an argument (by dojox/layout/ResizeHandle etc.) to explicitly set the
+      //		size of the dialog.
+      // dim: Object?
+      //		Optional dimension object like {w: 200, h: 300}
+
+      if(this.domNode.style.display != "none"){
+
+        this._checkIfSingleChild();
+
+        if(!dim){
+          if(this._shrunk){
+            // If we earlier shrunk the dialog to fit in the viewport, reset it to its natural size
+            if(this._singleChild){
+              if(typeof this._singleChildOriginalStyle != "undefined"){
+                this._singleChild.domNode.style.cssText = this._singleChildOriginalStyle;
+                delete this._singleChildOriginalStyle;
+              }
+            }
+            array.forEach([this.domNode, this.containerNode, this.titleBar, this.actionBarNode], function(node){
+              if(node){	// because titleBar may not be defined
+                domStyle.set(node, {
+                  position: "static",
+                  width: "auto",
+                  height: "auto"
+                });
+              }
+            });
+            this.domNode.style.position = "absolute";
+          }
+
+          // If necessary, shrink Dialog to fit in viewport and have some space around it
+          // to indicate that it's a popup.  This will also compensate for possible scrollbars on viewport.
+          var viewport = winUtils.getBox(this.ownerDocument);
+          viewport.w *= this.maxRatio;
+          viewport.h *= this.maxRatio;
+
+          var bb = domGeometry.position(this.domNode);
+          this._shrunk = false;
+          // First check and limit width, because limiting the width may increase the height due to word wrapping.
+          if(bb.w >= viewport.w){
+            dim = {
+              w: viewport.w
+            };
+            domGeometry.setMarginBox(this.domNode, dim);
+            bb = domGeometry.position(this.domNode);
+            this._shrunk = true;
+          }
+          // Now check and limit the height
+          if(bb.h >= viewport.h){
+            if(!dim){
+              dim = {
+                w: bb.w
+              };
+            }
+            dim.h = viewport.h;
+            this._shrunk = true;
+          }
+          if(dim){
+            if(!dim.w){
+              dim.w = bb.w;
+            }
+            if(!dim.h){
+              dim.h = bb.h;
+            }
+          }
+        }
+
+        // Code to run if user has requested an explicit size, or the shrinking code above set an implicit size
+        if(dim){
+          // Set this.domNode to specified size
+          domGeometry.setMarginBox(this.domNode, dim);
+
+          // And then size this.containerNode
+          var layoutNodes = [];
+          if(this.titleBar){
+            layoutNodes.push({domNode: this.titleBar, region: "top"});
+          }
+          if(this.actionBarNode){
+            layoutNodes.push({domNode: this.actionBarNode, region: "bottom"});
+          }
+          var centerSize = {domNode: this.containerNode, region: "center"};
+          layoutNodes.push(centerSize);
+
+          var contentDim = utils.marginBox2contentBox(this.domNode, dim);
+          utils.layoutChildren(this.domNode, contentDim, layoutNodes);
+
+          // And then if this.containerNode has a single layout widget child, size it too.
+          // Otherwise, make this.containerNode show a scrollbar if it's overflowing.
+          if(this._singleChild){
+            var cb = utils.marginBox2contentBox(this.containerNode, centerSize);
+            // note: if containerNode has padding singleChildSize will have l and t set,
+            // but don't pass them to resize() or it will doubly-offset the child
+            this._singleChild.resize({w: cb.w, h: cb.h});
+            // TODO: save original size for restoring it on another show()?
+          }else{
+            this.containerNode.style.overflow = "auto";
+            this._layoutChildren();		// send resize() event to all child widgets
+          }
+        }else{
+          this._layoutChildren();		// send resize() event to all child widgets
+        }
+
+        if(!has("touch") && !dim){
+          // If the user has scrolled the viewport then reposition the Dialog.  But don't do it for touch
           // devices, because it will counteract when a keyboard pops up and then the browser auto-scrolls
           // the focused node into view.
           this._position();
@@ -492,18 +553,29 @@ define([
       }
     },
 
-    destroy: function() {
-      if(this._fadeInDeferred) {
+    _layoutChildren: function(){
+      // Override _ContentPaneResizeMixin._layoutChildren because even when there's just a single layout child
+      // widget, sometimes we don't want to size it explicitly (i.e. to pass a dim argument to resize())
+
+      array.forEach(this.getChildren(), function(widget){
+        if(widget.resize){
+          widget.resize();
+        }
+      });
+    },
+
+    destroy: function(){
+      if(this._fadeInDeferred){
         this._fadeInDeferred.cancel();
       }
-      if(this._fadeOutDeferred) {
+      if(this._fadeOutDeferred){
         this._fadeOutDeferred.cancel();
       }
-      if(this._moveable) {
+      if(this._moveable){
         this._moveable.destroy();
       }
       var h;
-      while(h = this._modalconnects.pop()) {
+      while(h = this._modalconnects.pop()){
         h.remove();
       }
 
@@ -513,16 +585,16 @@ define([
     }
   });
 
-  if(has("dojo-bidi")) {
+  if(has("dojo-bidi")){
     _DialogBase = declare("dijit._DialogBase", _DialogBase, {
-      _setTitleAttr: function(/* String*/ title) {
+      _setTitleAttr: function(/*String*/ title){
         this._set("title", title);
         this.titleNode.innerHTML = title;
         this.applyTextDir(this.titleNode);
       },
 
-      _setTextDirAttr: function(textDir) {
-        if(this._created && this.textDir != textDir) {
+      _setTextDirAttr: function(textDir){
+        if(this._created && this.textDir != textDir){
           this._set("textDir", textDir);
           this.set("title", this.title);
         }
@@ -531,7 +603,7 @@ define([
   }
 
   var Dialog = declare("dijit.Dialog", [ContentPane, _DialogBase], {
-    // Summary:
+    // summary:
     //		A modal dialog Widget.
     // description:
     //		Pops up a modal dialog window, blocking access to the screen
@@ -544,18 +616,18 @@ define([
     // |	foo.placeAt(win.body());
     // |	foo.startup();
   });
-  Dialog._DialogBase = _DialogBase;	// For monkey patching and dojox/widget/DialogSimple
+  Dialog._DialogBase = _DialogBase;	// for monkey patching and dojox/widget/DialogSimple
 
   var DialogLevelManager = Dialog._DialogLevelManager = {
-    // Summary:
+    // summary:
     //		Controls the various active "levels" on the page, starting with the
     //		stuff initially visible on the page (at z-index 0), and then having an entry for
     //		each Dialog shown.
 
     _beginZIndex: 950,
 
-    show: function(/* dijit/_WidgetBase*/ dialog, /* Object*/ underlayAttrs) {
-      // Summary:
+    show: function(/*dijit/_WidgetBase*/ dialog, /*Object*/ underlayAttrs){
+      // summary:
       //		Call right before fade-in animation for new dialog.
       //		Saves current focus, displays/adjusts underlay for new dialog,
       //		and sets the z-index of the dialog itself.
@@ -570,7 +642,7 @@ define([
 
       // Set z-index a bit above previous dialog
       var zIndex = ds[ds.length - 1].dialog ? ds[ds.length - 1].zIndex + 2 : Dialog._DialogLevelManager._beginZIndex;
-      domStyle.set(dialog.domNode, "zIndex", zIndex);
+      domStyle.set(dialog.domNode, 'zIndex', zIndex);
 
       // Display the underlay, or if already displayed then adjust for this new dialog
       DialogUnderlay.show(underlayAttrs, zIndex - 1);
@@ -578,8 +650,8 @@ define([
       ds.push({dialog: dialog, underlayAttrs: underlayAttrs, zIndex: zIndex});
     },
 
-    hide: function(/* dijit/_WidgetBase*/ dialog) {
-      // Summary:
+    hide: function(/*dijit/_WidgetBase*/ dialog){
+      // summary:
       //		Called when the specified dialog is hidden/destroyed, after the fade-out
       //		animation ends, in order to reset page focus, fix the underlay, etc.
       //		If the specified dialog isn't open then does nothing.
@@ -587,28 +659,28 @@ define([
       //		Caller is responsible for either setting display:none on the dialog domNode,
       //		or calling dijit/popup.hide(), or removing it from the page DOM.
 
-      if(ds[ds.length - 1].dialog == dialog) {
+      if(ds[ds.length - 1].dialog == dialog){
         // Removing the top (or only) dialog in the stack, return focus
         // to previous dialog
 
         ds.pop();
 
-        var pd = ds[ds.length - 1];	// The new active dialog (or the base page itself)
+        var pd = ds[ds.length - 1];	// the new active dialog (or the base page itself)
 
         // Adjust underlay
-        if(ds.length == 1) {
+        if(ds.length == 1){
           // Returning to original page.  Hide the underlay.
           DialogUnderlay.hide();
-        } else {
+        }else{
           // Popping back to previous dialog, adjust underlay.
           DialogUnderlay.show(pd.underlayAttrs, pd.zIndex - 1);
         }
 
         // Adjust focus.
-        // TODO: regardless of setting of dialog.refocus, if the execute() method set focus somewhere,
+        // TODO: regardless of setting of dialog.refocus, if the exeucte() method set focus somewhere,
         // don't shift focus back to button.  Note that execute() runs at the start of the fade-out but
         // this code runs later, at the end of the fade-out.  Menu has code like this.
-        if(dialog.refocus) {
+        if(dialog.refocus){
           var focus;
           // Pentaho - BACKLOG-36893 hack
           if(dialog.dialogOpener) {
@@ -625,36 +697,36 @@ define([
             focus = dialog._refreshElement(pd.focus);
             // End of BACKLOG-36893
 
-            if(pd.dialog && (!focus || !dom.isDescendant(focus, pd.dialog.domNode))) {
-              pd.dialog._getFocusItems(pd.dialog.domNode);
+            if(pd.dialog && (!focus || !dom.isDescendant(focus, pd.dialog.domNode))){
+              pd.dialog._getFocusItems();
               focus = pd.dialog._firstFocusItem;
             }
           }
 
-          if(focus) {
+          if(focus){
             // Refocus the button that spawned the Dialog.   This will fail in corner cases including
             // page unload on IE, because the dijit/form/Button that launched the Dialog may get destroyed
             // before this code runs.  (#15058)
-            try {
+            try{
               focus.focus();
-            } catch(e) {
+            }catch(e){
             }
           }
         }
-      } else {
+      }else{
         // Removing a dialog out of order (#9944, #10705).
         // Don't need to mess with underlay or z-index or anything.
-        var idx = array.indexOf(array.map(ds, function(elem) {
+        var idx = array.indexOf(array.map(ds, function(elem){
           return elem.dialog;
         }), dialog);
-        if(idx != -1) {
+        if(idx != -1){
           ds.splice(idx, 1);
         }
       }
     },
 
-    isTop: function(/* dijit/_WidgetBase*/ dialog) {
-      // Summary:
+    isTop: function(/*dijit/_WidgetBase*/ dialog){
+      // summary:
       //		Returns true if specified Dialog is the top in the task
       return ds[ds.length - 1].dialog == dialog;
     }
@@ -669,31 +741,33 @@ define([
   //		underlayAttrs: attributes to set on underlay (when this widget is active)
   // }
   var ds = Dialog._dialogStack = [
-    {dialog: null, focus: null, underlayAttrs: null} // Entry for stuff at z-index: 0
+    {dialog: null, focus: null, underlayAttrs: null}    // entry for stuff at z-index: 0
   ];
 
   // If focus was accidentally removed from the dialog, such as if the user clicked a blank
   // area of the screen, or clicked the browser's address bar and then tabbed into the page,
   // then refocus.   Won't do anything if focus was removed because the Dialog was closed, or
   // because a new Dialog popped up on top of the old one, or when focus moves to popups
-  focus.watch("curNode", function(attr, oldNode, node) {
+  focus.watch("curNode", function(attr, oldNode, node){
     // Note: if no dialogs, ds.length==1 but ds[ds.length-1].dialog is null
     var topDialog = ds[ds.length - 1].dialog;
 
+    // Pentaho
     function isGwtModalDialogNode(node) {
       return domClass.contains(node, "pentaho-gwt") && domClass.contains(node, "pentaho-dialog") && domClass.contains(node, "modal");
     }
 
     // If a node was focused, and there's a Dialog currently showing, and not in the process of fading out...
     // Ignore focus events on other document though because it's likely an Editor inside of the Dialog.
-    if(node && topDialog && !topDialog._fadeOutDeferred && node.ownerDocument == topDialog.ownerDocument) {
+    if(node && topDialog && !topDialog._fadeOutDeferred && node.ownerDocument == topDialog.ownerDocument){
       // If the node that was focused is inside the dialog or in a popup, even a context menu that isn't
       // technically a descendant of the the dialog, don't do anything.
-      do {
-        if(node == topDialog.domNode || domClass.contains(node, "dijitPopup") || isGwtModalDialogNode(node)) {
+      do{
+        // Pentaho
+        if(node == topDialog.domNode || domClass.contains(node, "dijitPopup") || isGwtModalDialogNode(node)){
           return;
         }
-      } while(node = node.parentNode);
+      }while(node = node.parentNode);
 
       // Otherwise, return focus to the dialog.  Use a delay to avoid confusing dijit/focus code's
       // own tracking of focus.
@@ -702,10 +776,10 @@ define([
   });
 
   // Back compat w/1.6, remove for 2.0
-  if(has("dijit-legacy-requires")) {
-    ready(0, function() {
+  if(has("dijit-legacy-requires")){
+    ready(0, function(){
       var requires = ["dijit/TooltipDialog"];
-      require(requires);	// Use indirection so modules not rolled into a build
+      require(requires);	// use indirection so modules not rolled into a build
     });
   }
 
