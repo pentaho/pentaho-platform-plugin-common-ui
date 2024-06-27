@@ -123,6 +123,19 @@ define("common-ui/util/URLEncoder", [], function() {
         .replaceAll(":", "~")
         .replaceAll("/", ":");
   }
+
+  //TODO BACKLOG-41091: Decoding would ideally be coming from the back-end (see also, BACKLOG-41089, BACKLOG-41229)
+  Encoder.urlDecodePvfsFilePath = function (attributeValue) {
+    try {
+      return decodeURI(attributeValue).replace("%23", "#");
+    } catch (error) {
+      // if there is an error, simply return the value. This should only impact the UI visually, not functionally.
+      // we can show an error if we'd like, but have opted not to at this time.
+      // let errorMessage = "Error decoding file attributeValue: " + attributeValue + "\n" + error;
+      // window.parent.mantle_showGenericError(errorMessage);
+      return attributeValue;
+    }
+  }
   
   // Return encoder for AMD use.
   return Encoder;
