@@ -1,3 +1,5 @@
+/* Overridden to replace "dojo" require by "dojo/dom-construct" */
+
 define([
 	"dojo/dom-construct",
 	"dijit/registry",
@@ -51,15 +53,15 @@ define([
 		// _togglingColumn: int
 		//		Width of the column being toggled (-1 for none)
 		_togglingColumn: -1,
-		
+
 		// _headerBuilderClass: Object
 		//		The class to use for our header builder
 		_headerBuilderClass: _Builder._HeaderBuilder,
-		
+
 		// _contentBuilderClass: Object
 		//		The class to use for our content builder
 		_contentBuilderClass: _Builder._ContentBuilder,
-		
+
 		postMixInProperties: function(){
 			this.rowNodes = {};
 		},
@@ -116,10 +118,10 @@ define([
 			this.simpleStructure = Boolean(vs.cells.length == 1);
 			// bookkeeping
 			this.testFlexCells();
-			// accomodate new structure
+			// accommodate new structure
 			this.updateStructure();
 		},
-		
+
 		_cleanupRowWidgets: function(inRowNode){
 			// Summary:
 			//		Cleans up the widgets for the given row node so that
@@ -135,14 +137,14 @@ define([
 				});
 			}
 		},
-		
+
 		onBeforeRow: function(inRowIndex, cells){
 			this._onBeforeRow(inRowIndex, cells);
 			if(inRowIndex >= 0){
 				this._cleanupRowWidgets(this.getRowNode(inRowIndex));
 			}
 		},
-		
+
 		onAfterRow: function(inRowIndex, cells, inRowNode){
 			this._onAfterRow(inRowIndex, cells, inRowNode);
 			var g = this.grid;
@@ -241,7 +243,7 @@ define([
 				if(this.source){
 					this.source.destroy();
 				}
-				
+
 				// Create the top and bottom markers
 				var bottomMarkerId = "dojoxGrid_bottomMarker";
 				var topMarkerId = "dojoxGrid_topMarker";
@@ -260,7 +262,7 @@ define([
 					}, win.body());
 					this._hide(this.bottomMarker);
 
-					
+
 					this.topMarker = html.create("div", {
 						"id": topMarkerId,
 						"class": "dojoxGridColPlaceTop"
@@ -270,7 +272,7 @@ define([
 				this.arrowDim = html.contentBox(this.bottomMarker);
 
 				var headerHeight = html.contentBox(this.headerContentNode.firstChild.rows[0]).h;
-				
+
 				this.source = new Source(this.headerContentNode.firstChild.rows[0], {
 					horizontal: true,
 					accept: [ "gridColumn_" + this.grid.id ],
@@ -304,7 +306,7 @@ define([
 							src._removeItemClass(getSibling(src.targetAnchor, src.before), src.before ? "After" : "Before");
 						}
 						Source.prototype._markTargetAnchor.call(src, before);
-						
+
 						var target = before ? src.targetAnchor : getSibling(src.targetAnchor, src.before);
 						var endAdd = 0;
 
@@ -367,7 +369,7 @@ define([
 				this.source.startup();
 			}
 		},
-		
+
 		_hide: function(node){
 			html.style(node, {
 				top: "-10000px",
@@ -422,7 +424,7 @@ define([
 			var idx = this.index;
 			delete this.source._targetNode;
 			delete this.source._beforeTarget;
-			
+
 			layout.moveColumn(
 				source.viewIndex,
 				idx,
@@ -447,7 +449,7 @@ define([
 				n = '&nbsp;'//otherwise arrow styles will be messed up
 			}
 			var ret = [ '<div class="dojoxGridSortNode' ];
-			
+
 			if(inCell.index != inCell.grid.getSortIndex()){
 				ret.push('">');
 			}else{
@@ -510,7 +512,7 @@ define([
 			}
 			return this._hasVScroll; // Boolean
 		},
-		
+
 		convertColPctToFixed: function(){
 			// Fix any percentage widths to be pixel values
 			var hasPct = false;
@@ -548,7 +550,7 @@ define([
 				var self = this;
 				var checkOtherViewScrollers = function(){
 					var v;
-					for(var i in self.grid.views.views){
+					for(var i = 0; i < self.grid.views.views.length; ++i){
 						v = self.grid.views.views[i];
 						if(v !== self && v.hasHScrollbar()){
 							return true;
@@ -620,12 +622,12 @@ define([
 		},
 
 		buildRow: function(inRowIndex, inRowNode){
-			
+
 			this.buildRowContent(inRowIndex, inRowNode);
-		  	
+
 			this.styleRow(inRowIndex, inRowNode);
-		  
-		 
+
+
 		},
 
 		buildRowContent: function(inRowIndex, inRowNode){

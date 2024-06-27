@@ -48,6 +48,7 @@
       <includes><include>LICENSE*</include></includes>
       <outputDirectory>jquery</outputDirectory>
     </fileSet>
+
     <fileSet>
       <directory>${webjars.target.directory}/echarts/${echarts.version}/dist</directory>
       <includes>
@@ -62,6 +63,7 @@
       </includes>
       <outputDirectory>echarts</outputDirectory>
     </fileSet>
+
     <fileSet>
       <directory>${webjars.target.directory}/dompurify/${dompurify.version}/dist</directory>
       <includes>
@@ -77,18 +79,33 @@
       <outputDirectory>dompurify</outputDirectory>
     </fileSet>
 
+    <!-- region Dojo -->
     <fileSet>
-      <directory>${build.dependenciesDirectory}/dojo-release-${dojo.version}-src</directory>
-      <outputDirectory>dojo</outputDirectory>
+      <directory>${webjars.target.directory}/dojo/${dojo.version}</directory>
+      <outputDirectory>dojo/dojo</outputDirectory>
       <excludes>
-        <exclude>dojox/*/tests/**</exclude>
-        <exclude>dojox/*/*/tests/**</exclude>
-        <exclude>dojox/.gitmodules</exclude>
-        <exclude>dijit/tests/**</exclude>
-        <exclude>dojo/tests/**</exclude>
-        <exclude>util/**</exclude>
+        <exclude>tests/**</exclude>
       </excludes>
     </fileSet>
+
+    <fileSet>
+      <directory>${webjars.target.directory}/dojox/${dojo.version}</directory>
+      <outputDirectory>dojo/dojox</outputDirectory>
+      <excludes>
+        <exclude>*/tests/**</exclude>
+        <exclude>*/*/tests/**</exclude>
+        <exclude>.gitmodules</exclude>
+      </excludes>
+    </fileSet>
+
+    <fileSet>
+      <directory>${webjars.target.directory}/dijit/${dojo.version}</directory>
+      <outputDirectory>dojo/dijit</outputDirectory>
+      <excludes>
+        <exclude>tests/**</exclude>
+      </excludes>
+    </fileSet>
+    <!-- endregion Dojo -->
 
     <!-- region Angular -->
     <fileSet>
