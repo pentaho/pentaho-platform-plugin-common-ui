@@ -29,7 +29,6 @@
   </scm>
 
   <properties>
-    <dojo.version>1.9.2</dojo.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <pentaho-cdf-plugin.version>10.2.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
     <echarts.version>5.4.3</echarts.version>
@@ -45,11 +44,19 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.dojotoolkit.dojo</groupId>
-        <artifactId>dojo-release</artifactId>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>dojo</artifactId>
         <version>${dojo.version}</version>
-        <type>zip</type>
-        <classifier>src</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>dojox</artifactId>
+        <version>${dojo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>dijit</artifactId>
+        <version>${dojo.version}</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.bower</groupId>
