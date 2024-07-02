@@ -86,7 +86,7 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <span class="label">The dialog contents go here. Clicking 'Ok' or 'Cancel' will make the glass pane go away.</span>
+                                                <span class="label label-default">The dialog contents go here. Clicking 'Ok' or 'Cancel' will make the glass pane go away.</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -112,7 +112,7 @@
                     </td>
                     <td class="panel-content">
 
-                        <span class="label">Click the button to show the glasspane</span>
+                        <span class="label label-default">Click the button to show the glasspane</span>
                         <button class="pentaho-button" onclick="document.getElementById('glasspane').style.display='block'">Show Glass Pane</button>
 
                     </td>
@@ -529,7 +529,7 @@
                     <td>
 
                         <!-- HTML markup for a toolbar -->
-                        <div class="pentaho-rounded-panel2-shadowed pentaho-padding-sm pentaho-shine pentaho-toolbar-background" style="height:22px">
+                        <div class="pentaho-rounded-panel2-shadowed pentaho-padding-sm pentaho-shine pentaho-toolprogress-progress-bar-background" style="height:22px">
                         </div>
                         <!-- end toolbar HTML -->
 
@@ -543,7 +543,7 @@
                 <tr>
                     <td>
 
-                        <table cellspacing="0" cellpadding="0" class="pentaho-rounded-panel2-shadowed pentaho-shine pentaho-toolbar-background content-toolbar" style="width: 100%;">
+                        <table cellspacing="0" cellpadding="0" class="pentaho-rounded-panel2-shadowed pentaho-shine pentaho-toolprogress-bar-background content-toolprogress-bar" style="width: 100%;">
                             <tbody>
                                 <tr>
                                     <td width="100%" align="left" style="vertical-align: middle;">
@@ -558,8 +558,8 @@
 
                                                     <!-- a regular toolbar button -->
                                                     <td align="left" style="vertical-align: middle;">
-                                                        <div class="content-toolbar-button">
-                                                            <table cellspacing="0" cellpadding="0" class="toolbar-button"
+                                                        <div class="content-toolprogress-progress-bar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolprogress-progress-bar-button"
                                                                 onmouseover="this.className='toolbar-button toolbar-button-hovering'"
                                                                 onmouseout="this.className='toolbar-button'">
                                                                 <tbody>
@@ -577,8 +577,8 @@
 
                                                     <!-- a regular toolbar button -->
                                                     <td align="left" style="vertical-align: middle;">
-                                                        <div class="content-toolbar-button">
-                                                            <table cellspacing="0" cellpadding="0" class="toolbar-button"
+                                                        <div class="content-toolprogress-progress-bar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolprogress-progress-bar-button"
                                                                 onmouseover="this.className='toolbar-button toolbar-button-hovering'"
                                                                 onmouseout="this.className='toolbar-button'">
                                                                 <tbody>
@@ -596,13 +596,13 @@
 
                                                     <!-- a toolbar separator -->
                                                     <td align="left" style="vertical-align: middle;">
-                                                        <div class="content-toolbar-separator">
-                                                            <table cellspacing="0" cellpadding="0" class="toolbar-button">
+                                                        <div class="content-toolprogress-progress-bar-separator">
+                                                            <table cellspacing="0" cellpadding="0" class="toolprogress-progress-bar-button">
                                                                 <tbody>
                                                                     <tr>
                                                                         <td width="" height="" align="center" style="vertical-align: middle;">
                                                                             <!-- HTML markup for a toolbar button -->
-                                                                            <img src="images/spacer.gif" class="pentaho-toolbar-separator"/>
+                                                                            <img src="images/spacer.gif" class="pentaho-toolprogress-progress-bar-separator"/>
                                                                             <!-- end toolbar button HTML -->
                                                                         </td>
                                                                     </tr>
@@ -613,8 +613,8 @@
 
                                                     <!-- a toggle toolbar button -->
                                                     <td align="left" style="vertical-align: middle;">
-                                                        <div class="content-toolbar-button">
-                                                            <table cellspacing="0" cellpadding="0" class="toolbar-toggle-button"
+                                                        <div class="content-toolprogress-progress-bar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolprogress-progress-bar-toggle-button"
                                                                 onmouseover="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button toolbar-toggle-button-hovering'} else {this.className='toolbar-toggle-button-down toolbar-toggle-button-down-hovering'}"
                                                                 onmouseout="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}"
                                                                 onclick="if(this.className.indexOf('down') != -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}">
@@ -633,8 +633,8 @@
 
                                                     <!-- a toggle toolbar button -->
                                                     <td align="left" style="vertical-align: middle;">
-                                                        <div class="content-toolbar-button">
-                                                            <table cellspacing="0" cellpadding="0" class="toolbar-toggle-button"
+                                                        <div class="content-toolprogress-progress-bar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolprogress-progress-bar-toggle-button"
                                                                 onmouseover="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button toolbar-toggle-button-hovering'} else {this.className='toolbar-toggle-button-down toolbar-toggle-button-down-hovering'}"
                                                                 onmouseout="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}"
                                                                 onclick="if(this.className.indexOf('down') != -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}">
@@ -666,7 +666,7 @@
 
                     </td>
                     <td class="panel-content">
-                        <span class="label">This is a label</span>
+                        <span class="label label-default">This is a label</span>
                         <!-- end toolbar HTML -->
 
                     </td>
@@ -732,11 +732,11 @@
                         <!-- this is the HTML for a section header -->
                         <div class="section-header-outer">
                             <div class="section-header-middle">
-                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                <div class="pentaho-titled-toolprogress-bar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
                                     <table id="datatabheader" style="width:100%">
                                         <tr>
                                             <td>
-                                                <span class="label contrast-color">Section 1</span>
+                                                <span class="label label-default contrast-color">Section 1</span>
                                             </td>
                                         </tr>
                                     </table>
@@ -751,11 +751,11 @@
                         <!-- this is the HTML for a section header -->
                         <div class="section-header-outer">
                             <div class="section-header-middle">
-                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                <div class="pentaho-titled-toolprogress-bar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
                                     <table style="width:100%">
                                         <tr>
                                             <td>
-                                                <span class="label contrast-color">Section 2</span>
+                                                <span class="label label-default contrast-color">Section 2</span>
                                             </td>
                                             <td style="width:16px; text-align: right">
                                                 <div title="Options" onclick="alert('Options clicked')" class="pentaho-optionsbutton"/>
@@ -773,11 +773,11 @@
                         <!-- this is the HTML for a section header -->
                         <div class="section-header-outer">
                             <div class="section-header-middle">
-                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                <div class="pentaho-titled-toolprogress-bar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
                                     <table style="width:100%">
                                         <tr>
                                             <td>
-                                                <span class="label contrast-color">Section 3</span>
+                                                <span class="label label-default contrast-color">Section 3</span>
                                             </td>
                                             <td style="width:16px; text-align: right">
                                                 <img src="images/spacer.gif" id="up-button" title="Move current item up" class="pentaho-upbutton pentaho-imagebutton-disabled"/>
@@ -808,7 +808,7 @@
                                     onmouseover="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem pentaho-listitem-hover'}"
                                     onmouseout="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem'} else {this.className='pentaho-listitem-selected'}"
                                     onclick="enabledListManagementButtons(); this.className='pentaho-listitem-selected'">
-                                    <span class="pentaho-listitem-label">Option 1</span>
+                                    <span class="pentaho-listitem-label label-default">Option 1</span>
                                 </td>
                             </tr>
                             <tr>
@@ -816,7 +816,7 @@
                                     onmouseover="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem pentaho-listitem-hover'}"
                                     onmouseout="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem'} else {this.className='pentaho-listitem-selected'}"
                                     onclick="enabledListManagementButtons(); this.className='pentaho-listitem-selected'">
-                                    <span class="pentaho-listitem-label">Option 2</span>
+                                    <span class="pentaho-listitem-label label-default">Option 2</span>
                                 </td>
                             </tr>
                         </table>
@@ -849,14 +849,14 @@
                                 <td role="presentation">
                                     <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem"/>
                                 </td>
-                                <td class="dpentaho-menuitem-label" colspan="2">Option 1</td>
+                                <td class="dpentaho-menuitem-label label-default" colspan="2">Option 1</td>
                                 <td class="" role="presentation">&nbsp;</td>
                             </tr>
                             <tr class="pentaho-menuitem pentaho-menuitem-disabled" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-disabled'" onmouseout="this.className='pentaho-menuitem pentaho-menuitem-disabled'">
                                 <td role="presentation">
                                     <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem"/>
                                 </td>
-                                <td class="dpentaho-menuitem-label" colspan="2">Disabled</td>
+                                <td class="dpentaho-menuitem-label label-default" colspan="2">Disabled</td>
                                 <td class="" role="presentation">&nbsp;</td>
                             </tr>
                             <tr>
@@ -868,7 +868,7 @@
                                 <td role="presentation">
                                     <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem menuitem-checked"/>
                                 </td>
-                                <td class="dijitReset pentaho-menuitem-label" colspan="2">Checked</td>
+                                <td class="dijitReset pentaho-menuitem-label label-default" colspan="2">Checked</td>
                                 <td class="dijitReset dijitMenuArrowCell" role="presentation">&nbsp;</td>
                             </tr>
                         </table>
@@ -881,7 +881,7 @@
                         <div class="pentaho-shadow-padding" style="width:200px">
                             <div class="pentaho-rounded-panel pentaho-tooltip-background pentaho-padding-sm pentaho-shadow">
                                 <div class="pentaho-tooltip-contents">
-                                    <span class="label">Tooltip contents</span> 
+                                    <span class="label label-default">Tooltip contents</span> 
                                 </div>
                             </div>
                         </div>
@@ -898,24 +898,24 @@
                             <tbody>
                                 <tr>
                                     <td class="pentaho-table-header-cell">
-                                        <div class="label">Column 1</div>
+                                        <div class="label label-default">Column 1</div>
                                     </td>
                                     <td class="pentaho-table-header-cell">
-                                        <div class="label">Column 2</div>
+                                        <div class="label label-default">Column 2</div>
                                     </td>
                                     <td class="pentaho-table-header-cell">
-                                        <div class="label">Column 3</div>
+                                        <div class="label label-default">Column 3</div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="pentaho-table-cell">
-                                        <div class="label">Data</div>
+                                        <div class="label label-default">Data</div>
                                     </td>
                                     <td class="pentaho-table-cell">
-                                        <div class="label">Data</div>
+                                        <div class="label label-default">Data</div>
                                     </td>
                                     <td class="pentaho-table-cell">
-                                        <div class="label">Data</div>
+                                        <div class="label label-default">Data</div>
                                     </td>
                                 </tr>
                             </tbody>
