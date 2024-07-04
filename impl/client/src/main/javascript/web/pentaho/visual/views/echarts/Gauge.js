@@ -23,66 +23,140 @@ define([
 
   return BaseView.extend(module.id, {
 
-    _buildSeries: function() {
-      var dataTable = this.model.data;
-      var range = dataTable.getColumnRange(dataTable.getNumberOfColumns() - 1);
+    _buildAxisLineColors: function () {
 
-      function log10Ceil(x) {
-        return (x > 0)
-            ? Math.pow(10, Math.ceil(Math.log10(x)))
-            : -Math.pow(10, -Math.ceil(-Math.log10(-x)));
+      var colorArray = this._getContinuousColorScale();
+
+      var step = 1 / colorArray.length;
+      var threshold = step;
+
+      var axisLineColors = [];
+
+      for (var i = 0; i < colorArray.length; i++) {
+        axisLineColors.push([threshold, colorArray[i]]);
+        threshold += step;
       }
 
-      function log10Floor(x) {
-        return (x > 0)
-            ? Math.pow(10, Math.floor(Math.log(x)))
-            : -Math.pow(10, -Math.floor(-Math.log(-x)));
-      }
+      return axisLineColors;
+    },
 
-      var minEf = log10Floor(range.min);
-      var maxEf = log10Ceil(range.max);
 
-      // Make sure range includes 0.
-      if (maxEf < 0) {
-        maxEf = 0;
-      } else if (minEf > 0) {
-        minEf = 0;
+    _buildSeries: function(echartData) {
+      var model = this.model;
+      var dataTable = model.data;
+
+      var range = this._getColumnRange(dataTable, dataTable.getNumberOfColumns() - 1, true);
+
+      var showProgress = !model.useMeasureColors;
+      var colorScale = model.useMeasureColors ? this._buildAxisLineColors() : [[1, '#E6EBF8']];
+      var fontColor = model.labelColor || this.fontColor;
+      var axisLabelColor = model.useMeasureColors ? 'inherit' : fontColor;
+      var labelFontFamily = this._getFontFamily(model.labelFontFamily);
+      var labelFontWeight = this._getFontWeight(model.labelStyle);
+      var titleFontWeight = this._getFontWeight(model.legendStyle);
+      var titleFontFamily = this._getFontFamily(model.legendFontFamily);
+      var legendPosition = model.legendPosition || "right";
+      var center;
+
+      switch (legendPosition) {
+        case "left":
+          center = ['60%', '50%'];
+          break;
+        case "top":
+          center = ['50%', '55%'];
+          break;
+        case "bottom":
+          center = ['50%', '45%'];
+          break;
+        case "right":
+        default:
+          center = ['40%', '50%'];
+          break;
       }
 
       return [
         {
           type: "gauge",
-          min: minEf,
-          max: maxEf,
+          center: center,
+          min: range.min,
+          max: range.max,
+          data: echartData,
+          selectedMode: "multiple",
 
-          pointer: {
-            width: 8,
-            length: "80%",
-            offsetCenter: [0, "8%"]
+          /*
+           If user wishes to fire a select action when 'useMeasureColors' is true,
+           it is recommended to click on the dial and not on "colored partition".
+           The dial is clickable and provides the value. The "colored partition" is just an
+           axis and not clickable, like any other axis in ECharts.
+           Reference: https://github.com/apache/echarts/issues/18093#issuecomment-1366918061
+          */
+          axisLine: {
+            lineStyle: {
+              color: colorScale
+            }
+          },
+          anchor: {
+            show: true,
+            showAbove: true,
+            size: 18,
+            itemStyle: {
+              color: 'auto'
+            }
           },
           progress: {
-            show: true,
+            show: showProgress,
             overlap: true,
             roundCap: true
           },
+          pointer: {
+            icon: 'path://M2.9,0.7L2.9,0.7c1.4,0,2.6,1.2,2.6,2.6v115c0,1.4-1.2,2.6-2.6,2.6l0,0c-1.4,0-2.6-1.2-2.6-2.6V3.3C0.3,1.9,1.4,0.7,2.9,0.7z',
+            width: 8,
+            length: '80%',
+            offsetCenter: [0, '8%']
+          },
+          axisTick: {
+            show: false,
+            distance: -30,
+            length: 8
+          },
+          splitLine: {
+            show: false,
+            distance: -30,
+            length: 30
+          },
+          axisLabel: {
+            color: axisLabelColor,
+            distance: 40,
+            fontSize: model.labelSize || this.fontSize,
+            fontFamily: labelFontFamily,
+            fontWeight: labelFontWeight,
+            formatter: function(value) {
+              return new Intl.NumberFormat("en-US", {
+                notation: "compact",
+                maximumFractionDigits: 2,
+                compactDisplay: "short"
+              }).format(value);
+            }
+          },
+          title: {
+            show: model.showLegend,
+            fontFamily: titleFontFamily,
+            fontWeight: titleFontWeight,
+            fontSize: model.legendSize || 14
+          },
           detail: {
+            show: model.showLegend,
             width: "auto",
             height: "auto",
             legendHoverLink: true,
-            fontSize: 14,
+            fontSize: model.legendSize || 14,
             color: "#fff",
-            backgroundColor: "inherit",
             borderRadius: 3,
             formatter: "{value}"
           },
           itemStyle: {
             borderColor: "#fff",
             borderWidth: 1
-          },
-          emphasis: {
-            label: {
-              fontSize: 20
-            }
           }
         }
       ];
@@ -92,57 +166,120 @@ define([
      * This method transforms the table into a plain structure,
      * obtains the required values for categories and measures from te source dataTable object,
      * transforms them into target name-value pairs in string and number formats,
-     * handles their layout within the available width,
+     * handles their layout within the available width/height,
      * and builds the tooltip.
      *
      * @override
      */
     _buildData: function() {
-      var dataTable = this.model.data;
+      var model = this.model;
+      var dataTable = model.data;
 
       if(dataTable.originalCrossTable) {
         dataTable = dataTable.originalCrossTable.toPlainTable({skipRowsWithAllNullMeasures: true});
       }
 
       var rowCount = dataTable.getNumberOfRows();
-      var categoriesColIndexes = this.model.rows.fieldIndexes;
-      var measureColIndex = this.model.measures.fieldIndexes[0];
+      var categoriesColIndexes = model.rows.fieldIndexes;
+      var measureColIndex = model.measures.fieldIndexes[0];
       var font = util.getDefaultFont(null, 12);
+      var legendPosition = model.legendPosition || "right";
+      var bgColorDetail = this._buildColors();
 
       var records = [];
 
-      var innerWidth = this.model.width * 0.8;
-
-      // Avoid overlapping title text by having a safety margin on either side of text (2.5%).
       var bandPercent = 0.95;
-      var stepWidth = innerWidth / (rowCount - (1 - bandPercent));
-      var bandWidth = bandPercent * stepWidth;
-      var detailWidth = stepWidth * 0.7;
 
-      var offsetCenterYPercent = 100;
+      var self = this;
 
-      // X coordinates of title/detail are relative to the center of the chart, as per option `offsetCenter`.
-      // Also, center points on each band, by offsetting by half band.
-      var offsetCenterX0 = -innerWidth / 2 + bandWidth / 2;
+      function pushRecordsHorizontal(offsetCenterYPercent){
+        var offsetCenterX;
+        var innerWidth = model.width * 0.8;
+        var stepWidthHorizontal = innerWidth / (rowCount - (1 - bandPercent));
+        var bandWidthHorizontal = bandPercent * stepWidthHorizontal;
+        var detailWidthHorizontal = stepWidthHorizontal * 0.7;
+        var offsetCenterX0 = -innerWidth / 2 + bandWidthHorizontal / 2;
+        var formattedValueMap = {};
 
-      // Read data from dataTable and push it to records
-      for(var i = 0; i < rowCount; i++) {
-        var offsetCenterX = offsetCenterX0 + stepWidth * i;
+        for (var i = 0; i < rowCount; i++) {
+          offsetCenterX = offsetCenterX0 + stepWidthHorizontal * i;
+          var measureValue = dataTable.getValue(i, measureColIndex);
+          formattedValueMap[measureValue] = dataTable.getFormattedValue(i, measureColIndex);
 
-        records.push({
-          name: this._getTableFormattedValue(dataTable, i, categoriesColIndexes),
-          value: dataTable.getValue(i, measureColIndex),
-          tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font),
-          title: {
-            offsetCenter: [offsetCenterX, offsetCenterYPercent + "%"],
-            overflow: "truncate",
-            width: bandWidth
-          },
-          detail: {
-            offsetCenter: [offsetCenterX, (offsetCenterYPercent + 15) + "%"],
-            width: detailWidth
-          }
-        });
+          records.push({
+            name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, self.groupedLabelSeparator),
+            value: measureValue,
+            tooltip: self._buildTooltip(self._buildRowTooltipHtml(dataTable, i), font),
+            vars: {"rows": self._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))},
+            title: {
+              offsetCenter: [offsetCenterX, offsetCenterYPercent + "%"],
+              overflow: "truncate",
+              width: bandWidthHorizontal
+            },
+            detail: {
+              offsetCenter: [offsetCenterX, (offsetCenterYPercent + 15) + "%"],
+              width: detailWidthHorizontal,
+              backgroundColor: bgColorDetail[i],
+              formatter: function (value) {
+                return formattedValueMap[value];
+              }
+            }
+          });
+        }
+      }
+
+      function pushRecordsVertical(offsetCenterXPercent){
+        var offsetCenterY;
+        var innerHeight = model.height * 0.8;
+        var stepWidthVertical = innerHeight / (rowCount - (1 - bandPercent));
+        var bandWidthVertical = bandPercent * stepWidthVertical;
+        var detailWidthVertical = stepWidthVertical * 0.8;
+        var offsetCenterY0 = -innerHeight / 2 + bandWidthVertical / 2;
+        var formattedValueMap = {};
+
+        for (var i = 0; i < rowCount; i++) {
+          offsetCenterY = offsetCenterY0 + stepWidthVertical * i;
+          var measureValue = dataTable.getValue(i, measureColIndex);
+          formattedValueMap[measureValue] = dataTable.getFormattedValue(i, measureColIndex);
+
+          records.push({
+            name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, self.groupedLabelSeparator),
+            value: measureValue,
+            tooltip: self._buildTooltip(self._buildRowTooltipHtml(dataTable, i), font),
+            vars: {"rows": self._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))},
+            title: {
+              offsetCenter: [offsetCenterXPercent + "%", offsetCenterY],
+              overflow: "truncate",
+              width: bandWidthVertical
+            },
+            detail: {
+              offsetCenter: [(offsetCenterXPercent + 40) + "%", offsetCenterY],
+              width: detailWidthVertical,
+              backgroundColor: bgColorDetail[i],
+              formatter: function (value) {
+                return formattedValueMap[value];
+              }
+            }
+          });
+        }
+      }
+
+      switch (legendPosition) {
+        case "bottom":
+          pushRecordsHorizontal(100);
+          break;
+
+        case "top":
+          pushRecordsHorizontal(-135);
+          break;
+
+        case "left":
+          pushRecordsVertical(-235);
+          break;
+
+        case "right":
+        default:
+          pushRecordsVertical(150);
       }
 
       return records;

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2023 Hitachi Vantara. All rights reserved.
+ * Copyright 2023 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,10 @@ define([
   return BaseView.extend(module.id, {
 
     /** @override */
-    _buildSeries: function() {
+    _buildSeries: function(echartData) {
       var dataTable = this.model.data;
       var range = dataTable.getColumnRange(dataTable.getNumberOfColumns() - 1);
+      var label = this._configureLabel(this._getEChartsLabel(this.model.labelsOption), "{b}: {d}%");
 
       return [
         {
@@ -34,6 +35,9 @@ define([
           left: "20%",
           right: "20%",
           top: "10%",
+          data: echartData,
+          selectedMode: "multiple",
+          label: label,
           bottom: "10%",
           width: "auto",
           height: "auto",
@@ -52,8 +56,7 @@ define([
             }
           },
           itemStyle: {
-            borderColor: "#fff",
-            borderWidth: 1
+            borderWidth: 0
           },
           emphasis: {
             label: {
@@ -82,9 +85,10 @@ define([
       // Read data from dataTable and push it to records
       for(var i = 0; i < rowLength; i++) {
         records.push({
-          name: this._getTableFormattedValue(dataTable, i, categoriesColIndexes),
+          name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, this.groupedLabelSeparator),
           value: dataTable.getValue(i, measureColIndex),
-          tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font)
+          tooltip: this._buildTooltip(this._buildRowTooltipHtml(dataTable, i), font),
+          vars: {"rows": this._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))}
         });
       }
 
@@ -96,7 +100,6 @@ define([
 
       this.base();
 
-      this._configureLabel(this._echartOptions, this._getEChartsLabel(this.model.labelsOption), "{b}: {d}%");
       this._configureLegend(this._echartOptions, this._echartData);
     }
   })

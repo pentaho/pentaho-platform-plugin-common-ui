@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara. All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,58 @@ define([
           (typeof a === "number" && isNaN(a) && typeof b === "number" && isNaN(b));
     },
 
+    getRowCells: function(rowIndex, colIndexes) {
+      var colCount = colIndexes.length;
+      var cells = new Array(colCount);
+      var i = colCount;
+      while(i--) {
+        cells[i] = this.getCell(rowIndex, colIndexes[i]);
+      }
+
+      return cells;
+    },
+
+    getCompositeValue: function(rowIndex, colIndexes, valueSep) {
+      switch(colIndexes == null ? 0 : colIndexes.length) {
+        case 0: return null;
+        case 1: return this.getValue(rowIndex, colIndexes[0]);
+        default:
+          return colIndexes.map(function(colIndex) {
+            var value = this.getValue(rowIndex, colIndex);
+            return value == null ? "" : value;
+          }, this).join(valueSep == null ? "~" : valueSep);
+      }
+    },
+
+    getCompositeFormattedValue: function(rowIndex, colIndexes, labelSep) {
+      var colCount = colIndexes == null ? 0 : colIndexes.length;
+      if(colCount === 0) {
+        return "";
+      }
+
+      if(colCount === 1) {
+        return this.getFormattedValue(rowIndex, colIndexes[0]);
+      }
+
+      if(labelSep == null) {
+        labelSep = "~";
+      }
+
+      var label = "";
+      for(var i = 0 ; i < colCount; i++) {
+        var colLabel = this.getFormattedValue(rowIndex, colIndexes[i]);
+        if (colLabel) {
+          if (label) {
+            label += labelSep + colLabel;
+          } else {
+            label = colLabel;
+          }
+        }
+      }
+
+      return label;
+    },
+
     /**
      * Gets the index of the first column having a given name or attribute.
      *
@@ -230,7 +282,7 @@ define([
      * Gets an array of the distinct values of a column, given its index.
      *
      * Values are obtained by calling
-     * {@link pentaho.data.AbstractTable##getValue} on each cell.
+     * {@link pentaho.data.AbstractTable#getValue} on each cell.
      *
      * The distinct values are returned in order of (first) occurrence (not sorted).
      *

@@ -18,3 +18,4 @@ bin
 /impl/server/pentaho.log
 docs/.jekyll-metadata
 docs/_site
+.eslintcache

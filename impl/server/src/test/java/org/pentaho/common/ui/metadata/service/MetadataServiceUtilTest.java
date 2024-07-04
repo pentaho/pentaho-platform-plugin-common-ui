@@ -216,7 +216,7 @@ public class MetadataServiceUtilTest {
             + "\"name\":null,\"selectedAggType\":\"SUM\",\"type\":null}],\"conditions\":[{\"category\":\"MY_CATEGORY\","
             + "\"class\":\"org.pentaho.common.ui.metadata.model.impl.Condition\",\"column\":\"MY_COL_COND\","
             + "\"combinationType\":\"AND\",\"operator\":\"EQUAL\",\"parameterized\":false,\"selectedAggType\":null,"
-            + "\"value\":[\"Val_0\"]}],\"defaultParameterMap\":null,\"disableDistinct\":false,"
+            + "\"value\":[ ]}],\"defaultParameterMap\":null,\"disableDistinct\":false,"
             + "\"domainName\":\"my_test_domain\",\"modelId\":\"my_test_model_id\",\"orders\":[{\"category\":\"MY_CATEGORY\","
             + "\"class\":\"org.pentaho.common.ui.metadata.model.impl.Order\",\"column\":\"my_order_column\","
             + "\"orderType\":\"ASC\"}],\"parameters\":[]}";
@@ -245,7 +245,7 @@ public class MetadataServiceUtilTest {
     assertEquals( "EQUAL", condition.getOperator() );
     assertFalse( condition.isParameterized() );
     assertNull( condition.getSelectedAggType() );
-    Assert.assertArrayEquals( new String[] { "Val_0" }, condition.getValue() );
+    Assert.assertArrayEquals( new String[] {  }, condition.getValue() );
     assertEquals( 1, result.getOrders().length );
     Order order = result.getOrders()[0];
     assertEquals( "MY_CATEGORY", order.getCategory() );

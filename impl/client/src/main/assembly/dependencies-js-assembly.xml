@@ -24,7 +24,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>${webjars.target.directory}/requirejs/${requirejs.version}</directory>
+      <directory>${webjars.target.directory}/prantlf__requirejs/${prantlf.requirejs.version}</directory>
       <outputDirectory>.</outputDirectory>
       <includes>
         <include>**/require.js</include>
@@ -61,6 +61,20 @@
         <include>LICENSE*</include>
       </includes>
       <outputDirectory>echarts</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/dompurify/${dompurify.version}/dist</directory>
+      <includes>
+        <include>purify.js</include>
+      </includes>
+      <outputDirectory>dompurify</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/dompurify/${dompurify.version}</directory>
+      <includes>
+        <include>LICENSE*</include>
+      </includes>
+      <outputDirectory>dompurify</outputDirectory>
     </fileSet>
 
     <fileSet>

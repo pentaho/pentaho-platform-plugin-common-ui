@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 - 2019 Hitachi Vantara. All rights reserved.
+ * Copyright 2018 - 2024 Hitachi Vantara. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -266,17 +266,8 @@ define([
 
   function createMultipleFieldsMapper(data, fieldIndexes) {
 
-    var fieldCount = fieldIndexes.length;
-
     return function multipleFieldsMapper(rowIndex) {
-      var cells = new Array(fieldCount);
-
-      var fieldIndex = fieldCount;
-      while(fieldIndex--) {
-        cells[fieldIndex] = data.getCell(rowIndex, fieldIndex);
-      }
-
-      return cells;
+      return data.getRowCells(rowIndex, fieldIndexes);
     };
   }
 });
