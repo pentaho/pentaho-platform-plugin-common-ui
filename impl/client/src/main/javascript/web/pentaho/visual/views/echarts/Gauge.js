@@ -199,13 +199,16 @@ define([
         var bandWidthHorizontal = bandPercent * stepWidthHorizontal;
         var detailWidthHorizontal = stepWidthHorizontal * 0.7;
         var offsetCenterX0 = -innerWidth / 2 + bandWidthHorizontal / 2;
+        var formattedValueMap = {};
 
         for (var i = 0; i < rowCount; i++) {
-          offsetCenterX = offsetCenterX0 + stepWidthHorizontal * i
+          offsetCenterX = offsetCenterX0 + stepWidthHorizontal * i;
+          var measureValue = dataTable.getValue(i, measureColIndex);
+          formattedValueMap[measureValue] = dataTable.getFormattedValue(i, measureColIndex);
 
           records.push({
             name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, self.groupedLabelSeparator),
-            value: dataTable.getValue(i, measureColIndex),
+            value: measureValue,
             tooltip: self._buildTooltip(self._buildRowTooltipHtml(dataTable, i), font),
             vars: {"rows": self._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))},
             title: {
@@ -216,7 +219,10 @@ define([
             detail: {
               offsetCenter: [offsetCenterX, (offsetCenterYPercent + 15) + "%"],
               width: detailWidthHorizontal,
-              backgroundColor: bgColorDetail[i]
+              backgroundColor: bgColorDetail[i],
+              formatter: function (value) {
+                return formattedValueMap[value];
+              }
             }
           });
         }
@@ -229,13 +235,16 @@ define([
         var bandWidthVertical = bandPercent * stepWidthVertical;
         var detailWidthVertical = stepWidthVertical * 0.8;
         var offsetCenterY0 = -innerHeight / 2 + bandWidthVertical / 2;
+        var formattedValueMap = {};
 
         for (var i = 0; i < rowCount; i++) {
           offsetCenterY = offsetCenterY0 + stepWidthVertical * i;
+          var measureValue = dataTable.getValue(i, measureColIndex);
+          formattedValueMap[measureValue] = dataTable.getFormattedValue(i, measureColIndex);
 
           records.push({
             name: dataTable.getCompositeFormattedValue(i, categoriesColIndexes, self.groupedLabelSeparator),
-            value: dataTable.getValue(i, measureColIndex),
+            value: measureValue,
             tooltip: self._buildTooltip(self._buildRowTooltipHtml(dataTable, i), font),
             vars: {"rows": self._getCellsValues(dataTable.getRowCells(i, categoriesColIndexes))},
             title: {
@@ -246,7 +255,10 @@ define([
             detail: {
               offsetCenter: [(offsetCenterXPercent + 40) + "%", offsetCenterY],
               width: detailWidthVertical,
-              backgroundColor: bgColorDetail[i]
+              backgroundColor: bgColorDetail[i],
+              formatter: function (value) {
+                return formattedValueMap[value];
+              }
             }
           });
         }
