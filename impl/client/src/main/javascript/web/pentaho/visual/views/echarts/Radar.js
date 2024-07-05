@@ -17,8 +17,9 @@ define([
   "pentaho/module!_",
   "./Abstract",
   "pentaho/data/TableView",
-  "pentaho/util/object"
-], function(module, BaseView, TableView, O) {
+  "pentaho/util/object",
+  "pentaho/visual/util"
+], function(module, BaseView, TableView, O, util) {
 
   "use strict";
 
@@ -147,6 +148,11 @@ define([
       return indicators;
     },
 
+    _buildRadarTooltip: function(tooltipString) {
+      var font = util.getDefaultFont(null, 12);
+      return this._buildTooltip(tooltipString, font);
+    },
+
     _buildRadarRecords: function(dataTable, visualData, radarIndicators) {
       var records = [];
 
@@ -183,6 +189,14 @@ define([
           rowIndexes: rowIndexes
         };
 
+        function escapeHTML(str) {
+          var elem = document.createElement("e");
+          elem.appendChild(document.createTextNode(str));
+          return elem.innerHTML;
+        }
+
+        var tooltipString = record.name !== "" ? (escapeHTML(record.name) + "<br />") : "";
+
         // Given that series x category together form the
         // [visual key]{@link pentaho.visual.role.AbstractPropertyType#isVisualKey},
         // there can be a single data row per series and category combination.
@@ -210,8 +224,11 @@ define([
             : "";
           values.push(value);
           labels.push(label);
+          tooltipString = tooltipString + escapeHTML(indicator.name) + " : " + escapeHTML(label) + "<br />";
           rowIndexes.push(rowIndex);
         });
+
+        record.tooltip = this._buildRadarTooltip(tooltipString);
 
         return record;
       }
