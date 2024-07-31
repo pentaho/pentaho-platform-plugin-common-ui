@@ -11,8 +11,8 @@
  ******************************************************************************/
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/dom", "dojo/query", "dojo/dom-construct", "dojo/dom-style", "dijit/Dialog", "pentaho/common/button", "pentaho/common/SmallImageButton", "pentaho/common/Messages", "dojo/dom-class",
-  "dojo/_base/lang", "dojo/_base/event", "dojo/keys", "common-ui/util/_focus"],
-    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil){
+  "dojo/_base/lang", "dojo/_base/event", "dojo/keys", "common-ui/util/_focus", "common-ui/dompurify"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil, DOMPurify){
       return declare("pentaho.common.Dialog",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
             popup : null,
@@ -31,6 +31,15 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             responsiveClasses: undefined,
 
             dialogOpener: null,
+
+            /**
+             * Returns a sanitized version either of the localized string for the given key or the key itself.
+             *
+             * @param {string} localeKey - The key of the localized string.
+             */
+            getSanitizedLocaleString: function(localeKey) {
+              return DOMPurify.sanitize(this.getLocaleString(localeKey));
+            },
 
             /**
              * Sets the element opening the dialog and to which focus should be restored when the dialog is hidden.
@@ -78,9 +87,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               if(this.getLocaleString) {
                 for(var i=0; i<this.buttons.length; i++) {
                   var button = query("button"+i, this.popup.domNode);
-                  this.buttons[i] = this.getLocaleString(this.buttons[i]);
+                  this.buttons[i] = this.getSanitizedLocaleString(this.buttons[i]);
                   if(button) {
-                    button.innerHTML = this.getLocaleString();
+                    button.innerHTML = this.buttons[i];
                   }
                 }
                 if (this.hasCloseIcon) {
@@ -118,7 +127,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 var btn = document.createElement("BUTTON");
                 domClass.add(btn, "pentaho-button");
                 btn.setAttribute( "id", "button"+j);
-                btn.innerHTML = this.buttons[j];
+                // This is filled with the sanitized localized strings, however buttons can be override hence the double check
+                btn.innerHTML = DOMPurify.sanitize(this.buttons[j]);
                 cell.appendChild(btn);
                 btn.onclick = lang.hitch(this, this.buttonClick, j);
               }

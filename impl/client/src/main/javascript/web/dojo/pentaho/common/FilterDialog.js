@@ -95,25 +95,25 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     if (decSep !== undefined && decSep !== "filterDialogDecimalSeparator") {
       this.setDecimalSeparator(decSep);
     }
-    this.typePicklistSpan.innerHTML = this.getLocaleString("filterDialogTypePicklistSpan_content");
-    this.typeMatchSpan.innerHTML = this.getLocaleString("filterDialogTypeMatchSpan_content");
-    this.typeDateRangeSpan.innerHTML = this.getLocaleString("filterDialogTypeDateRangeSpan_content");
-    this.picklistHeadingSpan.innerHTML = this.getLocaleString("filterDialogPicklistHeadingSpan_content");
-    this.picklistFindButton.innerHTML = this.getLocaleString("filterDialogFindButton_content");
+    this.typePicklistSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistSpan_content");
+    this.typeMatchSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypeMatchSpan_content");
+    this.typeDateRangeSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypeDateRangeSpan_content");
+    this.picklistHeadingSpan.innerHTML = this.getSanitizedLocaleString("filterDialogPicklistHeadingSpan_content");
+    this.picklistFindButton.innerHTML = this.getSanitizedLocaleString("filterDialogFindButton_content");
     this.picklistAddSelected.title = this.getLocaleString("filterDialogAddSelected_title");
     this.picklistRemoveSelected.title = this.getLocaleString("filterDialogRemoveSelected_title");
     this.picklistAddAll.title = this.getLocaleString("filterDialogAddAll_title");
     this.picklistRemoveAll.title = this.getLocaleString("filterDialogRemoveAll_title");
-    this.parameterNameLabel.innerHTML = this.getLocaleString("filterDialogParameterName_content");
-    this.typePicklistCombinationTypeLinksIncludeLink.innerHTML = this.getLocaleString("filterDialogTypePicklistCombinationTypeLinksIncludeLink_content");
-    this.typePicklistCombinationTypeLinksExcludeLink.innerHTML = this.getLocaleString("filterDialogTypePicklistCombinationTypeLinksExcludeLink_content");
+    this.parameterNameLabel.innerHTML = this.getSanitizedLocaleString("filterDialogParameterName_content");
+    this.typePicklistCombinationTypeLinksIncludeLink.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistCombinationTypeLinksIncludeLink_content");
+    this.typePicklistCombinationTypeLinksExcludeLink.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistCombinationTypeLinksExcludeLink_content");
     this.picklistCombinationTypeIncludeOption.text = this.getLocaleString("filterDialogTypePicklistCombinationTypeIncluded_content");
     this.picklistCombinationTypeExcludeOption.text = this.getLocaleString("filterDialogTypePicklistCombinationTypeExcluded_content");
-    this.picklistCombinationTypeSpan.innerHTML = this.getLocaleString("filterDialogTypePicklistCombinationType_label");
-    this.matchFieldName.innerHTML = this.getLocaleString("filterDialogFieldName_content");
-    this.dateRangeFieldName.innerHTML = this.getLocaleString("filterDialogFieldName_content");
-    this.dateRangeBetweenSeparatorSpan.innerHTML = this.getLocaleString("dateRangeBetweenSeparatorSpan_content");
-    this.fieldPicklistSpan.innerHTML = this.getLocaleString("filterDialogFieldPicklistSpan_content");
+    this.picklistCombinationTypeSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistCombinationType_label");
+    this.matchFieldName.innerHTML = this.getSanitizedLocaleString("filterDialogFieldName_content");
+    this.dateRangeFieldName.innerHTML = this.getSanitizedLocaleString("filterDialogFieldName_content");
+    this.dateRangeBetweenSeparatorSpan.innerHTML = this.getSanitizedLocaleString("dateRangeBetweenSeparatorSpan_content");
+    this.fieldPicklistSpan.innerHTML = this.getSanitizedLocaleString("filterDialogFieldPicklistSpan_content");
   },
 
   _filterTypeChanged: function(event) {
@@ -550,7 +550,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   },
 
   _configureMatchContainer: function() {
-    this.matchFieldName.innerHTML = this.currentColumn.name.concat(':');
+    this.matchFieldName.innerText = this.currentColumn.name.concat(':');
     var value = this.currentFilter.value instanceof Array ? this.currentFilter.value[0] : null;
     switch(this.currentColumn.dataType) {
       case pentaho.pda.Column.DATA_TYPES.DATE:
@@ -669,7 +669,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
   // DATERANGE IMPL
   _configureDateRangeContainer: function() {
-    this.dateRangeFieldName.innerHTML = this.currentColumn.name;
+    this.dateRangeFieldName.innerText = this.currentColumn.name;
 
     this.dateRangeValueInputDate1.value = stamp.fromISOString(this.currentFilter.value);
     this.dateRangeValueInputDate2.value = null;

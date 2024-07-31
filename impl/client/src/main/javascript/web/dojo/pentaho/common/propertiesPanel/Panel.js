@@ -44,14 +44,15 @@ define([
   "pentaho/common/Messages",
   "pentaho/common/propertiesPanel/Configuration",
   "common-ui/util/_focus",
-  "dijit/Tooltip"
+  "dijit/Tooltip",
+  "common-ui/dompurify"
 ], function(declare, ItemFileReadStore,
             registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
             BorderContainer, HorizontalSlider, TextBox, ComboBox,
             Select, CheckBox, TitlePane,
             on, query, array, lang, html, construct, string, domClass,
             Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
-            Messages, Configuration, focusUtil, Tooltip) {
+            Messages, Configuration, focusUtil, Tooltip, DOMPurify) {
 
   /* eslint-disable dot-notation, new-cap */
 
@@ -1319,7 +1320,7 @@ define([
       if(!gemLabel){
         gemLabel=query(".gem-label", this.domNode)[0];
       }
-      gemLabel.innerHTML = this.model.value;
+      gemLabel.innerHTML = DOMPurify.sanitize(this.model.value);
 
       this.own(
         on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),

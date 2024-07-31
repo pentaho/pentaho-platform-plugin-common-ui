@@ -117,7 +117,7 @@ require(["common-ui/vizapi/VizController"], function(){
 
     }
 
-    this.numSpan.innerHTML = value == null ? "" : value;
+    this.numSpan.innerText = value == null ? "" : value;
     this.resize();
   }
 });
