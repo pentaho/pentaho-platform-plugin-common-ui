@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
 *
 */
 
-require(["common-ui/vizapi/VizController"], function(){
+require([
+  "common-ui/vizapi/VizController",
+  "common-ui/dompurify"
+], function(_VizController, DOMPurify) {
 
   pentaho.visualizations.push({
     id: 'sample_calc',                          // unique identifier
@@ -121,7 +124,7 @@ require(["common-ui/vizapi/VizController"], function(){
 
     }
 
-    this.numSpan.innerHTML = value == null ? "" : value;
+    this.numSpan.innerHTML = value == null ? "" : DOMPurify.sanitize(value);
     this.resize();
   }
 });
