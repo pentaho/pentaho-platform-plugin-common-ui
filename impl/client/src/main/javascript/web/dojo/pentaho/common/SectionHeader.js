@@ -11,8 +11,8 @@
  ******************************************************************************/
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "pentaho/common/SmallImageButton",
-  "dojo/text!pentaho/common/SectionHeader.html", "dojo/_base/lang"],
-    function (declare, _WidgetBase, _Templated, on, query, SmallImageButton, templateStr, lang) {
+  "dojo/text!pentaho/common/SectionHeader.html", "dojo/_base/lang", "common-ui/dompurify"],
+    function (declare, _WidgetBase, _Templated, on, query, SmallImageButton, templateStr, lang, DOMPurify) {
       return declare("pentaho.common.SectionHeader",
 
           [_WidgetBase, _Templated],
@@ -75,7 +75,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
             setHeader: function (/*String*/ header) {
               this.header = header;
-              this.headerNode.innerHTML = header;
+              this.headerNode.innerHTML = DOMPurify.sanitize(header);
             }
 
           });

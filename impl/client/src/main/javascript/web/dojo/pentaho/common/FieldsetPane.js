@@ -12,8 +12,8 @@
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/query", "dojo/dom-style",
   "pentaho/common/FieldsetPane", "pentaho/common/Messages", "pentaho/common/DisableablePanel", "dijit/layout/_LayoutWidget", "dijit/layout/ContentPane", "pentaho/common/Messages",
-  "dojo/text!pentaho/common/FieldsetPane.html"],
-    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, style, FieldsetPane, Messages, DisableablePanel, _LayoutWidget, ContentPane, Messages, templateStr) {
+  "dojo/text!pentaho/common/FieldsetPane.html", "common-ui/dompurify"],
+    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, style, FieldsetPane, Messages, DisableablePanel, _LayoutWidget, ContentPane, Messages, templateStr, DOMPurify) {
       return declare("pentaho.common.FieldsetPane",[DisableablePanel, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
 
@@ -36,7 +36,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             setTitle: function (/*String*/ title) {
               this.title = title;
-              this.titleNode.innerHTML = title;
+              this.titleNode.innerHTML = DOMPurify.sanitize(title);
             },
 
             layout: function () {
