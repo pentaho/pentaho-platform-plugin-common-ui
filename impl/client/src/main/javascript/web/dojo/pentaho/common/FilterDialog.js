@@ -34,16 +34,14 @@ define([
   "pentaho/common/Messages",
   "dojo/date/stamp",
   "dijit/form/MultiSelect",
-  "common-ui/util/_a11y",
-  "common-ui/dompurify"
+  "common-ui/util/_a11y"
 ], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, construct, on, query, lang, domClass, array,
-            Calendar, DateTextBox, Dialog, keys, MessageBox, templateStr, Messages, stamp, MultiSelect, a11yUtil, DOMPurify) {
+            Calendar, DateTextBox, Dialog, keys, MessageBox, templateStr, Messages, stamp, MultiSelect, a11yUtil) {
   return declare("pentaho.common.FilterDialog",[Dialog,_TemplatedMixin, _WidgetsInTemplateMixin], {
     templateString: templateStr,
     filterType: "PICKLIST",
     currentFilter: null,
     hasCloseIcon: false,
-    // Function for retrieving localized strings
 
     buttons: ['Ok_txt','Cancel_txt'],
 
@@ -113,25 +111,25 @@ define([
       if (decSep !== undefined && decSep !== "filterDialogDecimalSeparator") {
         this.setDecimalSeparator(decSep);
       }
-      this.typePicklistSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogTypePicklistSpan_content"));
-      this.typeMatchSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogTypeMatchSpan_content"));
-      this.typeDateRangeSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogTypeDateRangeSpan_content"));
-      this.picklistHeadingSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogPicklistHeadingSpan_content"));
-      this.picklistFindButton.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogFindButton_content"));
+      this.typePicklistSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistSpan_content");
+      this.typeMatchSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypeMatchSpan_content");
+      this.typeDateRangeSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypeDateRangeSpan_content");
+      this.picklistHeadingSpan.innerHTML = this.getSanitizedLocaleString("filterDialogPicklistHeadingSpan_content");
+      this.picklistFindButton.innerHTML = this.getSanitizedLocaleString("filterDialogFindButton_content");
       this.picklistAddSelected.title = this.getLocaleString("filterDialogAddSelected_title");
       this.picklistRemoveSelected.title = this.getLocaleString("filterDialogRemoveSelected_title");
       this.picklistAddAll.title = this.getLocaleString("filterDialogAddAll_title");
       this.picklistRemoveAll.title = this.getLocaleString("filterDialogRemoveAll_title");
-      this.parameterNameLabel.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogParameterName_content"));
-      this.typePicklistCombinationTypeLinksIncludeLink.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogTypePicklistCombinationTypeLinksIncludeLink_content"));
-      this.typePicklistCombinationTypeLinksExcludeLink.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogTypePicklistCombinationTypeLinksExcludeLink_content"));
+      this.parameterNameLabel.innerHTML = this.getSanitizedLocaleString("filterDialogParameterName_content");
+      this.typePicklistCombinationTypeLinksIncludeLink.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistCombinationTypeLinksIncludeLink_content");
+      this.typePicklistCombinationTypeLinksExcludeLink.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistCombinationTypeLinksExcludeLink_content");
       this.picklistCombinationTypeIncludeOption.text = this.getLocaleString("filterDialogTypePicklistCombinationTypeIncluded_content");
       this.picklistCombinationTypeExcludeOption.text = this.getLocaleString("filterDialogTypePicklistCombinationTypeExcluded_content");
-      this.picklistCombinationTypeSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogTypePicklistCombinationType_label"));
-      this.matchFieldName.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogFieldName_content"));
-      this.dateRangeFieldName.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogFieldName_content"));
-      this.dateRangeBetweenSeparatorSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("dateRangeBetweenSeparatorSpan_content"));
-      this.fieldPicklistSpan.innerHTML = DOMPurify.sanitize(this.getLocaleString("filterDialogFieldPicklistSpan_content"));
+      this.picklistCombinationTypeSpan.innerHTML = this.getSanitizedLocaleString("filterDialogTypePicklistCombinationType_label");
+      this.matchFieldName.innerHTML = this.getSanitizedLocaleString("filterDialogFieldName_content");
+      this.dateRangeFieldName.innerHTML = this.getSanitizedLocaleString("filterDialogFieldName_content");
+      this.dateRangeBetweenSeparatorSpan.innerHTML = this.getSanitizedLocaleString("dateRangeBetweenSeparatorSpan_content");
+      this.fieldPicklistSpan.innerHTML = this.getSanitizedLocaleString("filterDialogFieldPicklistSpan_content");
     },
 
     _filterTypeChanged: function(event) {
@@ -561,7 +559,7 @@ define([
     },
 
     _configureMatchContainer: function() {
-      this.matchFieldName.innerHTML = DOMPurify.sanitize(this.currentColumn.name.concat(':'));
+      this.matchFieldName.innerText = this.currentColumn.name.concat(':');
       var value = this.currentFilter.value instanceof Array ? this.currentFilter.value[0] : null;
       switch(this.currentColumn.dataType) {
         case pentaho.pda.Column.DATA_TYPES.DATE:
@@ -680,7 +678,7 @@ define([
 
     // DATERANGE IMPL
     _configureDateRangeContainer: function() {
-      this.dateRangeFieldName.innerHTML = DOMPurify.sanitize(this.currentColumn.name);
+      this.dateRangeFieldName.innerText = this.currentColumn.name;
 
       this.dateRangeValueInputDate1.value = stamp.fromISOString(this.currentFilter.value);
       this.dateRangeValueInputDate2.value = null;

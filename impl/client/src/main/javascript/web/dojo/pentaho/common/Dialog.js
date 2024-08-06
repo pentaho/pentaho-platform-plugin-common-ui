@@ -55,6 +55,15 @@ define([
     dialogOpener: null,
 
     /**
+     * Returns a sanitized version either of the localized string for the given key or the key itself.
+     *
+     * @param {string} localeKey - The key of the localized string.
+     */
+    getSanitizedLocaleString: function(localeKey) {
+      return DOMPurify.sanitize(this.getLocaleString(localeKey));
+    },
+
+    /**
      * Sets the element opening the dialog and to which focus should be restored when the dialog is hidden.
      *
      * Supports WCAG focus maintenance.
@@ -100,9 +109,9 @@ define([
       if(this.getLocaleString) {
         for(var i=0; i<this.buttons.length; i++) {
           var button = query("button"+i, this.popup.domNode);
-          this.buttons[i] = this.getLocaleString(this.buttons[i]);
+          this.buttons[i] = this.getSanitizedLocaleString(this.buttons[i]);
           if(button) {
-            button.innerHTML = DOMPurify.sanitize(this.getLocaleString());
+            button.innerHTML = this.buttons[i];
           }
         }
         if (this.hasCloseIcon) {
@@ -140,6 +149,7 @@ define([
         var btn = document.createElement("BUTTON");
         domClass.add(btn, "pentaho-button");
         btn.setAttribute( "id", "button"+j);
+        // this is filled with the sanitized localized strings, however buttons can be override hence the double check
         btn.innerHTML = DOMPurify.sanitize(this.buttons[j]);
         cell.appendChild(btn);
         btn.onclick = lang.hitch(this, this.buttonClick, j);

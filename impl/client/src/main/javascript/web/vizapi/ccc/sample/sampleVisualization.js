@@ -16,9 +16,8 @@
 */
 
 require([
-  "common-ui/vizapi/VizController",
-  "common-ui/dompurify"
-], function(_VizController, DOMPurify) {
+  "common-ui/vizapi/VizController"
+], function(_VizController) {
 
   pentaho.visualizations.push({
     id: 'sample_calc',                          // unique identifier
@@ -124,7 +123,7 @@ require([
 
     }
 
-    this.numSpan.innerHTML = value == null ? "" : DOMPurify.sanitize(value);
+    this.numSpan.innerText = value == null ? "" : value;
     this.resize();
   }
 });
