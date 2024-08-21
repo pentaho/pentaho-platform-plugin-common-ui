@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,36 +14,41 @@
 * limitations under the License.
 *
 */
-define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query",
-"pentaho/common/button", "pentaho/common/Dialog", "dojo/text!pentaho/common/SplashScreen.html"],
-    function(declare, _WidgetBase, _Templated, on, query, button, Dialog, templateStr){
-      return declare("pentaho.common.SplashScreen", [Dialog],
-     {
-        buttons: ['ok'],
-        imagePath: '',
-        hasTitleBar: false,
-        responsive: true, // Not intended to be set to false.
-        responsiveClasses: "dw-sm",
-        
-        setTitle: function(title) {
-            this.splashtitle.innerHTML = title;
-        },
+define([
+  "dojo/_base/declare",
+  "dijit/_WidgetBase",
+  "dijit/_Templated",
+  "dojo/on",
+  "dojo/query",
+  "pentaho/common/button",
+  "pentaho/common/Dialog",
+  "dojo/text!pentaho/common/SplashScreen.html",
+  "common-ui/dompurify"
+], function(declare, _WidgetBase, _Templated, on, query, button, Dialog, templateStr, DOMPurify) {
+  return declare("pentaho.common.SplashScreen", [Dialog], {
+    buttons: ['ok'],
+    imagePath: '',
+    hasTitleBar: false,
+    responsive: true, // Not intended to be set to false.
+    responsiveClasses: "dw-sm",
 
-        setText: function(text) {
-            this.splashmessage.innerHTML = text;
-        },
-    
-        setButtonText: function(text) {
-            this.buttons[0] = text;
-            query("#button"+0, this.domNode).innerHTML = text;
-        },
-    
-        templateString: templateStr,
-      
-       postCreate: function() {
-           this.inherited(arguments);
-       }
-       
+    setTitle: function(title) {
+      this.splashtitle.innerHTML = title;
+    },
+
+    setText: function(text) {
+      this.splashmessage.innerHTML = DOMPurify.sanitize(text);
+    },
+
+    setButtonText: function(text) {
+      this.buttons[0] = text;
+      query("#button"+0, this.domNode).innerHTML = DOMPurify.sanitize(text);
+    },
+
+    templateString: templateStr,
+
+    postCreate: function() {
+      this.inherited(arguments);
     }
-);
-    });
+  });
+});

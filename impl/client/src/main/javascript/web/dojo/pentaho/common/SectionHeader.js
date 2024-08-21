@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,73 +14,77 @@
  * limitations under the License.
  *
  */
-define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "pentaho/common/SmallImageButton",
-  "dojo/text!pentaho/common/SectionHeader.html", "dojo/_base/lang"],
-    function (declare, _WidgetBase, _Templated, on, query, SmallImageButton, templateStr, lang) {
-      return declare("pentaho.common.SectionHeader",
+define([
+  "dojo/_base/declare",
+  "dijit/_WidgetBase",
+  "dijit/_Templated",
+  "dojo/on",
+  "dojo/query",
+  "pentaho/common/SmallImageButton",
+  "dojo/text!pentaho/common/SectionHeader.html",
+  "dojo/_base/lang",
+  "common-ui/dompurify"
+], function (declare, _WidgetBase, _Templated, on, query, SmallImageButton, templateStr, lang, DOMPurify) {
+  return declare("pentaho.common.SectionHeader", [_WidgetBase, _Templated], {
+    title: '',
 
-          [_WidgetBase, _Templated],
-          {
+    header: 'header',
+
+    buttonTypes: '',
+
+    headerButtons: [],
+
+    id: '',
+
+    buttonInfo: [],
+
+    height: '20px',
+
+    templateString: templateStr,
+
+    postMixInProperties: function () {
+      this.inherited(arguments);
+    },
+
+    postCreate: function () {
+      this.inherited(arguments);
+      if (this.buttonTypes && this.buttonTypes.length > 0) {
+        var list = this.buttonTypes.split(',');
+        var buttonInfo = [];
+        for (var idx = 0; idx < list.length; idx++) {
+          var info = {
+            baseClass: list[idx],
+            id: '' + this.id + '-button-' + idx,
             title: '',
+            callback: lang.hitch(this, this.buttonClick, idx)
+          };
+          buttonInfo.push(info);
+        }
+        this.setButtons(buttonInfo);
+      }
+    },
 
-            header: 'header',
+    setButtons: function (buttonInfo) {
+      this.buttonInfo = buttonInfo;
+      this.headerButtons = [];
+      for (var idx = 0; idx < buttonInfo.length; idx++) {
+        var button = new SmallImageButton(buttonInfo[idx]);
+        this.headerButtons.push(button);
+        // the the button to the section.
+        var cell = this.table.rows[0].insertCell(-1);
+        cell.appendChild(button.domNode);
+      }
+    },
 
-            buttonTypes: '',
+    buttonClick: function (idx) {
+      if (this.callbacks && idx < this.callbacks.length) {
+        this.callbacks[idx](this.headerButtons[idx].id);
+      }
+    },
 
-            headerButtons: [],
-
-            id: '',
-
-            buttonInfo: [],
-
-            height: '20px',
-
-            templateString: templateStr,
-
-            postMixInProperties: function () {
-              this.inherited(arguments);
-            },
-
-            postCreate: function () {
-              this.inherited(arguments);
-              if (this.buttonTypes && this.buttonTypes.length > 0) {
-                var list = this.buttonTypes.split(',');
-                var buttonInfo = [];
-                for (var idx = 0; idx < list.length; idx++) {
-                  var info = {
-                    baseClass: list[idx],
-                    id: '' + this.id + '-button-' + idx,
-                    title: '',
-                    callback: lang.hitch(this, this.buttonClick, idx)
-                  };
-                  buttonInfo.push(info);
-                }
-                this.setButtons(buttonInfo);
-              }
-            },
-
-            setButtons: function (buttonInfo) {
-              this.buttonInfo = buttonInfo;
-              this.headerButtons = [];
-              for (var idx = 0; idx < buttonInfo.length; idx++) {
-                var button = new SmallImageButton(buttonInfo[idx]);
-                this.headerButtons.push(button);
-                // the the button to the section.
-                var cell = this.table.rows[0].insertCell(-1);
-                cell.appendChild(button.domNode);
-              }
-            },
-
-            buttonClick: function (idx) {
-              if (this.callbacks && idx < this.callbacks.length) {
-                this.callbacks[idx](this.headerButtons[idx].id);
-              }
-            },
-
-            setHeader: function (/*String*/ header) {
-              this.header = header;
-              this.headerNode.innerHTML = header;
-            }
-
-          });
-    });
+    setHeader: function (/*String*/ header) {
+      this.header = header;
+      this.headerNode.innerHTML = DOMPurify.sanitize(header);
+    }
+  });
+});

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2023 Hitachi Vantara.  All rights reserved.
+ * Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,14 +48,12 @@ define([
   "pentaho/common/Messages",
   "pentaho/common/propertiesPanel/Configuration",
   "common-ui/util/_focus",
-  "dijit/Tooltip"
-], function(declare, ItemFileReadStore,
-            registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
-            BorderContainer, HorizontalSlider, TextBox, ComboBox,
-            Select, CheckBox, TitlePane,
-            on, query, array, lang, html, construct, string, domClass,
-            Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
-            Messages, Configuration, focusUtil, Tooltip) {
+  "dijit/Tooltip",
+  "common-ui/dompurify"
+], function(declare, ItemFileReadStore, registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
+            BorderContainer, HorizontalSlider, TextBox, ComboBox, Select, CheckBox, TitlePane, on, query, array, lang,
+            html, construct, string, domClass, Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
+            Messages, Configuration, focusUtil, Tooltip, DOMPurify) {
 
   /* eslint-disable dot-notation, new-cap */
 
@@ -1323,7 +1321,7 @@ define([
       if(!gemLabel){
         gemLabel=query(".gem-label", this.domNode)[0];
       }
-      gemLabel.innerHTML = this.model.value;
+      gemLabel.innerHTML = DOMPurify.sanitize(this.model.value);
 
       this.own(
         on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
