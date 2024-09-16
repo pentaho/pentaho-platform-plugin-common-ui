@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2017 Hitachi Vantara..  All rights reserved.
+ * Copyright (c) 2002-2024 Hitachi Vantara..  All rights reserved.
  */
 
 package org.pentaho.common.ui.metadata.service;
@@ -395,7 +395,7 @@ public class MetadataServiceUtil extends PentahoBase {
       ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-        PentahoJsonValidator.validateJson( json, Query.class );
+        PentahoJsonValidator.validateJson( json, Query.CLASS_LIST);
         return new JSONDeserializer<Query>().deserialize( json, Query.class );
       } finally {
         Thread.currentThread().setContextClassLoader( oldLoader );
