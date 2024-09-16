@@ -203,6 +203,8 @@
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
   // endregion
 
+  requirePaths["common-ui/dompurify"] = basePath + "/dompurify/purify";
+
   // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery.conflict";
 

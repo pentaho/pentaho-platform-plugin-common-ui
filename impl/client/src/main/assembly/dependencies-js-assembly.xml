@@ -62,6 +62,20 @@
       </excludes>
     </fileSet>
 
+    <fileSet>
+      <directory>${webjars.target.directory}/dompurify/${dompurify.version}/dist</directory>
+      <includes>
+        <include>purify.js</include>
+      </includes>
+      <outputDirectory>dompurify</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/dompurify/${dompurify.version}</directory>
+      <includes>
+        <include>LICENSE*</include>
+      </includes>
+      <outputDirectory>dompurify</outputDirectory>
+    </fileSet>
   </fileSets>
 
   <files>
