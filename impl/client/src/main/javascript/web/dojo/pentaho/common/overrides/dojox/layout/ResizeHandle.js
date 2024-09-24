@@ -1,14 +1,3 @@
-/*! ******************************************************************************
- *
- * Pentaho
- *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
- *
- * Use of this software is governed by the Business Source License included
- * in the LICENSE.TXT file.
- *
- * Change Date: 2028-08-13
- ******************************************************************************/
 define(["dojo/_base/kernel","dojo/_base/lang","dojo/_base/connect","dojo/_base/array","dojo/_base/event",
 	"dojo/_base/fx","dojo/_base/window","dojo/fx","dojo/window","dojo/dom","dojo/dom-class",
 	"dojo/dom-geometry","dojo/dom-style","dijit/_base/manager","dijit/_Widget","dijit/_TemplatedMixin",
