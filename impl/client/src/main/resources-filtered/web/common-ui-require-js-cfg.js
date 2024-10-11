@@ -194,6 +194,7 @@
 
   requirePaths["dojo/_base/config"] = dojoOverrides + "dojo/_base/config";
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
+  requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
   requirePaths["dojo/dom-prop"] = dojoOverrides + "dojo/dom-prop";
   requirePaths["dojo/i18n"] = dojoOverrides + "dojo/i18n";
 
