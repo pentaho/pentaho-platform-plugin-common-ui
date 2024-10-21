@@ -158,3 +158,4 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
 require(["common-ui/util/xss"], function(xssUtil) {
   Object.defineProperty(pho.util, "xss", { value: xssUtil });
 });
+
