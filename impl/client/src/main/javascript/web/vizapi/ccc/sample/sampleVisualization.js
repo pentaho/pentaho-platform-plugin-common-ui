@@ -16,8 +16,9 @@
 */
 
 require([
-  "common-ui/vizapi/VizController"
-], function(_VizController) {
+  "common-ui/vizapi/VizController",
+  "common-ui/util/xss"
+], function(_VizController, xssUtil) {
 
   pentaho.visualizations.push({
     id: 'sample_calc',                          // unique identifier
@@ -123,7 +124,7 @@ require([
 
     }
 
-    this.numSpan.innerText = value == null ? "" : value;
+    xssUtil.setHtml(this.numSpan, value == null ? "" : value);
     this.resize();
   }
 });
