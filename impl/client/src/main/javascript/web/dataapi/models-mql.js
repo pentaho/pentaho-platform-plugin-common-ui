@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2010 - 2024 Hitachi Vantara.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -571,7 +571,7 @@ pentaho.pda.query.mql = function(model) {
   pentaho.pda.query.call(this,model); //call parent object
 
   this.state = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Query",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Query",
     "domainName" : null,
     "modelId" : null,
     "disableDistinct" : false,
@@ -611,7 +611,7 @@ pentaho.pda.query.mql.prototype.prepare = function( ) {
 
 pentaho.pda.query.mql.prototype.createSelection = function() {
   var selection = {
-    "class":"org.pentaho.common.ui.metadata.model.impl.Column",
+    "class":"org.pentaho.platform.dataaccess.metadata.model.impl.Column",
     "aggTypes":[],
     "category":null,
     "defaultAggType":null,
@@ -626,7 +626,7 @@ pentaho.pda.query.mql.prototype.createSelection = function() {
 
 pentaho.pda.query.mql.prototype.createSort = function() {
   var sort = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Order",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Order",
     "category" : null,
     "column" : null,
     "orderType" : pentaho.pda.Column.SORT_TYPES.ASCENDING
@@ -636,7 +636,7 @@ pentaho.pda.query.mql.prototype.createSort = function() {
 
 pentaho.pda.query.mql.prototype.createCondition = function() {
   var condition = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Condition",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Condition",
     "category" : null,
     "column" : null,
     "operator" : null,
@@ -650,7 +650,7 @@ pentaho.pda.query.mql.prototype.createCondition = function() {
 
 pentaho.pda.query.mql.prototype.createParameter = function() {
   var parameter = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Parameter",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Parameter",
     "column": null,
     "name": null,
     "type" : null,
