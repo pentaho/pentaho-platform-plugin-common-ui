@@ -185,30 +185,24 @@
 
   // ...Overrides
   var dojoOverrides = basePath + "/dojo/pentaho/common/overrides/";
-  requirePaths["dojo/on"] = dojoOverrides + "dojo/on";
-  requirePaths["dojo/dom-geometry"] = dojoOverrides + "dojo/dom-geometry";
-  requirePaths["dojo/dom-prop"] = dojoOverrides + "dojo/dom-prop";
-  requirePaths["dojox/layout/ResizeHandle"] = dojoOverrides + "dojox/layout/ResizeHandle";
-  requirePaths["dojox/grid/_View"] = dojoOverrides + "dojox/grid/_View";
-  requirePaths["dojox/xml/parser"] = dojoOverrides + "dojox/xml/parser";
-  requirePaths["dojox/grid/Selection"] = dojoOverrides + "dojox/grid/Selection";
-  requirePaths["dojox/grid/_FocusManager"] = dojoOverrides + "dojox/grid/_FocusManager";
-  requirePaths["dojox/grid/_Scroller"] = dojoOverrides + "dojox/grid/_Scroller";
-  requirePaths["dojox/storage"] = dojoOverrides + "dojox/storage";
-  requirePaths["dojox/json"] = dojoOverrides + "dojox/json";
-  requirePaths["dojox/rpc"] = dojoOverrides + "dojox/rpc";
-  requirePaths["dojo/_base/kernel"] = dojoOverrides + "dojo/_base/kernel";
-  requirePaths["dojo/_base/config"] = dojoOverrides + "dojo/_base/config";
-  requirePaths["dojo/store/JsonRest"] = dojoOverrides + "dojo/store/JsonRest";
-  requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
-  requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
+
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
+  requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
   requirePaths["dijit/_PaletteMixin"] = dojoOverrides + "dijit/_PaletteMixin";
   requirePaths["dijit/Dialog"] = dojoOverrides + "dijit/Dialog";
   requirePaths["dijit/Menu"] = dojoOverrides + "dijit/Menu";
-  requirePaths["dojo/selector/_loader"] = dojoOverrides + "dojo/selector/_loader";
-  requirePaths["dojo/i18n"] = dojoOverrides + "dojo/i18n";
+
+  requirePaths["dojo/_base/config"] = dojoOverrides + "dojo/_base/config";
   requirePaths["dojo/request/default"] = dojoOverrides + "dojo/request/default";
+  requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
+  requirePaths["dojo/dom-prop"] = dojoOverrides + "dojo/dom-prop";
+  requirePaths["dojo/i18n"] = dojoOverrides + "dojo/i18n";
+
+  requirePaths["dojox/grid/Selection"] = dojoOverrides + "dojox/grid/Selection";
+  requirePaths["dojox/grid/_View"] = dojoOverrides + "dojox/grid/_View";
+  requirePaths["dojox/json"] = dojoOverrides + "dojox/json";
+  requirePaths["dojox/rpc"] = dojoOverrides + "dojox/rpc";
+  requirePaths["dojox/storage/_common"] = dojoOverrides + "dojox/storage/_common";
   // endregion
 
   requirePaths["common-ui/echarts"] = basePath + "/echarts/echarts";

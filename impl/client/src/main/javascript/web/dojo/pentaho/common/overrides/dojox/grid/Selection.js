@@ -1,10 +1,14 @@
+/* Overridden to force ctrl as copy key
+   see comments starting with // Pentaho
+		- lines: 265-266
+*/
+
 define([
 	"dojo/_base/declare",
 	"dojo/_base/array",
 	"dojo/_base/lang",
-	"dojo/dom-attr",
-	"dojo/keys"
-], function(declare, array, lang, domAttr, keys){
+	"dojo/dom-attr"
+], function(declare, array, lang, domAttr){
 
 return declare("dojox.grid.Selection", null, {
 	// summary:
@@ -258,6 +262,7 @@ return declare("dojox.grid.Selection", null, {
 	},
 
 	clickSelectEvent: function(e){
+		// Pentaho
 		this.clickSelect(e.rowIndex, e.ctrlKey, e.shiftKey);
 	},
 
