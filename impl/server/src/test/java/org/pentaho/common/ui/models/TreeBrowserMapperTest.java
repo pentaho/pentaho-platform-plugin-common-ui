@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2018 Hitachi Vantara.  All rights reserved.
+ * Copyright (c) 2002-2024 Hitachi Vantara.  All rights reserved.
  */
 
 package org.pentaho.common.ui.models;
@@ -28,8 +28,8 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
