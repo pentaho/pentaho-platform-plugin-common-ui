@@ -1,3 +1,14 @@
+/*! ******************************************************************************
+ *
+ * Pentaho
+ *
+ * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ *
+ * Use of this software is governed by the Business Source License included
+ * in the LICENSE.TXT file.
+ *
+ * Change Date: 2028-08-13
+ ******************************************************************************/
 define("dojox/rpc/JsonRest", ["dojox/json/ref", "dojox/rpc/Rest", "dojo/on", "dojo/_base/array", "dojo/aspect", "dojox/data/JsonRestStore"], function(ref, Rest, on, array, aspect, _restStore) {
 	var dirtyObjects = [];
 	var jr;
