@@ -87,5 +87,13 @@ define(["common-ui/util/xss"], function(xssUtil) {
         expect(elem.innerHTML).toBe(unsafeHtml);
       });
     });
+
+    describe("sanitizeUrl", function() {
+      it("should allow valid URL", function() {
+        const result = xssUtil.sanitizeUrl("javascript:alert('XSS')");
+        expect(result).toBe("about:blank");
+      });
+    });
+
   });
 });
