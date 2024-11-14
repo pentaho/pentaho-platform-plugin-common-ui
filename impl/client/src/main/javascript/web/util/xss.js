@@ -145,22 +145,25 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     },
 
     /**
-     * Set's an anchor HTML element to a given sanitized Url.
+     * Sanitize the unsafe url
      *
      * @param url
      */
+
     sanitizeUrl: function(url) {
-      try {
-        const parsedUrl = new URL(url);
-        const allowedProtocols = ['http:', 'https:'];
-        if (!allowedProtocols.includes(parsedUrl.protocol)) {
-          return 'about:blank';
-        }
-        return parsedUrl.href;
-      } catch (e) {
-        return 'about:blank';
+      const allowedProtocols = ["http:", "https:"];
+      // Regex to extract protocol from the URL
+      const protocolMatch = url.match(/^([a-zA-Z][a-zA-Z\d+\-.]*:)/);
+      const protocol = protocolMatch ? protocolMatch[0].toLowerCase() : null;
+
+      // Check if the protocol is allowed
+      if (protocol && allowedProtocols.includes(protocol)) {
+        return url;
       }
-  }
+
+      // Default to 'about:blank' for disallowed protocols or any caught errors
+      return "about:blank";
+    }
 
 });
 

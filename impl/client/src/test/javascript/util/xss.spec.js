@@ -89,7 +89,17 @@ define(["common-ui/util/xss"], function(xssUtil) {
     });
 
     describe("sanitizeUrl", function() {
-      it("should allow valid URL", function() {
+      it("should allow valid HTTP URL", function() {
+        const result = xssUtil.sanitizeUrl("http://google.com");
+        expect(result).toBe("http://google.com");
+      });
+
+      it("should allow valid HTTPS URL", function() {
+        const result = xssUtil.sanitizeUrl("https://google.com");
+        expect(result).toBe("https://google.com");
+      });
+
+      it("should sanitize JavaScript URL", function() {
         const result = xssUtil.sanitizeUrl("javascript:alert('XSS')");
         expect(result).toBe("about:blank");
       });
