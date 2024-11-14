@@ -128,6 +128,12 @@ define("common-ui/util/_a11y", ["./_focus"], function (focusUtil) {
         return;
       }
 
+      if (!evt.ctrlKey) {
+        getSelectedOptions().forEach(option => {
+          toggleSelected(option)
+        });
+      }
+
       setActiveOption(evt.target);
       toggleSelected(evt.target);
       scrollActiveOptionIntoView();
