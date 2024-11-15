@@ -36,6 +36,7 @@
     <file context="global">content/common-ui/resources/web/util/_a11y.js</file>
     <file context="global">content/common-ui/resources/web/util/_dialog.js</file>
     <file context="global">content/common-ui/resources/web/util/URLEncoder.js</file>
+    <file context="global">content/common-ui/resources/web/util/xss.js</file>
     <file context="global">content/common-ui/resources/web/util/SessionExpiryCheckStartingPoint.js</file>
 
     <file context="global">content/common-ui/resources/web/util/pentaho-csrf.js</file>
