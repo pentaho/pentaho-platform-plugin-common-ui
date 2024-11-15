@@ -43,7 +43,7 @@ define("common-ui/util/Glasspane", [], function() {
     hide: function() {
       // notify glasspane listeners that we are hiding a glasspane
       if(window.top.mantle_notifyGlasspaneListeners) {
-        window.top.mantle_notifyGlasspaneListeners(false);
+        //window.top.mantle_notifyGlasspaneListeners(false);
       }
       var that = this;
       this.$glasspane.fadeOut(this.fadeOutDuration, function() {
