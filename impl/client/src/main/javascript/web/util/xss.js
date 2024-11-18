@@ -145,15 +145,14 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     },
 
     /**
-     * Sanitize the unsafe url
-     *
-     * @param url
+     * Sanitize the given URL.
+     * Return the sanitized URL if it is valid, otherwise return 'about:blank'
+     * @param {string} url - The URL to sanitize.
      */
-
     sanitizeUrl: function(url) {
       try {
         // Use `document.location.href` for resolving relative URLs in browser contexts.
-        // Fallback to 'http://localhost' in non-browser environments like Node.js.
+        // Fallback to 'http://localhost' in non-browser environments.
         const baseUrl = typeof document !== "undefined" ? document.location.href : "http://localhost";
 
         // `new URL` ensures consistent, standard-compliant parsing of both absolute and relative URLs.
@@ -170,7 +169,7 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
 
       // Default to 'about:blank' for disallowed protocols or any errors encountered.
       return "about:blank";
-}
+    }
 
 });
 
