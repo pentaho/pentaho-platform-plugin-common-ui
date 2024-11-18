@@ -151,19 +151,26 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
      */
 
     sanitizeUrl: function(url) {
-      const allowedProtocols = ["http:", "https:"];
-      // Regex to extract protocol from the URL
-      const protocolMatch = url.match(/^([a-zA-Z][a-zA-Z\d+\-.]*:)/);
-      const protocol = protocolMatch ? protocolMatch[0].toLowerCase() : null;
+      try {
+        // Use `document.location.href` for resolving relative URLs in browser contexts.
+        // Fallback to 'http://localhost' in non-browser environments like Node.js.
+        const baseUrl = typeof document !== "undefined" ? document.location.href : "http://localhost";
 
-      // Check if the protocol is allowed
-      if (protocol && allowedProtocols.includes(protocol)) {
-        return url;
+        // `new URL` ensures consistent, standard-compliant parsing of both absolute and relative URLs.
+        const parsedUrl = new URL(url, baseUrl);
+
+        // Allow only URLs with protocols in the `allowedProtocols` list.
+        const allowedProtocols = ["http:", "https:"];
+        if (allowedProtocols.includes(parsedUrl.protocol)) {
+          return parsedUrl.href;
+        }
+      } catch (e) {
+        // Catch errors from invalid URLs or unsupported inputs.
       }
 
-      // Default to 'about:blank' for disallowed protocols or any caught errors
+      // Default to 'about:blank' for disallowed protocols or any errors encountered.
       return "about:blank";
-    }
+}
 
 });
 
