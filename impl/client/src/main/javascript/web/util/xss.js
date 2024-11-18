@@ -146,8 +146,9 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
 
     /**
      * Sanitize the given URL.
-     * Return the sanitized URL if it is valid, otherwise return 'about:blank'
+     *
      * @param {string} url - The URL to sanitize.
+     * @return {string} The sanitized URL if it is valid, otherwise return 'about:blank'.
      */
     sanitizeUrl: function(url) {
       try {
