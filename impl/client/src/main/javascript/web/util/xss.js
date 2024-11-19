@@ -142,8 +142,37 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
      */
     setHtmlUnsafe: function(elem, unsafeHtml) {
       elem.innerHTML = unsafeHtml;
+    },
+
+    /**
+     * Sanitize the given URL.
+     *
+     * @param {string} url - The URL to sanitize.
+     * @return {string} The sanitized URL if it is valid, otherwise return 'about:blank'.
+     */
+    sanitizeUrl: function(url) {
+      try {
+        // Use `document.location.href` for resolving relative URLs in browser contexts.
+        // Fallback to 'http://localhost' in non-browser environments.
+        const baseUrl = typeof document !== "undefined" ? document.location.href : "http://localhost";
+
+        // `new URL` ensures consistent, standard-compliant parsing of both absolute and relative URLs.
+        const parsedUrl = new URL(url, baseUrl);
+
+        // Allow only URLs with protocols in the `allowedProtocols` list.
+        const allowedProtocols = ["http:", "https:"];
+        if (allowedProtocols.includes(parsedUrl.protocol)) {
+          return parsedUrl.href;
+        }
+      } catch (e) {
+        // Catch errors from invalid URLs or unsupported inputs.
+      }
+
+      // Default to 'about:blank' for disallowed protocols or any errors encountered.
+      return "about:blank";
     }
-  });
+
+});
 
   return xssUtil;
 });
