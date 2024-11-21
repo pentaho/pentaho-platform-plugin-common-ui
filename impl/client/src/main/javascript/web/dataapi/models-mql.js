@@ -18,7 +18,7 @@ define("common-data/models-mql", ['common-data/oop', 'common-data/controller', '
 pentaho.pda.MqlHandler = function mqlHandler(sandbox) {
   pentaho.pda.Handler.call(this, sandbox);
   this.type = pentaho.pda.SOURCE_TYPE_MQL;
-  this.METADATA_SERVICE_URL = '../../../../content/ws-run/metadataService';
+  this.METADATA_SERVICE_URL = '../../../../plugin/data-access/api/metadataDA';
 }
 
 inheritPrototype(pentaho.pda.MqlHandler, pentaho.pda.Handler); //borrow the parent's methods
@@ -55,7 +55,7 @@ pentaho.pda.MqlHandler.prototype.getSources = function(callback, options) {
 
     // parse the XML
     var xml = parseXML( result ),
-        nodes = xml.getElementsByTagName('return');
+        nodes = xml.getElementsByTagName('modelInfo');
     for( var idx=0; idx<nodes.length; idx++ ) {
       each = this.addModelInfoFromNode( nodes[idx] ) || {};
       each.addCapability(pentaho.pda.CAPABILITIES.HAS_DOWN_AXIS);
@@ -85,8 +85,8 @@ pentaho.pda.MqlHandler.prototype.getModelInfoFromNode = function getModelInfoFro
   model.modelId  = this.getNodeText( node, 'modelId' );
   model.id       = model.domainId +':'+ model.modelId;
   model.name     = this.getNodeText( node, 'modelName' );
-  model.type     = pentaho.pda.SOURCE_TYPE_MQL,
-      model.description = this.getNodeText( node, 'modelDescription' );
+  model.type     = pentaho.pda.SOURCE_TYPE_MQL;
+  model.description = this.getNodeText( node, 'modelDescription' );
 
   return model;
 }
@@ -203,7 +203,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
   var xml = parseXML( result );
   this.categories = [];
 
-  var nodes = xml.getElementsByTagName('return');
+  var nodes = xml.getElementsByTagName('model');
   if( nodes && nodes.length> 0 ) {
     //return this.getDetailFromNode( nodes[0], modelAccess, datasourceConfig );
     // get the categories
@@ -310,10 +310,7 @@ pentaho.pda.model.mql.prototype.submit = function( jsonString, rowLimit, callbac
   if (!rowLimit) {
     rowLimit = -1;
   }
-  var handleResultCallback = dojo.hitch(this, function(resultXml) {
-    var result = parseXML( resultXml );
-    var nodes = result.getElementsByTagName('return');
-    resultJson = this.getText( nodes[0] );
+  var handleResultCallback = dojo.hitch(this, function(resultJson) {
 //          alert(resultJson);
     var result = JSON.parse(resultJson);
     if (callback) {
@@ -353,10 +350,7 @@ pentaho.pda.model.mql.prototype.submitXmlQuery = function( queryObject, rowLimit
     var url = this.handler.METADATA_SERVICE_URL+'/doXmlQueryToCdaJson';
     var query = 'xml='+escape(xml)+'&rowLimit='+rowLimit;
 
-    var resultXml = pentahoGet( url, query );
-    var result = parseXML( resultXml );
-    var nodes = result.getElementsByTagName('return');
-    resultJson = this.getText( nodes[0] );
+    resultJson = pentahoGet( url, query );
 //            alert(resultJson);
     var result = JSON.parse(resultJson);
     return result;
@@ -573,7 +567,7 @@ pentaho.pda.query.mql = function(model) {
   pentaho.pda.query.call(this,model); //call parent object
 
   this.state = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Query",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Query",
     "domainName" : null,
     "modelId" : null,
     "disableDistinct" : false,
@@ -613,7 +607,7 @@ pentaho.pda.query.mql.prototype.prepare = function( ) {
 
 pentaho.pda.query.mql.prototype.createSelection = function() {
   var selection = {
-    "class":"org.pentaho.common.ui.metadata.model.impl.Column",
+    "class":"org.pentaho.platform.dataaccess.metadata.model.impl.Column",
     "aggTypes":[],
     "category":null,
     "defaultAggType":null,
@@ -628,7 +622,7 @@ pentaho.pda.query.mql.prototype.createSelection = function() {
 
 pentaho.pda.query.mql.prototype.createSort = function() {
   var sort = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Order",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Order",
     "category" : null,
     "column" : null,
     "orderType" : pentaho.pda.Column.SORT_TYPES.ASCENDING
@@ -638,7 +632,7 @@ pentaho.pda.query.mql.prototype.createSort = function() {
 
 pentaho.pda.query.mql.prototype.createCondition = function() {
   var condition = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Condition",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Condition",
     "category" : null,
     "column" : null,
     "operator" : null,
@@ -652,7 +646,7 @@ pentaho.pda.query.mql.prototype.createCondition = function() {
 
 pentaho.pda.query.mql.prototype.createParameter = function() {
   var parameter = {
-    "class" : "org.pentaho.common.ui.metadata.model.impl.Parameter",
+    "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Parameter",
     "column": null,
     "name": null,
     "type" : null,
