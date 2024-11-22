@@ -87,5 +87,69 @@ define(["common-ui/util/xss"], function(xssUtil) {
         expect(elem.innerHTML).toBe(unsafeHtml);
       });
     });
+
+    describe("sanitizeUrl", function() {
+      it("should allow valid HTTP URL", function() {
+        const result = xssUtil.sanitizeUrl("http://google.com");
+        expect(result).toBe("http://google.com/");
+      });
+
+      it("should allow valid HTTPS URL", function() {
+        const result = xssUtil.sanitizeUrl("https://google.com");
+        expect(result).toBe("https://google.com/");
+      });
+
+      it("should sanitize JavaScript URL", function() {
+        const result = xssUtil.sanitizeUrl("javascript:alert('XSS')");
+        expect(result).toBe("about:blank");
+      });
+
+      it("should sanitize data URL", function() {
+        const result = xssUtil.sanitizeUrl("data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==");
+        expect(result).toBe("about:blank");
+      });
+
+      it("should sanitize mailto URL", function() {
+        const result = xssUtil.sanitizeUrl("mailto:someone@example.com");
+        expect(result).toBe("about:blank");
+      });
+
+      it("should sanitize file URL", function() {
+        const result = xssUtil.sanitizeUrl("file:///etc/passwd");
+        expect(result).toBe("about:blank");
+      });
+
+      it("should sanitize relative URL", function() {
+        const result = xssUtil.sanitizeUrl("/relative-path");
+        expect(result).toBe("http://localhost:9876/relative-path");
+      });
+
+      it("should sanitize empty URL", function() {
+        const result = xssUtil.sanitizeUrl("");
+        expect(result).toBe("http://localhost:9876/context.html");
+      });
+
+      it("should sanitize disallowed protocol URL", function() {
+        const result = xssUtil.sanitizeUrl("ftp://example.com");
+        expect(result).toBe("about:blank");
+      });
+
+      it("should allow HTTP URL with a port", function() {
+        const result = xssUtil.sanitizeUrl("http://example.com:8080");
+        expect(result).toBe("http://example.com:8080/");
+      });
+
+      it("should sanitize malformed URL", function() {
+        const result = xssUtil.sanitizeUrl("http:///example.com");
+        expect(result).toBe("http://example.com/");
+      });
+
+      it("should allow URL with special characters", function() {
+        const result = xssUtil.sanitizeUrl("https://example.com/path?query=<script>");
+        expect(result).toBe("https://example.com/path?query=%3Cscript%3E");
+      });
+
+    });
+
   });
 });
