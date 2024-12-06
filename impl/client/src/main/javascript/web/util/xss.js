@@ -59,6 +59,14 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
   }
   // endregion
 
+  function isHtmlElement(elem) {
+    return elem instanceof HTMLElement;
+  }
+
+  function isJQueryObject(jQuery) {
+    return !!jQuery && typeof jQuery.html === "function";
+  }
+
   /**
    * This module contains utilities that help in writing XSS-free code.
    * @name XssUtil
@@ -125,23 +133,36 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
      *
      * Uses {@link #sanitizeHtml} to sanitize the given, possibly unsafe, HTML text.
      *
-     * @param {Element} elem - The HTML element.
+     * @param {HTMLElement|jQuery} elem - The HTML element.
      * @param {string} unsafeHtml - The possibly unsafe HTML text.
      * @see #sanitizeHtml
      */
     setHtml: function(elem, unsafeHtml) {
-      elem.innerHTML = xssUtil.sanitizeHtml(unsafeHtml);
+      const safeHtml = xssUtil.sanitizeHtml(unsafeHtml);
+      if (isHtmlElement(elem)) {
+        elem.innerHTML = safeHtml;
+      } else if (isJQueryObject(elem)) {
+        elem.html(safeHtml);
+      } else {
+        throw new Error("Invalid argument 'elem'.");
+      }
     },
 
     /**
      * Set's an element's HTML to a given text, without sanitizing the text.
      *
-     * @param {Element} elem - The HTML element.
+     * @param {HTMLElement} elem - The HTML element.
      * @param {string} unsafeHtml - The possibly unsafe HTML text.
      * @see #sanitizeHtml
      */
     setHtmlUnsafe: function(elem, unsafeHtml) {
-      elem.innerHTML = unsafeHtml;
+      if (isHtmlElement(elem)) {
+        elem.innerHTML = unsafeHtml;
+      } else if (isJQueryObject(elem)) {
+        elem.html(unsafeHtml);
+      } else {
+        throw new Error("Invalid argument 'elem'.");
+      }
     },
 
     /**
@@ -170,10 +191,75 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
 
       // Default to 'about:blank' for disallowed protocols or any errors encountered.
       return "about:blank";
+    },
+
+    /**
+     * Function to open a new window with a sanitized URL.
+     *
+     * This function sanitizes the provided URL to prevent XSS attacks
+     * and then opens a new window with the sanitized URL and additional arguments.
+     *
+     * @param {string} url - The URL to open in a new window.
+     * @param {...*} restArgs - Additional arguments to pass to window.open.
+     * @return {Window|null} The newly opened window, or null if the URL is invalid.
+     */
+    open: function(url, ...restArgs) {
+      // Sanitize the provided URL to prevent XSS attacks
+      const sanitizedUrl = xssUtil.sanitizeUrl(url);
+      // Open a new window with the sanitized URL and additional arguments
+      return window.open(sanitizedUrl, ...restArgs);
+    },
+
+    /**
+     * Sets the location of the given window or document to a sanitized URL.
+     *
+     * This function sanitizes the provided URL to ensure it is safe before setting it as the location.
+     * It prevents potential XSS attacks by disallowing unsafe protocols.
+     *
+     * @param {Window|Document} winOrDoc - The window or document object whose location will be set.
+     * @param {string} url - The URL to set as the location.
+     */
+    setLocation: function(winOrDoc, url) {
+      winOrDoc.location = xssUtil.sanitizeUrl(url);
+    },
+
+    /**
+     * Writes sanitized HTML content to the document.
+     *
+     * @param {Document} doc - The document object where the HTML will be written.
+     * @param {string} html - The HTML string to be sanitized and written to the document.
+     */
+    writeLine: function(doc, html) {
+      doc.writeln(xssUtil.sanitizeHtml(html));
+    },
+
+    /**
+     * Writes sanitized HTML content to the document.
+     *
+     * This function sanitizes the provided HTML string to prevent XSS attacks
+     * and then writes the sanitized HTML to the document.
+     *
+     * @param {Document} doc - The document object where the HTML will be written.
+     * @param {string} html - The HTML string to be sanitized and written to the document.
+     */
+     write: function(doc, html) {
+      doc.write(xssUtil.sanitizeHtml(html));
+     },
+
+    /**
+     * Utility function to insert sanitized HTML at a specified position relative to an element.
+     *
+     * @param {Element} element - The target element.
+     * @param {string} position - The position relative to the element.
+     *                            Can be one of: 'beforebegin', 'afterbegin', 'beforeend', 'afterend'.
+     * @param {string} htmlContent - The HTML string to be sanitized and inserted.
+     */
+    insertAdjacentHtml: function(element, position, htmlContent) {
+      // Insert the sanitized HTML at the specified position
+      element.insertAdjacentHTML(position, xssUtil.sanitizeHtml(htmlContent));
     }
 
-});
-
+  });
   return xssUtil;
 });
 
