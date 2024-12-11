@@ -129,11 +129,11 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     },
 
     /**
-     * Set's an element's inner HTML to a given text in a safe way, by first sanitizing the text.
+     * Set's an element or jQuery object's inner HTML.
      *
      * Uses {@link #sanitizeHtml} to sanitize the given, possibly unsafe, HTML text.
      *
-     * @param {HTMLElement|jQuery} elem - The HTML element.
+     * @param {HTMLElement|jQuery} elem - The HTML element or jQuery object.
      * @param {string} unsafeHtml - The possibly unsafe HTML text.
      * @see #sanitizeHtml
      */
@@ -149,9 +149,9 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     },
 
     /**
-     * Set's an element's HTML to a given text, without sanitizing the text.
+     * Set's an element or jQuery object's inner HTML without sanitizing the text.
      *
-     * @param {HTMLElement} elem - The HTML element.
+     * @param {HTMLElement|jQuery} elem - The HTML element or jQuery object.
      * @param {string} unsafeHtml - The possibly unsafe HTML text.
      * @see #sanitizeHtml
      */
@@ -257,6 +257,18 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     insertAdjacentHtml: function(element, position, htmlContent) {
       // Insert the sanitized HTML at the specified position
       element.insertAdjacentHTML(position, xssUtil.sanitizeHtml(htmlContent));
+    },
+
+    /**
+     * Sanitizes JavaScript input to prevent XSS attacks.
+     *
+     * This function encodes the provided JavaScript input using a predefined encoder.
+     *
+     * @param {string} input - The JavaScript input to sanitize.
+     * @return {string} The sanitized JavaScript input.
+     */
+    encodeForJavaScript: function(input) {
+      return xssUtil.sanitizeHtml(input);
     }
 
   });

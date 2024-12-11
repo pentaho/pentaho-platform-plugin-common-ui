@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-define(["common-ui/util/xss"], function(xssUtil) {
+define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
 
   describe("XssUtil", function() {
 
@@ -191,6 +191,76 @@ define(["common-ui/util/xss"], function(xssUtil) {
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("https://example.com/");
       });
+
+      it("should open a new window with 'about:blank' for a JavaScript URL", function() {
+        const url = "javascript:alert('XSS')";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
+      });
+
+      it("should open a new window with 'about:blank' for a data URL", function() {
+        const url = "data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
+      });
+
+      it("should open a new window with 'about:blank' for a mailto URL", function() {
+        const url = "mailto:someone@example.com";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
+      });
+
+      it("should open a new window with 'about:blank' for a file URL", function() {
+        const url = "file:///etc/passwd";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
+      });
+
+      it("should open a new window with a sanitized relative URL", function() {
+        const url = "/relative-path";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9876/relative-path");
+      });
+
+      it("should open a new window with 'about:blank' for an empty URL", function() {
+        const url = "";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9876/context.html");
+      });
+
+      it("should open a new window with 'about:blank' for a disallowed protocol URL", function() {
+        const url = "ftp://example.com";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
+      });
+
+      it("should open a new window with a sanitized HTTP URL with a port", function() {
+        const url = "http://example.com:8080";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("http://example.com:8080/");
+      });
+
+      it("should open a new window with a sanitized malformed URL", function() {
+        const url = "http:///example.com";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("http://example.com/");
+      });
+
+      it("should open a new window with a sanitized URL with special characters", function() {
+        const url = "https://example.com/path?query=<script>";
+        const windowOpenSpy = spyOn(window, "open");
+        xssUtil.open(url);
+        expect(windowOpenSpy).toHaveBeenCalledWith("https://example.com/path?query=%3Cscript%3E");
+      });
     });
 
     describe("setLocation", function () {
@@ -280,6 +350,35 @@ define(["common-ui/util/xss"], function(xssUtil) {
        const unsafeHtml = "<script>alert('XSS');</script><p>Safe Content</p>";
        xssUtil.insertAdjacentHtml(targetElement, "beforeend", unsafeHtml);
        expect(targetElement.innerHTML).toBe("<p>Safe Content</p>");
+     });
+   });
+
+   describe("encodeForJavaScript", function() {
+     it("should sanitize JavaScript input", function() {
+       const unsafeJs = "alert('XSS')";
+       const sanitizedJs = xssUtil.encodeForJavaScript(unsafeJs);
+       expect(sanitizedJs).toBe("alert('XSS')");
+     });
+
+     it("should return an empty string for empty input", function() {
+       const result = xssUtil.encodeForJavaScript("");
+       expect(result).toBe("");
+     });
+
+     it("should return null for null input", function() {
+       const result = xssUtil.encodeForJavaScript(null);
+       expect(result).toBe("");
+     });
+
+     it("should return undefined for undefined input", function() {
+       const result = xssUtil.encodeForJavaScript(undefined);
+       expect(result).toBe("");
+     });
+
+     it("should not modify safe JavaScript input", function() {
+       const safeJs = "console.log('Hello, world!')";
+       const result = xssUtil.encodeForJavaScript(safeJs);
+       expect(result).toBe(safeJs);
      });
    });
 
