@@ -259,18 +259,6 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
       element.insertAdjacentHTML(position, xssUtil.sanitizeHtml(htmlContent));
     },
 
-    /**
-     * Sanitizes JavaScript input to prevent XSS attacks.
-     *
-     * This function encodes the provided JavaScript input using a predefined encoder.
-     *
-     * @param {string} input - The JavaScript input to sanitize.
-     * @return {string} The sanitized JavaScript input.
-     */
-    encodeForJavaScript: function(input) {
-      return xssUtil.sanitizeHtml(input);
-    }
-
   });
   return xssUtil;
 });

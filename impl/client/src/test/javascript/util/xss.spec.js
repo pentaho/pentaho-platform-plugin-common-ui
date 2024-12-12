@@ -353,34 +353,5 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
      });
    });
 
-   describe("encodeForJavaScript", function() {
-     it("should sanitize JavaScript input", function() {
-       const unsafeJs = "alert('XSS')";
-       const sanitizedJs = xssUtil.encodeForJavaScript(unsafeJs);
-       expect(sanitizedJs).toBe("alert('XSS')");
-     });
-
-     it("should return an empty string for empty input", function() {
-       const result = xssUtil.encodeForJavaScript("");
-       expect(result).toBe("");
-     });
-
-     it("should return null for null input", function() {
-       const result = xssUtil.encodeForJavaScript(null);
-       expect(result).toBe("");
-     });
-
-     it("should return undefined for undefined input", function() {
-       const result = xssUtil.encodeForJavaScript(undefined);
-       expect(result).toBe("");
-     });
-
-     it("should not modify safe JavaScript input", function() {
-       const safeJs = "console.log('Hello, world!')";
-       const result = xssUtil.encodeForJavaScript(safeJs);
-       expect(result).toBe(safeJs);
-     });
-   });
-
 });
 });
