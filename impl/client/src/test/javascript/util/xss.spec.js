@@ -353,5 +353,43 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
      });
    });
 
+   describe("encodeForJavaScript", function() {it("should encode special characters", function() {
+     const input = "<script>alert('XSS')</script>";
+     const expectedOutput = "\\u003c\\u0073\\u0063\\u0072\\u0069\\u0070\\u0074\\u003e\\u0061\\u006c\\u0065" +
+         "\\u0072\\u0074\\u0028\\u0027\\u0058\\u0053\\u0053\\u0027\\u0029\\u003c\\u002f\\u0073\\u0063\\u0072\\u0069" +
+         "\\u0070\\u0074\\u003e";
+     const result = xssUtil.encodeForJavaScript(input);
+     expect(result).toBe(expectedOutput);
+   })
+
+     it("should encode alphanumeric characters", function() {
+     const input = "abc123";
+     const expectedOutput = "\\u0061\\u0062\\u0063\\u0031\\u0032\\u0033";
+     const result = xssUtil.encodeForJavaScript(input);
+     expect(result).toBe(expectedOutput);
+     })
+
+     it("should encode empty string", function() {
+     const input = "";
+     const expectedOutput = "";
+     const result = xssUtil.encodeForJavaScript(input);
+     expect(result).toBe(expectedOutput);
+      })
+
+     it("should encode null input", function() {
+     const input = null;
+     const expectedOutput = "";
+     const result = xssUtil.encodeForJavaScript(input);
+     expect(result).toBe(expectedOutput);
+      })
+
+     it("should encode undefined input", function() {
+     const input = undefined;
+     const expectedOutput = "";
+     const result = xssUtil.encodeForJavaScript(input);
+     expect(result).toBe(expectedOutput);
+     });
+   });
+
 });
 });
