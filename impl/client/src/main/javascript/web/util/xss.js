@@ -259,6 +259,23 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
       element.insertAdjacentHTML(position, xssUtil.sanitizeHtml(htmlContent));
     },
 
+    /**
+     * Encodes a given input string for safe use in JavaScript contexts.
+     *
+     * This function replaces each character in the input string with its Unicode escape sequence.
+     * It ensures that any potentially unsafe characters are properly escaped to prevent XSS attacks.
+     *
+     * @param {string} input - The input string to encode.
+     * @return {string} The encoded string with each character replaced by its Unicode escape sequence.
+     */
+    encodeForJavaScript: function(input) {
+      if(input == null) return ""; // Return an empty string if the input is null or undefined
+      return input.replace(/[\u0000-\uFFFF]/g, function(character) {
+        const escape = character.charCodeAt(0).toString(16);
+        return '\\u' + ('0000' + escape).slice(-4);
+      });
+    },
+
   });
   return xssUtil;
 });
