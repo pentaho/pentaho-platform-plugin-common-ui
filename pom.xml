@@ -16,7 +16,7 @@
   <name>Common-UI root POM</name>
   <description>Parent pom for Common-UI projects.</description>
   <url>http://www.pentaho.com</url>
-
+<!---->
   <modules>
     <module>impl</module>
     <module>assemblies</module>
