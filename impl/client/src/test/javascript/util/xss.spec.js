@@ -355,41 +355,82 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
 
    describe("encodeForJavaScript", function() {
 
-     it("should encode special characters", function() {
-     const input = "<script>alert('XSS')</script>";
-     const expectedOutput = "<script>alert(\\'XSS\\')<\\/script>";
-     const result = xssUtil.encodeForJavaScript(input);
-     expect(result).toBe(expectedOutput);
-     })
-
-     it("should encode alphanumeric characters", function() {
-     const input = "abc123";
-     const expectedOutput = "abc123";
-     const result = xssUtil.encodeForJavaScript(input);
-     expect(result).toBe(expectedOutput);
-     })
-
-     it("should encode empty string", function() {
-     const input = "";
-     const expectedOutput = "";
-     const result = xssUtil.encodeForJavaScript(input);
-     expect(result).toBe(expectedOutput);
-      })
-
-     it("should encode null input", function() {
-     const input = null;
-     const expectedOutput = "";
-     const result = xssUtil.encodeForJavaScript(input);
-     expect(result).toBe(expectedOutput);
-      })
-
-     it("should encode undefined input", function() {
-     const input = undefined;
-     const expectedOutput = "";
-     const result = xssUtil.encodeForJavaScript(input);
-     expect(result).toBe(expectedOutput);
+     it("should encode control characters for JavaScript", function() {
+       const text = "Hello\nWorld";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("Hello\\nWorld");
      });
-   });
+
+     it("should return null for null input", function() {
+       const encodedText = xssUtil.encodeForJavaScript(null);
+       expect(encodedText).toBeNull();
+     });
+
+     it("should return undefined for undefined input", function() {
+       const encodedText = xssUtil.encodeForJavaScript(undefined);
+       expect(encodedText).toBeUndefined();
+     });
+
+     it("should encode empty string correctly", function() {
+       const text = "";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("");
+     });
+
+     it("should encode backspace character", function() {
+       const text = "\b";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\b");
+     });
+
+     it("should encode tab character", function() {
+       const text = "\t";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\t");
+     });
+
+     it("should encode form feed character", function() {
+       const text = "\f";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\f");
+     });
+
+     it("should encode carriage return character", function() {
+       const text = "\r";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\r");
+     });
+
+     it("should encode double quote character", function() {
+       const text = "\"";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\x22");
+     });
+
+     it("should encode single quote character", function() {
+       const text = "'";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\x27");
+     });
+
+     it("should encode ampersand character", function() {
+       const text = "&";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\x26");
+     });
+
+     it("should encode backslash character", function() {
+       const text = "\\";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\");
+     });
+
+     it("should encode forward slash character", function() {
+       const text = "/";
+       const encodedText = xssUtil.encodeForJavaScript(text);
+       expect(encodedText).toBe("\\/");
+     });
+    });
 
 });
 });
