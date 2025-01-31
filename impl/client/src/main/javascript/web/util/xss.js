@@ -36,13 +36,31 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     "'": "&#39;" // &apos;
   };
 
+  var jsEntitiesMap = {
+    // Control Characters are escaped using standard escape sequences.
+    "\b": "\\b",
+    "\t": "\\t",
+    "\n": "\\n",
+    "\f": "\\f",
+    "\r": "\\r",
+
+    // Special Characters are escaped
+    "\"": "\\x22",
+    "'": "\\x27",
+    "&": "\\x26",
+
+    "\\": "\\\\",
+    "/": "\\/"
+  };
+
   var htmlEncoder;
   var htmlAttrEncoder;
+  var jsEncoder;
 
-  function compileHtmlEncoder(map) {
+  function compileTextEncoder(map) {
     var re = new RegExp("[" + Object.keys(map).join("") + "]", "g");
 
-    return function htmlEncoder(text) {
+    return function textEncoder(text) {
       if (text == null) return text;
       return String(text).replace(re, function($0) {
         return map[$0];
@@ -50,13 +68,40 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     };
   }
 
+  /**
+   * Compiles a JavaScript encoder function based on the provided map.
+   * @param {Object} map - A map of characters and their encoded representations.
+   * @returns {Function} - A function that encodes strings for JavaScript contexts.
+   */
+  function compileJsEncoder(map) {
+    var baseEncoder = compileTextEncoder(map);
+
+    return function jsEncoderFunction(text) {
+      if(text == null) return text;
+
+      // Also replace other control characters without a special representation (e.g. \n)
+      return baseEncoder(text).replace(
+        /[\u0000-\u001F]/g,
+        (char) => `\\x${char.charCodeAt(0).toString(16).padStart(2, "0")}`);
+    };
+  }
+
   function getHtmlEncoder() {
-    return htmlEncoder || (htmlEncoder = compileHtmlEncoder(htmlEntitiesMap));
+    return htmlEncoder || (htmlEncoder = compileTextEncoder(htmlEntitiesMap));
   }
 
   function getHtmlAttrEncoder() {
-    return htmlAttrEncoder || (htmlAttrEncoder = compileHtmlEncoder(htmlAttrEntitiesMap));
+    return htmlAttrEncoder || (htmlAttrEncoder = compileTextEncoder(htmlAttrEntitiesMap));
   }
+
+  /**
+   * Returns the JavaScript encoder, initializing it if not already created.
+   * @returns {Function} - The JavaScript encoder function.
+   */
+  function getJsEncoder() {
+    return jsEncoder || (jsEncoder = compileJsEncoder(jsEntitiesMap));
+  }
+
   // endregion
 
   function isHtmlElement(elem) {
@@ -258,6 +303,16 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
       // Insert the sanitized HTML at the specified position
       element.insertAdjacentHTML(position, xssUtil.sanitizeHtml(htmlContent));
     },
+
+    // Based on OWASP's java Encode#forJavaScript.
+    /**
+     * Encodes text for safe inclusion in JavaScript strings and in HTML contexts.
+     * @param {string} literalText - The input text to encode.
+     * @returns {string} - The encoded string.
+     */
+    encodeForJavaScript: function(literalText) {
+    return getJsEncoder()(literalText);
+    }
 
   });
   return xssUtil;
