@@ -2,7 +2,7 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ * Copyright (C) 2025 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
@@ -19,8 +19,8 @@ define([
   "pentaho/common/SmallImageButton",
   "dojo/text!pentaho/common/SectionHeader.html",
   "dojo/_base/lang",
-  "common-ui/dompurify"
-], function (declare, _WidgetBase, _Templated, on, query, SmallImageButton, templateStr, lang, DOMPurify) {
+  "common-ui/util/xss"
+], function (declare, _WidgetBase, _Templated, on, query, SmallImageButton, templateStr, lang, xssUtil) {
   return declare("pentaho.common.SectionHeader", [_WidgetBase, _Templated], {
     title: '',
 
@@ -80,7 +80,7 @@ define([
 
     setHeader: function (/*String*/ header) {
       this.header = header;
-      this.headerNode.innerHTML = DOMPurify.sanitize(header);
+      xssUtil.setHtml(this.headerNode, header);
     }
   });
 });

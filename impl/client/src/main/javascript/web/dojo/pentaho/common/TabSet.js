@@ -2,7 +2,7 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ * Copyright (C) 2025 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
@@ -20,8 +20,8 @@ define([
   "dijit/registry",
   "dojo/dom-construct",
   "dojo/_base/lang",
-  "common-ui/dompurify"
-], function(declare, _WidgetBase, _Templated, on, query, domClass, registry, construct, lang, DOMPurify) {
+  "common-ui/util/xss"
+], function(declare, _WidgetBase, _Templated, on, query, domClass, registry, construct, lang, xssUtil) {
   return declare("pentaho.common.TabSet", [_WidgetBase, _Templated], {
     templateString: '<div data-dojo-attach-point="tabSetDiv" style="margin-right: 0px"></div>',
 
@@ -73,7 +73,7 @@ define([
         var span = construct.create('span', {}, div);
         domClass.add(span, 'pentaho-tabWidgetLabel', div);
         span.setAttribute( 'tabId', this.tabs[idx].id);
-        span.innerHTML = DOMPurify.sanitize(this.tabs[idx].title);
+        xssUtil.setHtml(span, this.tabs[idx].title);
         on(div, 'click', lang.hitch(this, this.tabClicked));
       }
     },
