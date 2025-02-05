@@ -2,7 +2,7 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ * Copyright (C) 2025 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
@@ -25,9 +25,9 @@ define([
   "dijit/layout/ContentPane",
   "pentaho/common/Messages",
   "dojo/text!pentaho/common/FieldsetPane.html",
-  "common-ui/dompurify"
+  "common-ui/util/xss"
 ], function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, style, FieldsetPane, Messages,
-             DisableablePanel, _LayoutWidget, ContentPane, Messages, templateStr, DOMPurify) {
+             DisableablePanel, _LayoutWidget, ContentPane, Messages, templateStr, xssUtil) {
   return declare("pentaho.common.FieldsetPane",[DisableablePanel, _TemplatedMixin, _WidgetsInTemplateMixin], {
     templateString: templateStr,
     title: "title",
@@ -48,7 +48,7 @@ define([
 
     setTitle: function (/*String*/ title) {
       this.title = title;
-      this.titleNode.innerHTML = DOMPurify.sanitize(title);
+      xssUtil.setHtml(this.titleNode, title);
     },
 
     layout: function () {

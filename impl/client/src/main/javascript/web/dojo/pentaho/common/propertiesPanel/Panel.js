@@ -2,7 +2,7 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ * Copyright (C) 2025 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
@@ -45,11 +45,11 @@ define([
   "pentaho/common/propertiesPanel/Configuration",
   "common-ui/util/_focus",
   "dijit/Tooltip",
-  "common-ui/dompurify"
+  "common-ui/util/xss"
 ], function(declare, ItemFileReadStore, registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, ContentPane,
             BorderContainer, HorizontalSlider, TextBox, ComboBox, Select, CheckBox, TitlePane, on, query, array, lang,
             html, construct, string, domClass, Target, Source, ManagerClass, Evented, topic, dom, geometry, aspect,
-            Messages, Configuration, focusUtil, Tooltip, DOMPurify) {
+            Messages, Configuration, focusUtil, Tooltip, xssUtil) {
 
   /* eslint-disable dot-notation, new-cap */
 
@@ -1317,7 +1317,7 @@ define([
       if(!gemLabel){
         gemLabel=query(".gem-label", this.domNode)[0];
       }
-      gemLabel.innerHTML = DOMPurify.sanitize(this.model.value);
+      xssUtil.setHtml(gemLabel, this.model.value);
 
       this.own(
         on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),

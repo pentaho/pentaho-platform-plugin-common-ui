@@ -2,7 +2,7 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ * Copyright (C) 2025 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
@@ -29,9 +29,9 @@ define([
   "dojo/_base/event",
   "dojo/keys",
   "common-ui/util/_focus",
-  "common-ui/dompurify"
+  "common-ui/util/xss"
 ], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog,
-            Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil, DOMPurify) {
+            Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil, xssUtil) {
   return declare("pentaho.common.Dialog",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
     popup : null,
     title: "",
@@ -56,7 +56,7 @@ define([
      * @param {string} localeKey - The key of the localized string.
      */
     getSanitizedLocaleString: function(localeKey) {
-      return DOMPurify.sanitize(this.getLocaleString(localeKey));
+      return xssUtil.sanitizeHtml(this.getLocaleString(localeKey));;
     },
 
     /**
@@ -146,7 +146,7 @@ define([
         domClass.add(btn, "pentaho-button");
         btn.setAttribute( "id", "button"+j);
         // this is filled with the sanitized localized strings, however buttons can be override hence the double check
-        btn.innerHTML = DOMPurify.sanitize(this.buttons[j]);
+        xssUtil.setHtml(btn, this.buttons[j]);
         cell.appendChild(btn);
         btn.onclick = lang.hitch(this, this.buttonClick, j);
       }
