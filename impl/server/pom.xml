@@ -6,31 +6,31 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
-    <version>10.2.0.0-SNAPSHOT</version>
+    <version>10.2.0.2-296</version>
   </parent>
   <artifactId>common-ui-impl-server</artifactId>
-  <version>10.2.0.0-SNAPSHOT</version>
+  <version>10.2.0.2-296</version>
   <name>Common UI server side</name>
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
   <properties>
     <junit.version>4.13.2</junit.version>
-    <pentaho-connections.version>10.2.0.0-SNAPSHOT</pentaho-connections.version>
-    <pentaho-reporting.version>10.2.0.0-SNAPSHOT</pentaho-reporting.version>
-    <pentaho-metadata.version>10.2.0.0-SNAPSHOT</pentaho-metadata.version>
+    <pentaho-connections.version>10.2.0.2-296</pentaho-connections.version>
+    <pentaho-reporting.version>10.2.0.2-296</pentaho-reporting.version>
+    <pentaho-metadata.version>10.2.0.2-296</pentaho-metadata.version>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <hsqldb.version>2.3.2</hsqldb.version>
-    <commons-xul.version>10.2.0.0-SNAPSHOT</commons-xul.version>
+    <commons-xul.version>10.2.0.2-296</commons-xul.version>
     <mockito-core.version>5.10.0</mockito-core.version>
-    <commons-database.version>10.2.0.0-SNAPSHOT</commons-database.version>
-    <pdi.version>10.2.0.0-SNAPSHOT</pdi.version>
+    <commons-database.version>10.2.0.2-296</commons-database.version>
+    <pdi.version>10.2.0.2-296</pdi.version>
     <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
-    <platform.version>10.2.0.0-SNAPSHOT</platform.version>
+    <platform.version>10.2.0.2-296</platform.version>
     <commons-lang.version>2.2</commons-lang.version>
-    <encryption-support.version>10.2.0.0-SNAPSHOT</encryption-support.version>
+    <encryption-support.version>10.2.0.2-296</encryption-support.version>
   </properties>
   <dependencies>
     <dependency>
