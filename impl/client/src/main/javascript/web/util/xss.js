@@ -219,8 +219,8 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     sanitizeUrl: function(url) {
       try {
         // Use `document.location.href` for resolving relative URLs in browser contexts.
-        // Fallback to 'http://localhost' in non-browser environments.
-        const baseUrl = typeof document !== "undefined" ? document.location.href : "http://localhost";
+        // Fallback to 'http://localhost:9877' in non-browser environments.
+        const baseUrl = typeof document !== "undefined" ? document.location.href : "http://localhost:9877";
 
         // `new URL` ensures consistent, standard-compliant parsing of both absolute and relative URLs.
         const parsedUrl = new URL(url, baseUrl);

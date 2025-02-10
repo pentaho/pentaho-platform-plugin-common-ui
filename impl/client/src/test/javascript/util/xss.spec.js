@@ -147,12 +147,12 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
 
       it("should sanitize relative URL", function() {
         const result = xssUtil.sanitizeUrl("/relative-path");
-        expect(result).toBe("http://localhost:9876/relative-path");
+        expect(result).toBe("http://localhost:9877/relative-path");
       });
 
       it("should sanitize empty URL", function() {
         const result = xssUtil.sanitizeUrl("");
-        expect(result).toBe("http://localhost:9876/context.html");
+        expect(result).toBe("http://localhost:9877/context.html");
       });
 
       it("should sanitize disallowed protocol URL", function() {
@@ -224,14 +224,14 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const url = "/relative-path";
         const windowOpenSpy = spyOn(window, "open");
         xssUtil.open(url);
-        expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9876/relative-path");
+        expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9877/relative-path");
       });
 
       it("should open a new window with 'about:blank' for an empty URL", function() {
         const url = "";
         const windowOpenSpy = spyOn(window, "open");
         xssUtil.open(url);
-        expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9876/context.html");
+        expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9877/context.html");
       });
 
       it("should open a new window with 'about:blank' for a disallowed protocol URL", function() {
