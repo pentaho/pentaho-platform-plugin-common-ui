@@ -19,7 +19,7 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo,dojox,dijit,prantlf__requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular,angular-animate,angular-i18n,uirouter__core,uirouter__angularjs,echarts,dompurify</js.project.list>
+    <js.project.list>dojo,dojox,dijit,prantlf__requirejs,jquery,jquery-i18n-properties,pentaho-cdf-js,angular,angular-animate,angular-i18n,uirouter__core,uirouter__angularjs,echarts,dompurify,underscore</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
 
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
@@ -98,6 +98,10 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>dompurify</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>underscore</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -148,6 +152,25 @@
                   <directory>${basedir}/src/main/config/resources</directory>
                   <includes>
                     <include>requireCfg.bundles.js</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>copy-underscore</id>
+            <phase>${javascript_unpack-dependencies-phase}</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/src/main/javascript/web/underscore</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${webjars.target.directory}/underscore/${underscore.version}</directory>
+                  <includes>
+                    <include>underscore.js</include>
                   </includes>
                 </resource>
               </resources>
