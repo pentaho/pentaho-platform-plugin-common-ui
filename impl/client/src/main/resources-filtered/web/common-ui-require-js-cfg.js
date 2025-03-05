@@ -227,6 +227,7 @@
   requireShim["common-ui/bootstrap"] = ["common-ui/jquery"];
 
   requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
+  requireShim["common-ui/underscore"] = ["common-ui/jquery"];
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
