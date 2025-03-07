@@ -55,8 +55,16 @@
   var requirePackages = requireCfg.packages;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
+  var requireConfig = requireCfg.config;
+  var requireModules = requireConfig["pentaho/modules"];
 
-  var requireModules = requireCfg.config["pentaho/modules"];
+  if(!requireConfig["amd"]) {
+    requireConfig["amd"] = {};
+  }
+  if(!requireConfig["amd"]["shim"]) {
+    requireConfig["amd"]["shim"] = {};
+  }
+  var amdShim = requireConfig["amd"]["shim"];
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -226,8 +234,14 @@
   requirePaths["common-ui/bootstrap"] = basePath + "/bootstrap/bootstrap";
   requireShim["common-ui/bootstrap"] = ["common-ui/jquery"];
 
-  requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
-  requireShim["common-ui/underscore"] = ["common-ui/jquery"];
+  requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore-wrapper";
+  requirePaths["common-ui/_underscore-original"] = basePath + "/underscore/underscore";
+
+  amdShim["common-ui/_underscore-original"] = {
+    "prescript": "var _exports = {};var define;\n(function() {\n",
+    "postscript": "}.call(_exports));\nreturn _exports._;"
+  };
+
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
