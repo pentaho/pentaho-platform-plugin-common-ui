@@ -39,6 +39,17 @@
     <angular.version>1.8.0</angular.version>
     <uirouter-core.version>5.0.23</uirouter-core.version>
     <uirouter-angularjs.version>1.0.22</uirouter-angularjs.version>
+
+    <nodejs.version>v18.20.2</nodejs.version>
+    <npm.version>10.7.0</npm.version>
+
+    <!--
+      Overriding this to include requirejs@2.3.7
+
+      This should be done in the parent pom, but doing so would require other projects to update
+      their node and karma versions, to support ES2015+ syntax introduced in this version r.js file.
+    -->
+    <prantlf.requirejs.version>3.1.0</prantlf.requirejs.version>
   </properties>
 
   <dependencyManagement>
