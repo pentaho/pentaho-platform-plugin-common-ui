@@ -2,13 +2,12 @@
 
 # Common-UI
 
-Common-ui historically contains commonly used utils/frameworks (e.g. jquery) that are used across the platform.
-As we move forward with OSGI it is expected for these to be removed from common-ui to be deployed in a more modular way.
-
-
 ![Java](https://img.shields.io/badge/Java-11-brightorange?logo=openjdk)
 ![Javascript](https://img.shields.io/badge/JavaScript-323330?logo=javascript)
-![Node](https://img.shields.io/badge/node-16-brightgreen?logo=node.js)
+![Node](https://img.shields.io/badge/node-18-brightgreen?logo=node.js)
+
+Common-ui historically contains commonly used utils/frameworks (e.g. jquery) that are used across the platform.
+As we move forward with OSGI it is expected for these to be removed from common-ui to be deployed in a more modular way.
 
 </div>
 
