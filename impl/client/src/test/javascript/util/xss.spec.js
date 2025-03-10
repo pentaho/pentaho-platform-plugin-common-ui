@@ -14,19 +14,15 @@
 * limitations under the License.
 *
 */
+
 define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
 
   describe("XssUtil", function() {
-    const baseUrl = "http://localhost:9876";
-    let originalLocation;
+    const origin = "http://localhost:9876";
+    const basePath = `${origin}/folder`;
 
-    beforeEach(function() {
-      originalLocation = document.location;
-      document.location = {href: `${baseUrl}/folder/context.html`};
-    });
-
-    afterEach(function() {
-      document.location = originalLocation;
+    beforeEach(() => {
+      spyOn(xssUtil, "_getLocationHref").and.returnValue(`${basePath}/context.html`);
     });
 
     describe("sanitizeHtml", function() {
@@ -34,12 +30,14 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const unsafeHtml = "<div>Hello</div><script>alert(\"xss\")</script>";
         const expectedSanitizedHtml = "<div>Hello</div>";
         const result = xssUtil.sanitizeHtml(unsafeHtml);
+
         expect(result).toBe(expectedSanitizedHtml);
       });
 
       it("should return safe HTML unchanged", function() {
         const safeHtml = "<div><b>Hello</b></div>";
         const result = xssUtil.sanitizeHtml(safeHtml);
+
         expect(result).toBe(safeHtml);
       });
 
@@ -57,6 +55,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const unsafeHtml = "<div>Hello<script>alert(\"xss\")</script><p>World</p></div>";
         const expectedSanitizedHtml = "<div>Hello<p>World</p></div>";
         const result = xssUtil.sanitizeHtml(unsafeHtml);
+
         expect(result).toBe(expectedSanitizedHtml);
       });
     });
@@ -66,6 +65,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         it("should encode text for HTML", function() {
           const text = "<Hello & World>";
           const encodedText = xssUtil.encodeTextForHtml(text);
+
           expect(encodedText).toBe("&lt;Hello &amp; World&gt;");
         });
       });
@@ -74,6 +74,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         it("should encode text for HTML attribute", function() {
           const text = "\"Hello & World\"";
           const encodedText = xssUtil.encodeTextForHtmlAttribute(text);
+
           expect(encodedText).toBe("&quot;Hello &amp; World&quot;");
         });
       });
@@ -84,6 +85,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         it("should set sanitized HTML to an element", function () {
           const elem = document.createElement("div");
           const unsafeHtml = "<script>alert(\"XSS\");</script>";
+
           xssUtil.setHtml(elem, unsafeHtml);
           expect(elem.innerHTML).not.toContain("<script>");
         });
@@ -91,6 +93,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         it("should set sanitized HTML to a jQuery object", function () {
           const elem = $("<div></div>");
           const unsafeHtml = "<script>alert(\"XSS\");</script>";
+
           xssUtil.setHtml(elem, unsafeHtml);
           expect(elem.html()).not.toContain("<script>");
         });
@@ -98,6 +101,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         it("should throw an error for invalid element", function () {
           const elem = {};
           const unsafeHtml = "<script>alert(\"XSS\");</script>";
+
           expect(() => xssUtil.setHtml(elem, unsafeHtml)).toThrowError("Invalid argument 'elem'.");
         });
       });
@@ -107,6 +111,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       it("should set unsanitized HTML to an element", function() {
         const elem = document.createElement("div");
         const unsafeHtml = "<div>Hello World</div>";
+
         xssUtil.setHtmlUnsafe(elem, unsafeHtml);
         expect(elem.innerHTML).toBe(unsafeHtml);
       });
@@ -114,6 +119,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       it("should set unsanitized HTML to a jQuery object", function() {
         const elem = $("<div></div>");
         const unsafeHtml = "<div>Hello World</div>";
+
         xssUtil.setHtmlUnsafe(elem, unsafeHtml);
         expect(elem.html()).toBe(unsafeHtml);
       });
@@ -121,6 +127,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       it("should throw an error for invalid element", function() {
         const elem = {};
         const unsafeHtml = "<div>Hello World</div>";
+
         expect(() => xssUtil.setHtmlUnsafe(elem, unsafeHtml)).toThrowError("Invalid argument 'elem'.");
       });
     });
@@ -157,15 +164,14 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       });
 
       it("should sanitize absolute path", function() {
-        const result = xssUtil.sanitizeUrl("/relative-path");
-        expect(result).toBe("http://localhost:9876/relative-path");
+        const result = xssUtil.sanitizeUrl("/absolute-path");
+        expect(result).toBe(`${origin}/absolute-path`);
       });
 
-      /* This test is failing because for some reason the URL is being resolved to the base URL of the test environment.
       it("should sanitize relative path", function() {
-         const result = xssUtil.sanitizeUrl("relative-path");
-         expect(result).toBe("http://localhost:9876/folder/relative-path");
-       });*/
+        const result = xssUtil.sanitizeUrl("relative-path");
+        expect(result).toBe(`${basePath}/relative-path`);
+      });
 
       it("should sanitize empty URL", function() {
         const result = xssUtil.sanitizeUrl("");
@@ -191,110 +197,118 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const result = xssUtil.sanitizeUrl("https://example.com/path?query=<script>");
         expect(result).toBe("https://example.com/path?query=%3Cscript%3E");
       });
-
     });
 
     describe("open", function() {
+      let windowOpenSpy;
+
+      beforeEach(() => {
+        windowOpenSpy = spyOn(window, "open");
+      });
+
       it("should open a new window with a sanitized HTTP URL", function() {
         const url = "http://example.com";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("http://example.com/");
       });
 
       it("should open a new window with a sanitized HTTPS URL", function() {
         const url = "https://example.com";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("https://example.com/");
       });
 
       it("should open a new window with 'about:blank' for a JavaScript URL", function() {
         const url = "javascript:alert('XSS')";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
       });
 
       it("should open a new window with 'about:blank' for a data URL", function() {
         const url = "data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
       });
 
       it("should open a new window with 'about:blank' for a mailto URL", function() {
         const url = "mailto:someone@example.com";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
       });
 
       it("should open a new window with 'about:blank' for a file URL", function() {
         const url = "file:///etc/passwd";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
       });
 
       it("should open a new window with a sanitized absolute path", function() {
         const url = "/relative-path";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("http://localhost:9876/relative-path");
       });
 
       it("should open a new window with 'about:blank' for an empty URL", function() {
         const url = "";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
       });
 
       it("should open a new window with 'about:blank' for a disallowed protocol URL", function() {
         const url = "ftp://example.com";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("about:blank");
       });
 
       it("should open a new window with a sanitized HTTP URL with a port", function() {
         const url = "http://example.com:8080";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("http://example.com:8080/");
       });
 
       it("should open a new window with a sanitized malformed URL", function() {
         const url = "http:///example.com";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("http://example.com/");
       });
 
       it("should open a new window with a sanitized URL with special characters", function() {
         const url = "https://example.com/path?query=<script>";
-        const windowOpenSpy = spyOn(window, "open");
+
         xssUtil.open(url);
         expect(windowOpenSpy).toHaveBeenCalledWith("https://example.com/path?query=%3Cscript%3E");
       });
     });
 
     describe("setLocation", function () {
+      let mockWinOrDoc;
+
+      beforeEach(() => {
+        mockWinOrDoc = {location: ""};
+      });
+
       it("should set window.location for valid URL", () => {
-        const mockWindow = { location: "" };
-        xssUtil.setLocation(mockWindow, "http://example.com");
-        expect(mockWindow.location).toBe("http://example.com/");
+        xssUtil.setLocation(mockWinOrDoc, "http://example.com");
+        expect(mockWinOrDoc.location).toBe("http://example.com/");
       });
 
       it("should set document.location for a valid URL", () => {
-        const mockDocument = { location: "" };
-        xssUtil.setLocation(mockDocument, "https://example.com");
-        expect(mockDocument.location).toBe("https://example.com/");
+        xssUtil.setLocation(mockWinOrDoc, "https://example.com");
+        expect(mockWinOrDoc.location).toBe("https://example.com/");
       });
 
       it("should fallback to 'about:blank' for invalid URLs", () => {
-        const mockWinOrDoc = { location: "" };
         xssUtil.setLocation(mockWinOrDoc, "javascript:alert('XSS')");
         expect(mockWinOrDoc.location).toBe("about:blank");
       });
@@ -304,15 +318,17 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       it("should write sanitized HTML to the document", function () {
         const doc = document.implementation.createHTMLDocument("");
         const unsafeHtml = "<div>Hello</div><script>alert('XSS');</script>";
+
         xssUtil.write(doc, unsafeHtml);
-        expect(doc.body.innerHTML.trim()).toBe("<div>Hello</div>");  // Only sanitized content should be written
+        expect(doc.body.innerHTML.trim()).toBe("<div>Hello</div>"); // Only sanitized content should be written
       });
 
       it("should remove unsafe script tags from nested HTML", function () {
         const doc = document.implementation.createHTMLDocument('');
         const unsafeHtml = "<div>Hello<script>alert('XSS');</script><p>World</p></div>";
+
         xssUtil.write(doc, unsafeHtml);
-        expect(doc.body.innerHTML.trim()).toBe('<div>Hello<p>World</p></div>');  // Only safe HTML should remain
+        expect(doc.body.innerHTML.trim()).toBe('<div>Hello<p>World</p></div>'); // Only safe HTML should remain
       });
     });
 
@@ -320,15 +336,17 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       it("should write sanitized HTML to the document", function () {
         const doc = document.implementation.createHTMLDocument("");
         const unsafeHtml = "<div>Hello</div><script>alert('XSS');</script>";
+
         xssUtil.writeLine(doc, unsafeHtml);
-        expect(doc.body.innerHTML.trim()).toBe("<div>Hello</div>");  // Only sanitized content should be written
+        expect(doc.body.innerHTML.trim()).toBe("<div>Hello</div>"); // Only sanitized content should be written
       });
 
       it("should remove unsafe script tags from nested HTML", function () {
         const doc = document.implementation.createHTMLDocument('');
         const unsafeHtml = "<div>Hello<script>alert('XSS');</script><p>World</p></div>";
+
         xssUtil.writeLine(doc, unsafeHtml);
-        expect(doc.body.innerHTML.trim()).toBe('<div>Hello<p>World</p></div>');  // Only safe HTML should remain
+        expect(doc.body.innerHTML.trim()).toBe('<div>Hello<p>World</p></div>'); // Only safe HTML should remain
       });
     });
 
@@ -337,6 +355,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const parentElement = document.createElement("div");
         const targetElement = document.createElement("div");
         parentElement.appendChild(targetElement);
+
         const unsafeHtml = "<script>alert('XSS');</script><p>Safe Content</p>";
         xssUtil.insertAdjacentHtml(targetElement, "beforebegin", unsafeHtml);
         expect(parentElement.innerHTML).toBe("<p>Safe Content</p><div></div>");
@@ -346,6 +365,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const parentElement = document.createElement("div");
         const targetElement = document.createElement("div");
         parentElement.appendChild(targetElement);
+
         const unsafeHtml = "<script>alert('XSS');</script><p>Safe Content</p>";
         xssUtil.insertAdjacentHtml(targetElement, "afterend", unsafeHtml);
         expect(parentElement.innerHTML).toBe("<div></div><p>Safe Content</p>");
@@ -355,6 +375,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const parentElement = document.createElement("div");
         const targetElement = document.createElement("div");
         parentElement.appendChild(targetElement);
+
         const unsafeHtml = "<script>alert('XSS');</script><p>Safe Content</p>";
         xssUtil.insertAdjacentHtml(targetElement, "afterbegin", unsafeHtml);
         expect(targetElement.innerHTML).toBe("<p>Safe Content</p>");
@@ -364,6 +385,7 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         const parentElement = document.createElement("div");
         const targetElement = document.createElement("div");
         parentElement.appendChild(targetElement);
+
         const unsafeHtml = "<script>alert('XSS');</script><p>Safe Content</p>";
         xssUtil.insertAdjacentHtml(targetElement, "beforeend", unsafeHtml);
         expect(targetElement.innerHTML).toBe("<p>Safe Content</p>");
@@ -371,7 +393,6 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
     });
 
     describe("encodeForJavaScript", function() {
-
       it("should encode control characters for JavaScript", function() {
         const text = "Hello\nWorld";
         const encodedText = xssUtil.encodeForJavaScript(text);
@@ -448,6 +469,5 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         expect(encodedText).toBe("\\/");
       });
     });
-
   });
 });
