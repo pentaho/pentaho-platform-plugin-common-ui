@@ -117,7 +117,7 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
    * @name XssUtil
    * @memberOf pho.util
    */
-  var xssUtil = Object.freeze({
+  var xssUtil = {
     /**
      * Sanitizes a given HTML string.
      *
@@ -219,7 +219,7 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     sanitizeUrl: function(url) {
       if (url) {
         try {
-          const baseUrl = document.location.href;
+          const baseUrl = xssUtil._getLocationHref();
 
           // `new URL` ensures consistent, standard-compliant parsing of both absolute and relative URLs.
           const parsedUrl = new URL(url, baseUrl);
@@ -236,6 +236,10 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
 
       // Default to 'about:blank' for disallowed protocols or any errors encountered.
       return "about:blank";
+    },
+
+    _getLocationHref: function() {
+      return document.location.href;
     },
 
     /**
@@ -313,8 +317,8 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     encodeForJavaScript: function(literalText) {
       return getJsEncoder()(literalText);
     }
+  };
 
-  });
   return xssUtil;
 });
 
