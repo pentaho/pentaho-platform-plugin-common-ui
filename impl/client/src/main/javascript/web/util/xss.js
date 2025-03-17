@@ -275,16 +275,6 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     /**
      * Writes sanitized HTML content to the document.
      *
-     * @param {Document} doc - The document object where the HTML will be written.
-     * @param {string} html - The HTML string to be sanitized and written to the document.
-     */
-    writeLine: function(doc, html) {
-      doc.writeln(xssUtil.sanitizeHtml(html));
-    },
-
-    /**
-     * Writes sanitized HTML content to the document.
-     *
      * This function sanitizes the provided HTML string to prevent XSS attacks
      * and then writes the sanitized HTML to the document.
      *
@@ -293,6 +283,29 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
      */
     write: function(doc, html) {
       doc.write(xssUtil.sanitizeHtml(html));
+    },
+
+    /**
+     * Writes sanitized HTML content to the document.
+     *
+     * @param {Document} doc - The document object where the HTML will be written.
+     * @param {string} html - The HTML string to be sanitized and written to the document.
+     */
+    writeLine: function(doc, html) {
+      doc.writeln(xssUtil.sanitizeHtml(html));
+    },
+
+    /**
+     * Writes unsafe HTML content to the document.
+     *
+     * This function writes the provided HTML string directly to the document
+     * without sanitizing it.
+     *
+     * @param {Document} doc - The document object where the HTML will be written.
+     * @param {string} html - The HTML string to be written to the document.
+     */
+    writeLineUnsafe: function(doc, html) {
+      doc.writeln(html);
     },
 
     /**
