@@ -350,6 +350,24 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       });
     });
 
+    describe("writeLineUnsafe", function() {
+      it("should write unsafe HTML to the document", function () {
+        const doc = document.implementation.createHTMLDocument("");
+        const unsafeHtml = "<div>Hello</div><script>alert('XSS');</script>";
+
+        xssUtil.writeLineUnsafe(doc, unsafeHtml);
+        expect(doc.body.innerHTML.trim()).toBe("<div>Hello</div><script>alert('XSS');</script>");
+      });
+
+      it("should write empty string to the document", function () {
+        const doc = document.implementation.createHTMLDocument("");
+        const emptyString = "";
+
+        xssUtil.writeLineUnsafe(doc, emptyString);
+        expect(doc.body.innerHTML.trim()).toBe("");
+      });
+    });
+
     describe("insertAdjacentHtml", function () {
       it("should insert sanitized HTML before the target element", function () {
         const parentElement = document.createElement("div");
