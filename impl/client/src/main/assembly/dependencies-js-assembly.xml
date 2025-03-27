@@ -79,6 +79,15 @@
       <outputDirectory>dompurify</outputDirectory>
     </fileSet>
 
+    <fileSet>
+      <directory>${webjars.target.directory}/underscore/${underscore.version}</directory>
+      <outputDirectory>underscore</outputDirectory>
+      <includes>
+        <include>underscore.js</include>
+        <include>LICENSE*</include>
+      </includes>
+    </fileSet>
+
     <!-- region Dojo -->
     <fileSet>
       <directory>${webjars.target.directory}/dojo/${dojo.version}</directory>

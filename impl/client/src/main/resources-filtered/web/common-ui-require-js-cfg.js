@@ -55,8 +55,16 @@
   var requirePackages = requireCfg.packages;
   var requireShim = requireCfg.shim;
   var requireMap = requireCfg.map;
+  var requireConfig = requireCfg.config;
+  var requireModules = requireConfig["pentaho/modules"];
 
-  var requireModules = requireCfg.config["pentaho/modules"];
+  if(!requireConfig["amd"]) {
+    requireConfig["amd"] = {};
+  }
+  if(!requireConfig["amd"]["shim"]) {
+    requireConfig["amd"]["shim"] = {};
+  }
+  var amdShim = requireConfig["amd"]["shim"];
 
   // region common-ui
   requirePaths["common-ui"] = basePath;
@@ -168,6 +176,8 @@
   requirePaths["local"] = basePath + "/util/local";
   requirePaths["json"] = basePath + "/util/require-json/json";
   requirePaths["text"] = basePath + "/util/require-text/text";
+  requirePaths["amd"] = basePath + "/util/require-amd/nonamd";
+
   // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
   // Placing the minSuffix in the path ensures building works well,
   // so that the resolved module id is the same in both debug and non-debug cases.
@@ -226,7 +236,14 @@
   requirePaths["common-ui/bootstrap"] = basePath + "/bootstrap/bootstrap";
   requireShim["common-ui/bootstrap"] = ["common-ui/jquery"];
 
-  requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore";
+  requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore-wrapper";
+  requirePaths["common-ui/_underscore-original"] = basePath + "/underscore/underscore";
+
+  amdShim["common-ui/_underscore-original"] = {
+    "prescript": "var exports = {};var module = {exports: exports};\n(function() {\n",
+    "postscript": "}.call(this));\nreturn module.exports;"
+  };
+
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 

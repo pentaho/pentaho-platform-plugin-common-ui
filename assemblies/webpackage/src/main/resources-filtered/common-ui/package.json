@@ -36,6 +36,7 @@
     "local": "/util/local",
     "json": "/util/require-json/json",
     "text": "/util/require-text/text",
+    "amd": "/util/require-amd/nonamd",
     "common-ui/util/require-css/css": "/util/require-css/css",
 
     "dojo": "/dojo/dojo",
@@ -73,7 +74,8 @@
     "common-ui/jquery-i18n": "/jquery/jquery.i18n.properties-min",
     "common-ui/jquery-pentaho-i18n": "/jquery/jquery.i18n.properties.supported.languages",
     "common-ui/bootstrap": "/bootstrap/bootstrap",
-    "common-ui/underscore": "/underscore/underscore"
+    "common-ui/underscore": "/underscore/underscore-wrapper",
+    "common-ui/_underscore-original": "/underscore/underscore"
   },
 
   "map": {
@@ -546,6 +548,14 @@
       "pentaho/visual/color/palettes/divergentRyb5": {
         "type": "pentaho/visual/color/Palette",
         "ranking": -10
+      }
+    },
+    "amd": {
+      "shim": {
+        "common-ui/_underscore-original": {
+          "prescript": "var exports = {};var module = {exports: exports};\n(function() {\n",
+          "postscript": "}.call(this));\nreturn module.exports;"
+        }
       }
     }
   },
