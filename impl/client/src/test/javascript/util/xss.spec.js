@@ -84,25 +84,35 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
       describe("setHtml", function () {
         it("should set sanitized HTML to an element", function () {
           const elem = document.createElement("div");
-          const unsafeHtml = "<script>alert(\"XSS\");</script>";
+          const unsafeHtml = "<script>alert(\"XSS\");</script><p>Safe Content</p>";
 
           xssUtil.setHtml(elem, unsafeHtml);
-          expect(elem.innerHTML).not.toContain("<script>");
+          expect(elem.innerHTML).toBe("<p>Safe Content</p>");
         });
 
         it("should set sanitized HTML to a jQuery object", function () {
           const elem = $("<div></div>");
-          const unsafeHtml = "<script>alert(\"XSS\");</script>";
+          const unsafeHtml = "<script>alert(\"XSS\");</script><p>Safe Content</p>";
 
           xssUtil.setHtml(elem, unsafeHtml);
-          expect(elem.html()).not.toContain("<script>");
+          expect(elem.html()).toBe("<p>Safe Content</p>");
         });
 
-        it("should throw an error for invalid element", function () {
-          const elem = {};
-          const unsafeHtml = "<script>alert(\"XSS\");</script>";
+        it("should set sanitized HTML to an array-like object", function () {
+          const elem1 = document.createElement("div");
+          const elem2 = document.createElement("div");
+          const elems = [elem1, elem2];
+          const unsafeHtml = "<script>alert(\"XSS\");</script><p>Safe Content</p>";
 
-          expect(() => xssUtil.setHtml(elem, unsafeHtml)).toThrowError("Invalid argument 'elem'.");
+          xssUtil.setHtml(elems, unsafeHtml);
+          expect(elem1.innerHTML).toBe("<p>Safe Content</p>");
+          expect(elem2.innerHTML).toBe("<p>Safe Content</p>");
+        });
+
+        it("should throw an error for invalid argument 'elem'", function () {
+          const invalidElem = {};
+          const unsafeHtml = "<script>alert(\"XSS\");</script><p>Safe Content</p>";
+          expect(() => xssUtil.setHtml(invalidElem, unsafeHtml)).toThrowError("Invalid argument 'elem'.");
         });
       });
     });
@@ -124,11 +134,21 @@ define(["common-ui/util/xss", "common-ui/jquery"], function(xssUtil, $) {
         expect(elem.html()).toBe(unsafeHtml);
       });
 
-      it("should throw an error for invalid element", function() {
-        const elem = {};
+      it("should set unsanitized HTML to an array-like object", function() {
+        const elem1 = document.createElement("div");
+        const elem2 = document.createElement("div");
+        const elems = [elem1, elem2];
         const unsafeHtml = "<div>Hello World</div>";
 
-        expect(() => xssUtil.setHtmlUnsafe(elem, unsafeHtml)).toThrowError("Invalid argument 'elem'.");
+        xssUtil.setHtmlUnsafe(elems, unsafeHtml);
+        expect(elem1.innerHTML).toBe(unsafeHtml);
+        expect(elem2.innerHTML).toBe(unsafeHtml);
+      });
+
+      it("should throw an error for invalid argument 'elem'", function() {
+        const invalidElem = {};
+        const unsafeHtml = "<div>Hello</div><script>alert('XSS');</script>";
+        expect(() => xssUtil.setHtmlUnsafe(invalidElem, unsafeHtml)).toThrowError("Invalid argument 'elem'.");
       });
     });
 
