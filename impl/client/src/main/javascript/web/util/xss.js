@@ -112,6 +112,15 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     return !!jQuery && typeof jQuery.html === "function";
   }
 
+  // Based on lodash#isArrayLike.
+  function isLength(value) {
+    return typeof value == 'number' && value > -1 && (value % 1 === 0);
+  }
+
+  function isArrayLike(value) {
+    return value != null && isLength(value.length) && (typeof value !== "function") && (typeof value !== "string");
+  }
+
   /**
    * This module contains utilities that help in writing XSS-free code.
    * @name XssUtil
@@ -178,7 +187,8 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
      *
      * Uses {@link #sanitizeHtml} to sanitize the given, possibly unsafe, HTML text.
      *
-     * @param {HTMLElement|jQuery} elem - The HTML element or jQuery object.
+     * @param {HTMLElement|jQuery|Array} elem - The HTML element, jQuery object, or an array or array-like of those
+     *                                          (such as HTML collections and dojo/query results).
      * @param {string} unsafeHtml - The possibly unsafe HTML text.
      * @see #sanitizeHtml
      */
@@ -188,6 +198,10 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
         elem.innerHTML = safeHtml;
       } else if (isJQueryObject(elem)) {
         elem.html(safeHtml);
+      } else if (isArrayLike(elem)) {
+        for(let i = 0; i < elem.length; i++) {
+          xssUtil.setHtml(elem[i], safeHtml);
+        }
       } else {
         throw new Error("Invalid argument 'elem'.");
       }
@@ -196,7 +210,8 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
     /**
      * Set's an element or jQuery object's inner HTML without sanitizing the text.
      *
-     * @param {HTMLElement|jQuery} elem - The HTML element or jQuery object.
+     * @param {HTMLElement|jQuery|Array} elem - The HTML element, jQuery object, or an array or array-like of those
+     *                                        (such as HTML collections and dojo/query results).
      * @param {string} unsafeHtml - The possibly unsafe HTML text.
      * @see #sanitizeHtml
      */
@@ -205,6 +220,10 @@ define("common-ui/util/xss", ["common-ui/dompurify"], function(DOMPurify) {
         elem.innerHTML = unsafeHtml;
       } else if (isJQueryObject(elem)) {
         elem.html(unsafeHtml);
+      } else if (isArrayLike(elem)) {
+        for(let i = 0; i < elem.length; i++) {
+          xssUtil.setHtmlUnsafe(elem[i], unsafeHtml);
+        }
       } else {
         throw new Error("Invalid argument 'elem'.");
       }
