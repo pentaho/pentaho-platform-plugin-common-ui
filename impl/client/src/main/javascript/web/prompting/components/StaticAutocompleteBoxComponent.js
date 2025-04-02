@@ -101,8 +101,12 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
         // Initialize autocomplete.
         this._createAndInitializeInputAutocompleteElement(ph, initialValue);
       } else if(initialValue !== this.getValue() && initialValue !== undefined) {
-        //Update current value
-        input.val(initialValue);
+        // PRD-6156: Occasionally, the input box was being updated while the user was still writing.
+        // Since there might be a use case where the input should be refreshed after it's creation we decided
+        // to check if the input is not focused before updating it.
+        if (!$(':focus').is(input)) {
+          input.val(initialValue);
+        }
       }
 
       // BISERVER-14512: It was a problem that suggestion of autocomplete just appear for a moment and then dissapear.
