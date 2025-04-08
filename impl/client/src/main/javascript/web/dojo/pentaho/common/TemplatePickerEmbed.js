@@ -12,8 +12,8 @@
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/query", 'pentaho/common/button'
   , 'pentaho/common/SmallImageButton', "dojo/dom-class", "dojo/text!pentaho/common/TemplatePickerEmbed.html",
-  "dojo/_base/lang", "common-ui/dompurify"],
-    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, button, SmallImageButton, domClass, templateStr, lang, DOMPurify) {
+  "dojo/_base/lang", "common-ui/util/xss"],
+    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, button, SmallImageButton, domClass, templateStr, lang, xssUtil) {
       return declare("pentaho.common.TemplatePickerEmbed",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
             buttons: [],
@@ -54,7 +54,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                   if (this.templates[idx + start].description && this.templates[idx + start].description != null) {
                     this['templateImg' + idx].title = this.templates[idx + start].description;
                   }
-                  this['templateName' + idx].innerHTML = DOMPurify.sanitize(this.templates[idx + start].name);
+                  xssUtil.setHtml(this['templateName' + idx], this.templates[idx + start].name);
                   domClass.remove(this['templateImg' + idx], 'hidden');
                   domClass.add(this['templateName' + idx], 'fadeEmbed');
                   if (this.templates[idx + start].selected) {
