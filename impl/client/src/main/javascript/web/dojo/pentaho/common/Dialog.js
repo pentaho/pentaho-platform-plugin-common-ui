@@ -11,8 +11,8 @@
  ******************************************************************************/
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/dom", "dojo/query", "dojo/dom-construct", "dojo/dom-style", "dijit/Dialog", "pentaho/common/button", "pentaho/common/SmallImageButton", "pentaho/common/Messages", "dojo/dom-class",
-  "dojo/_base/lang", "dojo/_base/event", "dojo/keys", "common-ui/util/_focus", "common-ui/dompurify"],
-    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil, DOMPurify){
+  "dojo/_base/lang", "dojo/_base/event", "dojo/keys", "common-ui/util/_focus", "common-ui/util/xss"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang, event, keys, focusUtil,  xssUtil){
       return declare("pentaho.common.Dialog",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
             popup : null,
@@ -38,7 +38,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
              * @param {string} localeKey - The key of the localized string.
              */
             getSanitizedLocaleString: function(localeKey) {
-              return DOMPurify.sanitize(this.getLocaleString(localeKey));
+              return xssUtil.sanitizeHtml(this.getLocaleString(localeKey));
             },
 
             /**
@@ -128,7 +128,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 domClass.add(btn, "pentaho-button");
                 btn.setAttribute( "id", "button"+j);
                 // This is filled with the sanitized localized strings, however buttons can be override hence the double check
-                btn.innerHTML = DOMPurify.sanitize(this.buttons[j]);
+                xssUtil.setHtml(btn, this.buttons[j]);
                 cell.appendChild(btn);
                 btn.onclick = lang.hitch(this, this.buttonClick, j);
               }

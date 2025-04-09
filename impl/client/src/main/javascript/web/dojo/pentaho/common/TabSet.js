@@ -11,8 +11,8 @@
  ******************************************************************************/
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojo/dom-class", "dijit/registry", "dojo/dom-construct",
-"dojo/_base/lang", "common-ui/dompurify"],
-    function(declare, _WidgetBase, _Templated, on, query, domClass, registry, construct, lang, DOMPurify){
+"dojo/_base/lang", "common-ui/util/xss"],
+    function(declare, _WidgetBase, _Templated, on, query, domClass, registry, construct, lang, xssUtil){
       return declare("pentaho.common.TabSet",
     [_WidgetBase, _Templated],
     {
@@ -66,7 +66,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
                 var span = construct.create('span', {}, div);
                 domClass.add(span, 'pentaho-tabWidgetLabel', div);
                 span.setAttribute( 'tabId', this.tabs[idx].id);
-                span.innerHTML = DOMPurify.sanitize(this.tabs[idx].title);
+                xssUtil.setHtml(span, this.tabs[idx].title);
                 on(div, 'click', lang.hitch(this, this.tabClicked));
             }
         },

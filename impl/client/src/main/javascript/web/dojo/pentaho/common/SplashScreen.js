@@ -11,8 +11,8 @@
  ******************************************************************************/
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query",
-"pentaho/common/button", "pentaho/common/Dialog", "dojo/text!pentaho/common/SplashScreen.html", "common-ui/dompurify"],
-    function(declare, _WidgetBase, _Templated, on, query, button, Dialog, templateStr, DOMPurify){
+"pentaho/common/button", "pentaho/common/Dialog", "dojo/text!pentaho/common/SplashScreen.html", "common-ui/util/xss"],
+    function(declare, _WidgetBase, _Templated, on, query, button, Dialog, templateStr, xssUtil){
       return declare("pentaho.common.SplashScreen", [Dialog],
      {
         buttons: ['ok'],
@@ -26,12 +26,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         },
 
         setText: function(text) {
-            this.splashmessage.innerHTML = DOMPurify.sanitize(text);
+            xssUtil.setHtml(this.splashmessage, text);
         },
     
         setButtonText: function(text) {
             this.buttons[0] = text;
-            query("#button"+0, this.domNode).innerHTML = DOMPurify.sanitize(text);
+            xssUtil.setHtml(query("#button"+0, this.domNode), text);
         },
     
         templateString: templateStr,
