@@ -150,7 +150,8 @@
     // the platform bundle code.
     "css": "empty:",
     "text": "empty:",
-    "json": "empty:"
+    "json": "empty:",
+    "amd": "empty:"
   },
 
   modules: [
