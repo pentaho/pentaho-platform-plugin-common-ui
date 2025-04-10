@@ -100,7 +100,8 @@ if(!useDebug) {
     "common-ui/jquery-i18n",
     "common-ui/jquery-pentaho-i18n",
     "common-ui/bootstrap",
-    "common-ui/underscore"
+    "common-ui/underscore",
+    "common-ui/_underscore-original"
   ].forEach(function(mid) {
     var versionMid = getVersionedModuleId(mid);
     var path = requirePaths[versionMid];
