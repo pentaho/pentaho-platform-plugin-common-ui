@@ -21,4 +21,17 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>${maven-install-plugin.version}</version>
+        <configuration>
+          <allowIncompleteProjects>true</allowIncompleteProjects>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
