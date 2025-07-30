@@ -271,8 +271,9 @@
       <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>${jaxb-runtime.version}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -320,8 +321,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-servlet</artifactId>
+      <groupId>org.gwtproject</groupId>
+      <artifactId>gwt-servlet-jakarta</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
