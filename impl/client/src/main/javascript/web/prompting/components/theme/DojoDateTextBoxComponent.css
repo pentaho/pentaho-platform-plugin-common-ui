@@ -12,3 +12,163 @@ div.dijitDateTextBox.dijitComboBox .dijitArrowButton {
   /* Firefox */
   background: -moz-linear-gradient(#AAAAAA, #888888 10%, #3F3F3F 50%, #000000 55%, #121212 90%) repeat scroll 0 0 transparent;
 }
+
+.prompting-time-container input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.prompting-time-container .dijitUpArrowButton,
+.prompting-time-container .dijitDownArrowButton {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  width: 22px;
+  height: 18px;
+  cursor: pointer;
+  background: linear-gradient(to bottom, #fff 0%, #e0e0e0 100%);
+}
+
+.prompting-time-container .dijitUpArrowButton .dijitArrowButtonInner,
+.prompting-time-container .dijitDownArrowButton .dijitArrowButtonInner {
+  width: 16px;
+  height: 16px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #222;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.prompting-time-container .dijitUpArrowButton .dijitArrowButtonInner:before {
+  content: "▲";
+  display: block;
+  font-size: 12px;
+  color: #222;
+}
+.prompting-time-container .dijitDownArrowButton .dijitArrowButtonInner:before {
+  content: "▼";
+  display: block;
+  font-size: 12px;
+  color: #222;
+}
+
+.prompting-time-container .dijitUpArrowButton,
+.prompting-time-container .dijitDownArrowButton {
+  border-left: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.prompting-time-container .dijitUpArrowButton:hover,
+.prompting-time-container .dijitDownArrowButton:hover {
+  background: linear-gradient(to bottom, #f5f5f5 0%, #d0d0d0 100%);
+}
+
+.prompting-time-container .ampm-spinner {
+  display: inline-flex;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  overflow: hidden;
+  height: 38px;
+  background: #fff;
+  box-sizing: border-box;
+  margin-left: 2px;
+}
+
+.prompting-time-container .ampm-input {
+  width: 28px;
+  text-align: center;
+  border: none;
+  background: #fff;
+  font-size: 13px;
+  color: #222;
+  font-weight: bold;
+  outline: none;
+  height: 100%;
+  line-height: 38px;
+  padding: 0;
+  opacity: 1;
+}
+
+.prompting-time-container .ampm-arrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
+}
+
+.prompting-time-container .ampm-arrow-btn {
+  width: 22px;
+  height: 18px;
+  background: linear-gradient(to bottom, #fff 0%, #e0e0e0 100%);
+  border: none;
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: #222;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  outline: none;
+}
+.prompting-time-container .ampm-arrow-btn.ampm-up {
+  border-bottom: 1px solid #ccc;
+}
+.prompting-time-container .ampm-arrow-btn.ampm-down {
+  border-bottom: none;
+}
+.prompting-time-container .ampm-arrow-btn.ampm-up::before {
+  content: "▲";
+  font-size: 12px;
+}
+.prompting-time-container .ampm-arrow-btn.ampm-down::before {
+  content: "▼";
+  font-size: 12px;
+}
+.prompting-time-container .ampm-arrow-btn:hover {
+  background: linear-gradient(to bottom, #f5f5f5 0%, #d0d0d0 100%);
+}
+
+.prompting-time-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.prompting-time-container .prompting-time-label {
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+.prompting-time-container .ampm-spinner .ampm-input {
+  width: 28px;
+  text-align: center;
+  border: none;
+  background: #fff;
+  font-size: 13px;
+  color: #222;
+  font-weight: bold;
+  outline: none;
+  height: 100%;
+  line-height: 38px;
+  padding: 0;
+  opacity: 1;
+}

@@ -105,25 +105,42 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("should init date text box with undefined param", function() {
+        var $container = $('<div>');
+        spyOn($.fn, 'empty').and.returnValue($container);
+        spyOn($.fn, 'append').and.returnValue($container);
+        spyOn($, 'isArray').and.returnValue(false);
+
+        comp.parameter = testParam;
+        comp.dashboard = dashboard;
+        comp.htmlObject = testId;
         comp.update();
 
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
         expect(transportFormatter.parse).not.toHaveBeenCalled();
         expect(comp.dijitId).toBe(testId + '_input');
-        expect($.fn.html).toHaveBeenCalled();
-        expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
+        expect($.fn.empty).toHaveBeenCalled();
+        expect($.fn.append).toHaveBeenCalled();
         expect(comp._doAutoFocus).toHaveBeenCalled();
       });
 
       it("should init date text box with array param", function() {
+        var $container = $('<div>');
+        spyOn($.fn, 'empty').and.returnValue($container);
+        spyOn($.fn, 'append').and.returnValue($container);
+        spyOn($, 'isArray').and.returnValue(true);
+
         dashboard.getParameterValue.and.returnValue([testVal]);
+        transportFormatter.parse.and.callFake(function(val) {
+          return new Date(val);
+        });
+
         comp.update();
 
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
         expect(transportFormatter.parse).toHaveBeenCalledWith(testVal);
         expect(comp.dijitId).toBe(testId + '_input');
-        expect($.fn.html).toHaveBeenCalled();
-        expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
+        expect($.fn.empty).toHaveBeenCalled();
+        expect($.fn.append).toHaveBeenCalled();
         expect(comp._doAutoFocus).toHaveBeenCalled();
       });
 
