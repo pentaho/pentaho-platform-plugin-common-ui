@@ -108,7 +108,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
            if(ampm === "AM" && hour === 12) hour = 0;
 
            date.setHours(hour, minute, second, 0);
-           myself.dashboard.processChange(myself.name, myself._getFormattedDate(date));
+           this.dashboard.processChange(this.name, this._getFormattedDate(date));
           },
 
         /**
