@@ -283,5 +283,121 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         testLegacy("DD ooo", true);
       });
     });
+
+    describe("_updateTimeAndNotify", function() {
+      var comp;
+      var testId = "test_id";
+      var testDate;
+      var dashboard;
+      var dijitDate, dijitHour, dijitMinute, dijitSecond;
+
+      beforeEach(function() {
+        comp = new DojoDateTextBoxComponent();
+        comp.name = "test_name";
+        comp.dijitId = testId;
+        
+        // Create test date object
+        testDate = new Date(2025, 7, 18, 10, 30, 45);
+        
+        // Mock dijit widgets
+        dijitDate = jasmine.createSpyObj("dijitDate", ["get"]);
+        dijitDate.get.and.returnValue(testDate);
+        
+        dijitHour = jasmine.createSpyObj("dijitHour", ["get"]);
+        dijitHour.get.and.returnValue("10");
+        
+        dijitMinute = jasmine.createSpyObj("dijitMinute", ["get"]);
+        dijitMinute.get.and.returnValue("30");
+        
+        dijitSecond = jasmine.createSpyObj("dijitSecond", ["get"]);
+        dijitSecond.get.and.returnValue("45");
+        
+        // Mock registry.byId
+        spyOn(registry, "byId").and.callFake(function(id) {
+          if (id === testId) return dijitDate;
+          if (id === testId + '_hour') return dijitHour;
+          if (id === testId + '_minute') return dijitMinute;
+          if (id === testId + '_second') return dijitSecond;
+          return null;
+        });
+        
+        // Mock jQuery val function for AM/PM selector
+        spyOn($.fn, "val").and.returnValue("AM");
+        
+        // Create dashboard mock
+        dashboard = jasmine.createSpyObj("dashboard", ["processChange"]);
+        comp.dashboard = dashboard;
+        
+        // Mock _getFormattedDate
+        spyOn(comp, "_getFormattedDate").and.returnValue("2025-08-18 10:30:45");
+      });
+
+      it("should update hour and call processChange", function() {
+        comp._updateTimeAndNotify(11, "hour");
+        
+        expect(testDate.getHours()).toBe(11);
+        expect(testDate.getMinutes()).toBe(30);
+        expect(testDate.getSeconds()).toBe(45);
+        expect(comp.dashboard.processChange).toHaveBeenCalledWith("test_name", "2025-08-18 10:30:45");
+      });
+
+      it("should update minute and call processChange", function() {
+        comp._updateTimeAndNotify(45, "minute");
+        
+        expect(testDate.getHours()).toBe(10);
+        expect(testDate.getMinutes()).toBe(45);
+        expect(testDate.getSeconds()).toBe(45);
+        expect(comp.dashboard.processChange).toHaveBeenCalledWith("test_name", "2025-08-18 10:30:45");
+      });
+
+      it("should update second and call processChange", function() {
+        comp._updateTimeAndNotify(15, "second");
+        
+        expect(testDate.getHours()).toBe(10);
+        expect(testDate.getMinutes()).toBe(30);
+        expect(testDate.getSeconds()).toBe(15);
+        expect(comp.dashboard.processChange).toHaveBeenCalledWith("test_name", "2025-08-18 10:30:45");
+      });
+
+      it("should convert 12-hour AM/PM to 24-hour format", function() {
+        // Test PM conversion (add 12 to hours < 12)
+        $.fn.val.and.returnValue("PM");
+        
+        comp._updateTimeAndNotify("PM", "ampm");
+        
+        expect(testDate.getHours()).toBe(22); // 10 PM = 22:00
+        expect(comp.dashboard.processChange).toHaveBeenCalledWith("test_name", "2025-08-18 10:30:45");
+        
+        // Test 12 AM special case (should be 0 in 24-hour format)
+        dijitHour.get.and.returnValue("12");
+        $.fn.val.and.returnValue("AM");
+        
+        comp._updateTimeAndNotify("AM", "ampm");
+        
+        expect(testDate.getHours()).toBe(0); // 12 AM = 00:00
+        expect(comp.dashboard.processChange).toHaveBeenCalledWith("test_name", "2025-08-18 10:30:45");
+        
+        // Test 12 PM special case (should remain 12 in 24-hour format)
+        dijitHour.get.and.returnValue("12");
+        $.fn.val.and.returnValue("PM");
+        
+        comp._updateTimeAndNotify("PM", "ampm");
+        
+        expect(testDate.getHours()).toBe(12); // 12 PM = 12:00
+        expect(comp.dashboard.processChange).toHaveBeenCalledWith("test_name", "2025-08-18 10:30:45");
+      });
+
+      it("should not update if values are missing", function() {
+         dijitHour.get.and.returnValue(null);
+         dijitMinute.get.and.returnValue(null);
+         dijitSecond.get.and.returnValue(null);
+         $.fn.val.and.returnValue(null);
+         comp._updateTimeAndNotify(null, "hour");
+         expect(testDate.getHours()).toBe(10); // Should not change
+         expect(testDate.getMinutes()).toBe(30);
+         expect(testDate.getSeconds()).toBe(45);
+         expect(comp.dashboard.processChange).not.toHaveBeenCalled();
+     });
+    });
   });
 });
