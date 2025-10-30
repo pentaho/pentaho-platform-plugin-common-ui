@@ -6,10 +6,10 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-impl</artifactId>
-    <version>11.0.0.0-latest</version>
+    <version>11.0.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>common-ui-impl-server</artifactId>
-  <version>11.0.0.0-latest</version>
+  <version>11.0.0.0-SNAPSHOT</version>
   <name>Common UI server side</name>
   <description>Java portion of the Common UI codebase</description>
   <url>http://www.pentaho.com</url>
