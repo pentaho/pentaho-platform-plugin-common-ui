@@ -32,7 +32,6 @@
     <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
 
     <!-- Versions -->
-    <flexjson.version>2.1</flexjson.version>
     <pentaho-modeler.version>11.1.0.0-SNAPSHOT</pentaho-modeler.version>
     <commons-gwt.version>11.1.0.0-SNAPSHOT</commons-gwt.version>
   </properties>
@@ -47,11 +46,6 @@
       <artifactId>common-ui-impl-server</artifactId>
       <version>${project.version}</version>
       <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.flexjson</groupId>
-      <artifactId>flexjson</artifactId>
-      <version>${flexjson.version}</version>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>
