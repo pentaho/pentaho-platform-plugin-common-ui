@@ -25,12 +25,13 @@ import org.pentaho.metadata.model.thin.Query;
 import org.pentaho.platform.api.engine.IParameterProvider;
 import org.pentaho.platform.engine.services.solution.SimpleContentGenerator;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class MetadataModelsContentGenerator extends SimpleContentGenerator {
 
   private static final long serialVersionUID = -3934988366302705814L;
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private Log logger = LogFactory.getLog( MetadataModelsContentGenerator.class );
 
@@ -59,8 +60,7 @@ public class MetadataModelsContentGenerator extends SimpleContentGenerator {
     } else if ( QUERY_ACTION.equals( action ) ) {
       String queryStr = params.getStringParameter( "query", null ); //$NON-NLS-1$
       int rowLimit = (int) params.getLongParameter( "rowlimit", -1 ); //$NON-NLS-1$
-      JSONDeserializer<Query> de = new JSONDeserializer<Query>();
-      Query query = de.deserialize( queryStr );
+      Query query = OBJECT_MAPPER.readValue( queryStr, Query.class );
       MetadataModelsService svc = new MetadataModelsService();
       DataTable table = svc.executeQuery( query, rowLimit );
       writeJson( table, output );
@@ -70,8 +70,7 @@ public class MetadataModelsContentGenerator extends SimpleContentGenerator {
 
   protected void writeJson( Object object, OutputStream output ) {
     try {
-      JSONSerializer json = new JSONSerializer();
-      String jsonStr = json.deepSerialize( object );
+      String jsonStr = OBJECT_MAPPER.writeValueAsString( object );
       output.write( jsonStr.getBytes() );
     } catch ( Exception e ) {
       logger.error( "Could not write JSON to output stream", e );

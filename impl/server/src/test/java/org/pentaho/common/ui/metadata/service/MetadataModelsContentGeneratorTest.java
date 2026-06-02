@@ -26,8 +26,7 @@ import org.pentaho.metadata.model.thin.Query;
 import org.pentaho.platform.api.engine.IParameterProvider;
 import org.pentaho.platform.engine.core.solution.SimpleParameterProvider;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SuppressWarnings( { "all" } )
 public class MetadataModelsContentGeneratorTest {
@@ -35,6 +34,8 @@ public class MetadataModelsContentGeneratorTest {
   static {
     TestModelProvider.getInstance();
   }
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   @Test
   public void testNoAction() throws Exception {
@@ -181,8 +182,7 @@ public class MetadataModelsContentGeneratorTest {
 
     SimpleParameterProvider requestParams = new SimpleParameterProvider();
     requestParams.setParameter( "action", MetadataModelsContentGenerator.QUERY_ACTION );
-    JSONSerializer ser = new JSONSerializer();
-    String queryJson = ser.deepSerialize( query );
+    String queryJson = OBJECT_MAPPER.writeValueAsString( query );
     System.out.println( queryJson );
     requestParams.setParameter( "query", queryJson );
 
@@ -195,8 +195,7 @@ public class MetadataModelsContentGeneratorTest {
 
     String result = output.toString();
     System.out.println( result );
-    JSONDeserializer<DataTable> de = new JSONDeserializer<DataTable>();
-    DataTable table = de.deserialize( result );
+    DataTable table = OBJECT_MAPPER.readValue( result, DataTable.class );
 
     Assert.assertNotNull( "Data table is null", table );
 
