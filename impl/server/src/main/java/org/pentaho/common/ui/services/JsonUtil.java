@@ -39,14 +39,9 @@ public class JsonUtil extends PentahoBase {
     return msg;
   }
 
-  public String createJsonMessage( String message, String code ) {
+  public String createJsonMessage( String message, String code ) throws Exception {
     StatusMessage msg = createMessage( message, code );
-    try {
-      return OBJECT_MAPPER.writeValueAsString( msg );
-    } catch ( Exception e ) {
-      logger.error( "Could not serialize message to JSON", e );
-      return "{}";
-    }
+    return OBJECT_MAPPER.writeValueAsString( msg );
   }
 
   @Override

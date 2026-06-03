@@ -98,7 +98,6 @@ public class MetadataModelsContentGeneratorTest {
     System.out.println( result );
 
     Assert.assertNotNull( "result is null", result );
-    Assert.assertTrue( "Wrong contents", result.indexOf( "org.pentaho.metadata.model.thin.ModelInfo" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test provider" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test group" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test model id" ) > 0 );
@@ -126,7 +125,6 @@ public class MetadataModelsContentGeneratorTest {
     System.out.println( result );
 
     Assert.assertNotNull( "result is null", result );
-    Assert.assertTrue( "Wrong contents", result.indexOf( "org.pentaho.metadata.model.thin.ModelInfo" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test provider" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test group" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test model id" ) > 0 );

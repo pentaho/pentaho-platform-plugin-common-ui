@@ -14,6 +14,7 @@
 package org.pentaho.common.ui.metadata.service;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +72,7 @@ public class MetadataModelsContentGenerator extends SimpleContentGenerator {
   protected void writeJson( Object object, OutputStream output ) {
     try {
       String jsonStr = OBJECT_MAPPER.writeValueAsString( object );
-      output.write( jsonStr.getBytes() );
+      output.write( jsonStr.getBytes( StandardCharsets.UTF_8 ) );
     } catch ( Exception e ) {
       logger.error( "Could not write JSON to output stream", e );
     }
