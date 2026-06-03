@@ -153,8 +153,11 @@ public class MetadataModelsContentGeneratorTest {
     System.out.println( result );
 
     Assert.assertNotNull( "result is null", result );
-    Assert.assertTrue( "Wrong contents", result.indexOf( "org.pentaho.metadata.model.thin.Element" ) > 0 );
     Assert.assertTrue( "Wrong contents", result.indexOf( "test model id" ) > 0 );
+
+    // Jackson output no longer contains Flexjson "class" metadata; validate actual payload fields.
+    Assert.assertEquals( "Wrong model id", id, OBJECT_MAPPER.readTree( result ).path( "id" ).asText() );
+    Assert.assertTrue( "Wrong contents", OBJECT_MAPPER.readTree( result ).path( "elements" ).isArray() );
 
   }
 
