@@ -34,10 +34,10 @@ public class JsonUtilTest {
   }
 
   @Test
-  public void testCreateJsonMessage() {
+  public void testCreateJsonMessage() throws Exception {
     String result = jsonUtil.createJsonMessage( TEST_MSG, TEST_CODE );
     assertNotNull( result );
-    assertEquals( "{\"class\":\"org.pentaho.common.ui.services.StatusMessage\",\"code\":\"" + TEST_CODE
-        + "\",\"message\":\"" + TEST_MSG + "\"}", result );
+    // Jackson output does not include the "class" field by default; assert on actual properties
+    assertEquals( "{\"code\":\"" + TEST_CODE + "\",\"message\":\"" + TEST_MSG + "\"}", result );
   }
 }
