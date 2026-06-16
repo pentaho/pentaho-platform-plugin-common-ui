@@ -25,7 +25,6 @@
     <mockito-core.version>5.10.0</mockito-core.version>
     <commons-database.version>11.1.0.0-SNAPSHOT</commons-database.version>
     <pdi.version>11.1.0.0-SNAPSHOT</pdi.version>
-    <flexjson.version>2.1</flexjson.version>
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
     <platform.version>11.1.0.0-SNAPSHOT</platform.version>
@@ -63,17 +62,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>net.sf.flexjson</groupId>
-      <artifactId>flexjson</artifactId>
-      <version>${flexjson.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>*</artifactId>
-          <groupId>*</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>${org.json.version}</version>
@@ -84,6 +72,12 @@
           <groupId>*</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${fasterxml-jackson.non-osgi.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- region - Needed for compilation -->
