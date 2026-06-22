@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>common-ui-assemblies</artifactId>
-    <version>11.1.0.0-SNAPSHOT</version>
+    <version>11.1.0.0-296</version>
   </parent>
   <groupId>pentaho</groupId>
   <artifactId>common-ui</artifactId>
-  <version>11.1.0.0-SNAPSHOT</version>
+  <version>11.1.0.0-296</version>
   <packaging>pom</packaging>
   <name>Common-UI Platform Plugin</name>
   <description>
@@ -32,8 +32,8 @@
     <gwt-widgets.directory>${prepared.assembly.directory}/gwt-widgets</gwt-widgets.directory>
 
     <!-- Versions -->
-    <pentaho-modeler.version>11.1.0.0-SNAPSHOT</pentaho-modeler.version>
-    <commons-gwt.version>11.1.0.0-SNAPSHOT</commons-gwt.version>
+    <pentaho-modeler.version>11.1.0.0-296</pentaho-modeler.version>
+    <commons-gwt.version>11.1.0.0-296</commons-gwt.version>
   </properties>
   <dependencies>
     <dependency>
