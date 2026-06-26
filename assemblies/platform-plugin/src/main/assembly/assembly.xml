@@ -42,7 +42,6 @@
       </excludes>
       <includes>
         <include>org.pentaho:common-ui-impl-server:jar</include>
-        <include>net.sf.flexjson:flexjson</include>
         <include>pentaho:pentaho-modeler</include>
       </includes>
       <outputDirectory>common-ui/lib</outputDirectory>
