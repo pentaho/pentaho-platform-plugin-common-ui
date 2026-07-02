@@ -16,6 +16,12 @@ define(function() {
 
   /* eslint camelcase: "off", require-jsdoc: "off", brace-style:0, key-spacing:0, quote-props:0 */
 
+  var CDF_APP_ID = "pentaho/cdf";
+  var DET_APP_ID = "pentaho/det";
+  var ANALYZER_APP_ID = "pentaho/analyzer";
+  var DASHBOARD_DESIGNER_APP_ID = "pentaho/dashboardDesigner";
+  var BUSINESS_ANALYTICS_STUDIO_APP_ID = "@pentaho-apps/business-analytics-studio";
+
   var RULE_PRIO_VIZ_DEFAULT = -5;
   var RULE_PRIO_APP_DEFAULT = -1;
 
@@ -53,12 +59,17 @@ define(function() {
       //
       // TODO: This should be in AbstractProperty code, however, this can only move
       // when a way is implemented for dealing with CDF's non-key annotated tables.
-      // So, for now, this restriction is only being applied to Analyzer and DET.
+      // So, for now, this restriction is only being applied where proper key handling is supported.
       {
         priority: Infinity,
         select: {
           // TODO: Include DET when its createEmptyTable method takes isKey into account.
-          application: ["pentaho/analyzer", "pentaho/dashboardDesigner"], // "pentaho/det"
+          application: [
+            ANALYZER_APP_ID,
+            DASHBOARD_DESIGNER_APP_ID,
+            BUSINESS_ANALYTICS_STUDIO_APP_ID
+            // DET_APP_ID
+          ],
           module: "pentaho/visual/role/AbstractProperty"
         },
         deps: [
@@ -844,7 +855,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho/det",
+          application: DET_APP_ID,
           module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
@@ -856,7 +867,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho/det", "pentaho/cdf"],
+          application: [DET_APP_ID, CDF_APP_ID],
           module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
@@ -872,7 +883,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho/cdf",
+          application: CDF_APP_ID,
           module: "pentaho/ccc/visual/Abstract"
         },
         apply: {
@@ -898,7 +909,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho/det", "pentaho/cdf"],
+          application: [DET_APP_ID, CDF_APP_ID],
           module: "pentaho/ccc/visual/PointAbstract"
         },
         apply: {
@@ -915,7 +926,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho/det", "pentaho/cdf"],
+          application: [DET_APP_ID, CDF_APP_ID],
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
         apply: {
@@ -938,7 +949,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho/cdf",
+          application: CDF_APP_ID,
           module: "pentaho/ccc/visual/BarAbstract"
         },
         apply: {
@@ -951,10 +962,10 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho/analyzer", "pentaho/det"],
+          application: [ANALYZER_APP_ID, DET_APP_ID],
           module: "pentaho/ccc/visual/CartesianAbstract"
         },
-        apply: {
+        apply: {  
           extension: {
             // . horizontal discrete / minimum distance between bands/ticks
             xAxisBandSizeMin: 18,
@@ -985,7 +996,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: ["pentaho/analyzer", "pentaho/det"],
+          application: [ANALYZER_APP_ID, DET_APP_ID],
           module: "pentaho/ccc/visual/HeatGrid"
         },
         apply: {
@@ -1000,7 +1011,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho/cdf",
+          application: CDF_APP_ID,
           module: "pentaho/ccc/visual/MetricPointAbstract"
         },
         apply: {
@@ -1014,7 +1025,7 @@ define(function() {
       {
         priority: RULE_PRIO_APP_DEFAULT,
         select: {
-          application: "pentaho/cdf",
+          application: CDF_APP_ID,
           module: "pentaho/ccc/visual/Bubble"
         },
         apply: {
