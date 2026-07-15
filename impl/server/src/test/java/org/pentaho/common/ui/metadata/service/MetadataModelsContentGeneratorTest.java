@@ -158,6 +158,7 @@ public class MetadataModelsContentGeneratorTest {
     // Jackson output no longer contains Flexjson "class" metadata; validate actual payload fields.
     Assert.assertEquals( "Wrong model id", id, OBJECT_MAPPER.readTree( result ).path( "id" ).asText() );
     Assert.assertTrue( "Wrong contents", OBJECT_MAPPER.readTree( result ).path( "elements" ).isArray() );
+    Assert.assertFalse( "Response unexpectedly contains Flexjson class metadata", result.contains( "\"class\"" ) );
 
   }
 
@@ -183,7 +184,14 @@ public class MetadataModelsContentGeneratorTest {
 
     SimpleParameterProvider requestParams = new SimpleParameterProvider();
     requestParams.setParameter( "action", MetadataModelsContentGenerator.QUERY_ACTION );
-    String queryJson = OBJECT_MAPPER.writeValueAsString( query );
+    // Mirror the payload produced by impl/client/src/main/javascript/web/dataapi/models-svc.js.
+    String queryJson = "{"
+      + "\"class\":\"org.pentaho.metadata.model.thin.Query\","
+      + "\"sourceId\":\"" + id + "\","
+      + "\"elements\":["
+      + "{\"class\":\"org.pentaho.metadata.model.thin.Element\",\"id\":\"element1\"},"
+      + "{\"class\":\"org.pentaho.metadata.model.thin.Element\",\"id\":\"element2\"}"
+      + "]}";
     System.out.println( queryJson );
     requestParams.setParameter( "query", queryJson );
 
