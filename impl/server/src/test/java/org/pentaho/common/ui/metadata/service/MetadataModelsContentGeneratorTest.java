@@ -192,7 +192,6 @@ public class MetadataModelsContentGeneratorTest {
       + "{\"class\":\"org.pentaho.metadata.model.thin.Element\",\"id\":\"element1\"},"
       + "{\"class\":\"org.pentaho.metadata.model.thin.Element\",\"id\":\"element2\"}"
       + "]}";
-    System.out.println( queryJson );
     requestParams.setParameter( "query", queryJson );
 
     parameterProviders.put( IParameterProvider.SCOPE_REQUEST, requestParams );
@@ -203,7 +202,6 @@ public class MetadataModelsContentGeneratorTest {
     cg.createContent( output );
 
     String result = output.toString();
-    System.out.println( result );
     DataTable table = OBJECT_MAPPER.readValue( result, DataTable.class );
 
     Assert.assertNotNull( "Data table is null", table );
