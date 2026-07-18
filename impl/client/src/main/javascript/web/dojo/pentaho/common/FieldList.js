@@ -2,13 +2,14 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
+ * Copyright (C) 2024 - 2026 by Pentaho Canada Inc. : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
  *
- * Change Date: 2029-07-20
+ * Change Date: 2030-06-15
  ******************************************************************************/
+
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
 "dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event", "dojo/regexp", "dojo/keys", "dojo/dom-geometry", "common-ui/util/_focus"],
