@@ -2,14 +2,13 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 - 2026 by Pentaho Canada Inc. : http://www.pentaho.com
+ * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
  *
- * Change Date: 2030-06-15
+ * Change Date: 2029-07-20
  ******************************************************************************/
-
 
 define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", 'dijit/_WidgetBase',
       'dijit/_TemplatedMixin', 'pentaho/common/button', 'pentaho/common/Dialog', "dojo/dom-style", "dojo/dom-attr", "dojo/text!pentaho/common/RowLimitExceededDialog.html"],

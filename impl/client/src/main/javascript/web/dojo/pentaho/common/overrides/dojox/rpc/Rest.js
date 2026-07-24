@@ -2,14 +2,13 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 - 2026 by Pentaho Canada Inc. : http://www.pentaho.com
+ * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
  *
- * Change Date: 2030-06-15
+ * Change Date: 2029-07-20
  ******************************************************************************/
-
 define("dojox/rpc/Rest", ["dojo/_base/lang", "dojo/json", "dojo/io-query", "dojo/request"], function(lang, json, ioQuery, request) {
 // Note: This doesn't require dojox.rpc.Service, and if you want it you must require it
 // yourself, and you must load it prior to dojox.rpc.Rest.
