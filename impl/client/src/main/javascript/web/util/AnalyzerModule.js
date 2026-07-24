@@ -2,14 +2,13 @@
  *
  * Pentaho
  *
- * Copyright (C) 2024 - 2026 by Pentaho Canada Inc. : http://www.pentaho.com
+ * Copyright (C) 2024 by Hitachi Vantara, LLC : http://www.pentaho.com
  *
  * Use of this software is governed by the Business Source License included
  * in the LICENSE.TXT file.
  *
- * Change Date: 2030-06-15
+ * Change Date: 2029-07-20
  ******************************************************************************/
-
 
 
 define([
@@ -231,7 +230,7 @@ define([
      *    as well as some required properties indicated below.
      *
      * @param {string} options.url
-     *    The URL which points to the root of the Pentaho web application
+     *    The URL which points to the root of the Hitachi Vantara web application
      *    http://localhost:8080/pentaho
      *
      * @param {string|Object} options.parentElement

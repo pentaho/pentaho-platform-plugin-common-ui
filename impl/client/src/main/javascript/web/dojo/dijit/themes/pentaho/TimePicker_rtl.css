@@ -1,14 +1,3 @@
-/*! ******************************************************************************
- *
- * Pentaho
- *
- * Copyright (C) 2026 by Pentaho Canada Inc. : http://www.pentaho.com
- *
- * Use of this software is governed by the Business Source License included
- * in the LICENSE.TXT file.
- *
- * Change Date: 2030-06-15
- ******************************************************************************/
  .dj_ie6 .tundra .dijitTimePickerRtl .dijitTimePickerMarkerHover,
 .dj_ie7 .tundra .dijitTimePickerRtl .dijitTimePickerMarkerHover {
         border-top: 0; /* IE6/7 bug causes mouseover/out event storm */
