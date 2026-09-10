@@ -29,6 +29,74 @@
 	border-collapse: separate;
 	border: 1px solid #ccc;
 	margin: 0;
+	width: 170px;
+	box-sizing: border-box;
+}
+
+.tundra .dijitCalendarMonthContainer {
+	display: flex;
+	align-items: center;
+	height: 28px;
+	padding: 4px 2px;
+	box-sizing: border-box;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitCalendarArrow {
+	flex: 0 0 24px;
+	height: 20px;
+	text-align: center;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitCalendarDecrementArrow {
+	order: 1;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitCalendarIncrementArrow {
+	order: 3;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitDropDownButton {
+	order: 2;
+	flex: 1 1 auto;
+	min-width: 0;
+	position: relative !important;
+	display: block !important;
+	width: auto !important;
+	height: 20px !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	box-sizing: border-box !important;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitButtonNode {
+	position: relative !important;
+	display: block !important;
+	width: 100% !important;
+	height: 20px !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitButtonText {
+	display: block !important;
+	width: 100% !important;
+	padding: 0 14px 0 2px !important;
+	margin: 0 !important;
+	box-sizing: border-box !important;
+	text-align: center !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
+	white-space: nowrap !important;
+}
+
+.tundra .dijitCalendarMonthContainer .dijitArrowButtonInner {
+	position: absolute !important;
+	top: 50% !important;
+	right: 2px !important;
+	width: 10px !important;
+	height: 10px !important;
+	margin: -5px 0 0 !important;
+	padding: 0 !important;
 }
 
 .tundra .dijitCalendarMonthContainer th {
@@ -153,6 +221,10 @@
 }
 
 /* Styling for month drop down list */
+
+.tundra .dijitCalendarMonthMenu .dijitCalendarMonthLabel {
+	display: block !important;
+}
 
 .tundra .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover {
 	background-color: #3559ac;
