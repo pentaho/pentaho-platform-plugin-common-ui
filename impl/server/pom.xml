@@ -28,14 +28,14 @@
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
     <platform.version>11.1.0.0-SNAPSHOT</platform.version>
-    <commons-lang.version>2.2</commons-lang.version>
+    <commons-lang3.version>3.17.0</commons-lang3.version>
     <encryption-support.version>11.1.0.0-SNAPSHOT</encryption-support.version>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>${commons-lang.version}</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${commons-lang3.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>

@@ -14,7 +14,7 @@
 
 package org.pentaho.common.ui.metadata.model.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pentaho.metadata.model.concept.types.DataType;
 import org.pentaho.metadata.query.model.CombinationType;
 import org.pentaho.common.ui.metadata.model.ICondition;
@@ -124,7 +124,7 @@ public class Condition implements ICondition {
 
   /*
    * public void setDefaultValue(String val){ this.defaultValue = val; }
-   * 
+   *
    * public String getDefaultValue(){ return this.defaultValue; }
    */
   public void setSelectedAggType( String aggType ) {

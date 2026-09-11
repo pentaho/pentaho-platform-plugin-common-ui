@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pentaho.platform.repository2.unified.jcr.LocalizationUtil;
@@ -62,7 +62,7 @@ public class TreeBrowserMapper {
       // Map owner
       treeBrowserModel.setOwner( repositoryDto.getRepositoryFileAclDto().getOwner() );
     } catch ( Exception e ) {
-      logger.warn( ExceptionUtils.getFullStackTrace( e ) );
+      logger.warn( ExceptionUtils.getStackTrace( e ) );
     }
 
     // Map localized name
