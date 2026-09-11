@@ -28,7 +28,6 @@
     <org.json.version>3.1.1</org.json.version>
     <jug-lgpl.version>2.0.0</jug-lgpl.version>
     <platform.version>11.1.0.0-SNAPSHOT</platform.version>
-    <commons-lang3.version>3.17.0</commons-lang3.version>
     <encryption-support.version>11.1.0.0-SNAPSHOT</encryption-support.version>
   </properties>
   <dependencies>
