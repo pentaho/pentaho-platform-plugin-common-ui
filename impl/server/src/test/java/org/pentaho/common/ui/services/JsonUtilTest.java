@@ -15,6 +15,10 @@ package org.pentaho.common.ui.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.junit.Test;
 
@@ -34,10 +38,34 @@ public class JsonUtilTest {
   }
 
   @Test
-  public void testCreateJsonMessage() throws Exception {
+  public void testCreateJsonMessage() {
     String result = jsonUtil.createJsonMessage( TEST_MSG, TEST_CODE );
     assertNotNull( result );
     // Jackson output does not include the "class" field by default; assert on actual properties
     assertEquals( "{\"code\":\"" + TEST_CODE + "\",\"message\":\"" + TEST_MSG + "\"}", result );
+  }
+
+  @Test
+  public void testCreateJsonMessageWrapsSerializationFailureInUncheckedException() {
+    JsonUtil failingUtil = new JsonUtil() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public StatusMessage createMessage( String message, String code ) {
+        return new StatusMessage() {
+          @Override
+          public String getMessage() {
+            throw new IllegalArgumentException( "boom" );
+          }
+        };
+      }
+    };
+
+    try {
+      failingUtil.createJsonMessage( TEST_MSG, TEST_CODE );
+      fail( "Expected IllegalStateException" );
+    } catch ( IllegalStateException e ) {
+      assertTrue( e.getCause() instanceof JsonProcessingException );
+    }
   }
 }
