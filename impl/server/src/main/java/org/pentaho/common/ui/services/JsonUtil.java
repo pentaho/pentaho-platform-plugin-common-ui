@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pentaho.platform.engine.core.system.PentahoBase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -40,9 +41,14 @@ public class JsonUtil extends PentahoBase {
     return msg;
   }
 
-  public String createJsonMessage( String message, String code ) throws Exception {
+  public String createJsonMessage( String message, String code ) {
     StatusMessage msg = createMessage( message, code );
-    return OBJECT_MAPPER.writeValueAsString( msg );
+    try {
+      return OBJECT_MAPPER.writeValueAsString( msg );
+    } catch ( JsonProcessingException e ) {
+      // Keep the pre-Jackson signature (no checked exception) so existing callers still compile.
+      throw new IllegalStateException( "Could not serialize status message to JSON", e );
+    }
   }
 
   @Override
