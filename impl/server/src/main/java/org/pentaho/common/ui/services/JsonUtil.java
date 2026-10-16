@@ -17,7 +17,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pentaho.platform.engine.core.system.PentahoBase;
 
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class provides utility functions used by the common services
@@ -29,6 +30,7 @@ import flexjson.JSONSerializer;
 public class JsonUtil extends PentahoBase {
 
   private static final long serialVersionUID = -6164509181262122639L;
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   private Log logger = LogFactory.getLog( JsonUtil.class );
 
   public StatusMessage createMessage( String message, String code ) {
@@ -40,9 +42,12 @@ public class JsonUtil extends PentahoBase {
 
   public String createJsonMessage( String message, String code ) {
     StatusMessage msg = createMessage( message, code );
-    JSONSerializer serializer = new JSONSerializer();
-    String json = serializer.deepSerialize( msg );
-    return json;
+    try {
+      return OBJECT_MAPPER.writeValueAsString( msg );
+    } catch ( JsonProcessingException e ) {
+      // Keep the pre-Jackson signature (no checked exception) so existing callers still compile.
+      throw new IllegalStateException( "Could not serialize status message to JSON", e );
+    }
   }
 
   @Override
